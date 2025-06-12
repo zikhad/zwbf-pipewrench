@@ -19,13 +19,13 @@ const distPath = (dirPath, media = true) => {
 	return path.join(process.cwd(), "dist", name, media ? "media" : "", ...dirPath.split("/"));
 };
 
-// Copy ui folder to dist
-copyFolder(srcPath("src/ui"), distPath("ui"))
+// Copy media folder to dist
+copyFolder(srcPath("src/media"), distPath(""))
 	.then(() => {
-		console.info("ui folder copied successfully.");
+		console.info("media folder copied successfully.");
 	})
 	.catch(err => {
-		console.error("Error copying ui folder:", err);
+		console.error("Error copying media folder:", err);
 	});
 
 // Copy translations to dist
