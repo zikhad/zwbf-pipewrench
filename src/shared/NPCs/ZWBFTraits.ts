@@ -1,3 +1,3 @@
-import { TraitsClass } from "../components/TraitsClass";
+import { ZWBFTraits } from "../components/ZWBFTraits";
 
-new TraitsClass();
+new ZWBFTraits();

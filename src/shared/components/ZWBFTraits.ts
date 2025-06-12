@@ -1,60 +1,44 @@
+/**  @noSelfInFile */
 import { getText, TraitFactory } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 
-export enum ZWBFTraits {
-	INFERTILE = "Infertile",
-	FERTILE = "Fertile",
-	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY = "Pregnancy",
-	DAIRY_COW = "DairyCow",
-	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
-	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-}
-
-type TraitType = {
-	id: ZWBFTraits;
-	cost: number;
-	profession?: boolean,
-	exclusives?: ZWBFTraits[]
-}
-
-export class TraitsClass {
+export class ZWBFTraits {
 	private readonly traits: TraitType[];
 	private readonly defaultTraits: TraitType[] = [
 		/** Infertile trait [3]: You are infertile. You cannot get pregnant  */
 		{
-			id: ZWBFTraits.INFERTILE,
+			id: "Infertile",
 			cost: 3,
-			exclusives: [ZWBFTraits.FERTILE, ZWBFTraits.HYPERFERTILE, ZWBFTraits.PREGNANCY] 
+			exclusives: ["Fertile", "Hyperfertile", "Pregnancy"] 
 		},
 		/** Fertile [-2]: You are very fertile <br>- Higher chance of getting pregnant <br>- +50% fertility */
 		{
-			id: ZWBFTraits.FERTILE,
+			id: "Fertile",
 			cost: -2,
-			exclusives: [ZWBFTraits.HYPERFERTILE]
+			exclusives: ["Hyperfertile"]
 		},
-		/**  -- Fertile trait [-2]: You are very fertile. Higher chance of getting pregnant +50% fertility  */
+		/**  -- Fertile trait [-2]: You are Hyper fertile. Higher chance of getting pregnant +50% fertility  */
 		{
-			id: ZWBFTraits.HYPERFERTILE,
+			id: "Hyperfertile",
 			cost: -6
 		},
 		/** Pregnancy [-8]: Starts the game pregnant */
 		{
-			id: ZWBFTraits.PREGNANCY,
+			id: "Pregnancy",
 			cost: -8
 		},
 		/** Dairy Cow [-4]: Increases milk production rate (+25%) and time lactating (+25%). */
 		{
-			id: ZWBFTraits.DAIRY_COW,
+			id: "DairyCow",
 			cost: 4
 		},
 		{
-			id: ZWBFTraits.STRONG_MENSTRUAL_CRAMPS,
+			id: "StrongMenstrualCramps",
 			cost: -1,
-			exclusives: [ZWBFTraits.NO_MENSNTRUAL_CRAMPS]
+			exclusives: ["NoMenstrualCramps"]
 		},
 		{
-			id: ZWBFTraits.NO_MENSNTRUAL_CRAMPS,
+			id: "NoMenstrualCramps",
 			cost: 1
 		},
 	];
