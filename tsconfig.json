@@ -16,7 +16,22 @@
 			"@asledgehammer/pipewrench-events",
 			"jest"
 		],
-		"paths": {}
+		"paths": {
+			"@components/*": [
+				"shared/components/*",
+				"server/components/*",
+				"client/components/*"
+			],
+			"@test/*": [
+				"test/*"
+			],
+			"@types": [
+				"types.d.ts"
+			],
+			"@utils":[
+				"client/ZWBF/Utils.ts"
+			]
+		}
 	},
 	"tstl": {
 		"luaLibImport": "require",
