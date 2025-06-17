@@ -25,17 +25,7 @@ type ZWBFTraits = "Infertile"
 | "Pregnancy"
 | "DairyCow"
 | "StrongMenstrualCramps"
-| "NoMenstrualCramps"
-
-export enum ZWBFTraitsEnum {
-	INFERTILE = "Infertile",
-	FERTILE ="Fertile",
-	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY ="Pregnancy",
-	DAIRY_COW = "DairyCow",
-	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
-	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-}
+| "NoMenstrualCramps";
 
 type TraitType = {
 	id: ZWBFTraits;

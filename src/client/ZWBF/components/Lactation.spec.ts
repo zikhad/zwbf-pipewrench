@@ -128,6 +128,25 @@ describe("Lactation", () => {
 				expect(lactation.isLactating).toBe(expected);
 			});
 		});
+
+		describe("Debug functions", () => {
+			it.each<{operation: "add" | "remove" | "set", expected: number}>([
+				{ operation: "add", expected: 500},
+				{ operation: "remove", expected: 300},
+				{ operation: "set", expected: 100},
+			])("should $operation milk", ({operation, expected}) => {
+				const lactation = new Lactation();
+				lactation.Debug.set(400);
+				lactation.Debug[operation](100);
+				expect(lactation.milkAmount).toBe(expected);
+			});
+			it("should be able to toggle lactation", () => {
+				const lactation = new Lactation();
+				expect(lactation.isLactating).toBe(true);
+				lactation.Debug.toggle(false);
+				expect(lactation.isLactating).toBe(false);
+			});
+		});
 	});
 
 	describe("Image resolution", () => {

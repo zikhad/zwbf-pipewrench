@@ -1,21 +1,18 @@
-import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
+import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ModData } from "./ModData";
-import { LactationData, LactationImage as LactationImages, PregnancyData, ZWBFTraitsEnum } from "@types";
+import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { getSkinColor, percentageToNumber } from "@utils";
+import { LuaEventManager } from "@asledgehammer/pipewrench";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 
 export class Lactation {
 	private player?: IsoPlayer;
 	private _bottleAmount = 200;
 	private readonly _capacity: number;
-	private _expiration: number;
 	private modData?: ModData<LactationData>;
 	private data?: LactationData;
-	// TODO: implement SandBoxVars
-	private options = {
-		expiration: 7,
-		capacity: 1000
-	};
+	
 	private CONSTANTS = {
 		MAX_LEVEL: 5,
 		AMOUNTS: {
@@ -24,17 +21,38 @@ export class Lactation {
 		}
 	}
 
-	// TODO: should this be updated by events?
+	// TODO: implement SandBoxVars
+	private options = {
+		expiration: 7,
+		capacity: 1000
+	};
+
+	public Debug = {
+		add: (amount: number) => {
+			this.milkAmount += amount;
+		},
+		remove: (amount: number) => {
+			this.milkAmount -= amount;
+		},
+		set: (amount: number) => {
+			this.milkAmount = amount;
+		},
+		toggle: (status: boolean) => {
+			this.toggle(status);
+		}
+	}
+
 	private pregnancy: PregnancyData;
 
 	constructor() {
 
 		this._capacity = this.options.capacity;
-		this._expiration = this.options.expiration;
+
 		this.pregnancy = {
 			isPregnant: false,
 			progress: 0
 		}
+
 		Events.onCreatePlayer.addListener((_, player) => {
 			this.player = player;
 			this.modData = new ModData<LactationData>({
@@ -49,9 +67,18 @@ export class Lactation {
 			});
 			this.data = this.modData.data;
 		});
+		
+		// Default event listeners
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyHours.addListener(() => this.onEveryHour());
-		new Events.EventEmitter<(data: PregnancyData) => void>('ZWBFPregnancyUpdate').addListener((data) => this.onPregnancyUpdate(data));
+		
+		// Custom event listeners of other classes
+		new Events.EventEmitter<(data: PregnancyData) => void>(ZWBFEvents.PREGNANCY_UPDATE)
+			.addListener((data) => this.onPregnancyUpdate(data));
+		
+		// Custom event listener of this class
+		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
+		
 	}
 
 	private onPregnancyUpdate(data: PregnancyData) {
@@ -67,7 +94,7 @@ export class Lactation {
 		const amount = ZombRand(this.CONSTANTS.AMOUNTS.MIN, this.CONSTANTS.AMOUNTS.MAX);
 		const multiplier = 1 + this.data.multiplier;
 
-		this.milkAmount = Math.min(this._capacity, this.milkAmount + (amount * multiplier));
+		this.milkAmount = Math.min(this.capacity, this.milkAmount + (amount * multiplier));
 		this.multiplier = Math.max(0, this.multiplier - 0.1);
 		this.expiration = Math.max(0, this.expiration - 1);
 
@@ -78,10 +105,15 @@ export class Lactation {
 
 	private onEveryMinute() {
 		this.modData!.data = this.data!
+		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data!);
 	}
 
 	get isLactating() {
 		return this.data?.isActive || false;
+	}
+
+	private get capacity() {
+		return this._capacity;
 	}
 
 	get bottleAmount() {
@@ -110,7 +142,7 @@ export class Lactation {
 	}
 	
 	get percentage() {
-		return (this.milkAmount / this._capacity) * 100;
+		return (this.milkAmount / this.capacity) * 100;
 	}
 
 	get images(): LactationImages {
@@ -120,7 +152,7 @@ export class Lactation {
 			return `pregnant_${progress}`;
 		};
 		const skinColor = getSkinColor(this.player!);
-		const fullness = (this.milkAmount > (this._capacity / 2)) ? "full" : "empty";
+		const fullness = (this.milkAmount > (this.capacity / 2)) ? "full" : "empty";
 		const state = getState();
 		
 		const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
@@ -152,7 +184,7 @@ export class Lactation {
 		this.data.multiplier = Math.max(0, multiplier);
 		this.data.expiration = 24 * (expiration || this.options.expiration);
 		
-		if (this.player?.HasTrait(/* ZWBFTraitsEnum.DAIRY_COW */"DairyCow")) {
+		if (this.player?.HasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.data.multiplier *= 1.25;
 			this.data.expiration *= 1.25;
 		}

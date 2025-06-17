@@ -34,6 +34,9 @@
 			],
 			"@utils":[
 				"client/ZWBF/Utils.ts"
+			],
+			"@constants": [
+				"constants.ts"
 			]
 		}
 	},
