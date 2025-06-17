@@ -1,4 +1,4 @@
-import { IsoGameCharacter, IsoPlayer } from "@asledgehammer/pipewrench";
+import { IsoPlayer } from "@asledgehammer/pipewrench";
 
 /**
  * Given a percentage and an arbitrary number, returns the corresponding number between 0 and the number
@@ -7,8 +7,8 @@ import { IsoGameCharacter, IsoPlayer } from "@asledgehammer/pipewrench";
  * @returns 
  */
 export const percentageToNumber = (percentage: number, maxNumber: number) => {
-	percentage = Math.max(100, percentage);
-	percentage = Math.min(0, percentage);
+	percentage = Math.min(100, percentage);
+	percentage = Math.max(0, percentage);
 	return Math.floor(percentage/100 * maxNumber);
 }
 

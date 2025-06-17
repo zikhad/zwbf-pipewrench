@@ -1,4 +1,4 @@
-import { Event, HitVars, IsoPlayer, LuaEventManager, ZombRand } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ModData } from "./ModData";
 import { LactationData, LactationImage as LactationImages, PregnancyData, ZWBFTraitsEnum } from "@types";
@@ -7,7 +7,7 @@ import { getSkinColor, percentageToNumber } from "@utils";
 export class Lactation {
 	private player?: IsoPlayer;
 	private _bottleAmount = 200;
-	private _capacity: number;
+	private readonly _capacity: number;
 	private _expiration: number;
 	private modData?: ModData<LactationData>;
 	private data?: LactationData;
@@ -35,9 +35,7 @@ export class Lactation {
 			isPregnant: false,
 			progress: 0
 		}
-		//LuaEventManager.AddEvent('xpto')
 		Events.onCreatePlayer.addListener((_, player) => {
-			if (!player) return;
 			this.player = player;
 			this.modData = new ModData<LactationData>({
 				object: this.player,
@@ -54,11 +52,13 @@ export class Lactation {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyHours.addListener(() => this.onEveryHour());
 		new Events.EventEmitter<(data: PregnancyData) => void>('ZWBFPregnancyUpdate').addListener((data) => this.onPregnancyUpdate(data));
-
 	}
 
 	private onPregnancyUpdate(data: PregnancyData) {
 		this.pregnancy = data;
+		if(this.pregnancy.progress < 0.5) return;
+		this.toggle(true);
+		this.useMilk(0, this.pregnancy.progress);
 	}
 
 	private onEveryHour() {
@@ -69,7 +69,7 @@ export class Lactation {
 
 		this.milkAmount = Math.min(this._capacity, this.milkAmount + (amount * multiplier));
 		this.multiplier = Math.max(0, this.multiplier - 0.1);
-		this.expiration = Math.max(0, this.expiration--);
+		this.expiration = Math.max(0, this.expiration - 1);
 
 		if(this.data?.expiration == 0) {
 			this.toggle(false);
@@ -77,8 +77,7 @@ export class Lactation {
 	}
 
 	private onEveryMinute() {
-		if(!this.modData || !this.data) return;
-		this.modData.data = this.data
+		this.modData!.data = this.data!
 	}
 
 	get isLactating() {
@@ -96,18 +95,18 @@ export class Lactation {
 		return this.data?.milkAmount ?? 0
 	}
 
-	set multiplier(value:number) {
+	private set multiplier(value:number) {
 		this.data!.multiplier = value;
 	}
 	get multiplier() {
 		return this.data?.multiplier ?? 0;
 	}
 	
-	set expiration(value:number) {
+	private set expiration(value:number) {
 		this.data!.expiration = value;
 	}
 	get expiration() {
-		return this.data?.expiration ?? 0;
+		return this.data!.expiration;
 	}
 	
 	get percentage() {
@@ -115,7 +114,6 @@ export class Lactation {
 	}
 
 	get images(): LactationImages {
-
 		const getState = () => {
 			if (!this.pregnancy.isPregnant || this.pregnancy.progress < 0.4) return "normal";
 			const progress = (this.pregnancy.progress < 0.7) ? "early" : "late";
@@ -132,7 +130,7 @@ export class Lactation {
 		};
 	}
 	
-	public remove(amount: number) {
+	private remove(amount: number) {
 		this.milkAmount = Math.max(0, this.milkAmount - amount);
 	}
 

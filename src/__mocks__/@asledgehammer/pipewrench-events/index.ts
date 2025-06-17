@@ -1,25 +1,28 @@
-import { IsoPlayer } from "@asledgehammer/pipewrench";
-import { mock } from "jest-mock-extended";
-
-const mockedEvents = {
-	addListener: jest.fn(callback => {
-		// Simulate the event firing
-		callback();
-	})
+export const onGameStart = {
+	addListener: jest.fn()
 };
 
-export const onGameStart = mockedEvents;
+export const everyOneMinute = {
+	addListener: jest.fn()
+};
 
-export const everyOneMinute = mockedEvents;
+export const everyHours = {
+	addListener: jest.fn()
+};
 
-export const everyHours = mockedEvents;
+export const onCreatePlayer = {
+	addListener: jest.fn()
+};
 
-export const onCreatePlayer = mockedEvents;
+export const onGameBoot = {
+	addListener: jest.fn()
+};
 
-export const onGameBoot = mockedEvents;
+export const onPreDistributionMerge = {
+	addListener: jest.fn()
+};
 
-export const onPreDistributionMerge = mockedEvents;
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
 	addListener() { return jest.fn() }
-} 
+}

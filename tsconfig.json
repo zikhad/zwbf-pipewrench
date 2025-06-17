@@ -17,10 +17,14 @@
 			"jest"
 		],
 		"paths": {
-			"@components/*": [
-				"shared/components/*",
-				"server/components/*",
-				"client/components/*"
+			"@shared/components/*": [
+				"shared/components/*"
+			],
+			"@server/components/*": [
+				"server/components/*"
+			],
+			"@client/components/*": [
+				"client/ZWBF/components/*"
 			],
 			"@test/*": [
 				"test/*"
