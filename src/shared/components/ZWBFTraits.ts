@@ -1,6 +1,7 @@
 /**  @noSelfInFile */
 import { getText, TraitFactory } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
+import { TraitType } from "types";
 
 export class ZWBFTraits {
 	private readonly traits: TraitType[];

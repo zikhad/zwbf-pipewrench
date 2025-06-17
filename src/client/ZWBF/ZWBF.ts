@@ -1,5 +1,5 @@
-import { Lactation } from "./components/Lactation";
-import { Womb } from "./components/Womb";
+import { Lactation } from "@client/components/Lactation";
+import { Womb } from "@client/components/Womb";
 
 export const lactation = new Lactation();
 export const womb = new Womb();
