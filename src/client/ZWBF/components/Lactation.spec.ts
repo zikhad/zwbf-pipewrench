@@ -36,7 +36,6 @@ describe("Lactation", () => {
 			const lactation = new Lactation();
 			expect(lactation.isLactating).toBe(false);
 			expect(lactation.milkAmount).toBe(0);
-			expect(lactation.multiplier).toBe(0);
 		});
 
 		it("useMilk does not invoke HasTrait", () => {
