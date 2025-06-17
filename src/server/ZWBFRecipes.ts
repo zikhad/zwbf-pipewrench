@@ -15,7 +15,7 @@ export const ZWBFRecipes: Recipe = {
 		},
 		ClearSperm: () => {
 			const player = getPlayer();
-			const { spermAmount } = womb;
+			const { amount: spermAmount } = womb;
 			return player.isFemale() && spermAmount > 0;
 		}
 	},
@@ -35,7 +35,7 @@ export const ZWBFRecipes: Recipe = {
 			)
 		},
 		ClearSperm: () => {
-			womb.spermAmount = 0;
+			womb.amount = 0;
 		}
 	}
 }
