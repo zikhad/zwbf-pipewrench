@@ -1,3 +1,3 @@
-import { ZWBFTraits } from "@components/ZWBFTraits";
+import { ZWBFTraits } from "@shared/components/ZWBFTraits";
 
 new ZWBFTraits();
