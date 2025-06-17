@@ -5,7 +5,16 @@ import * as SpyZWBF from "../client/ZWBF/ZWBF";
 
 import { ZWBFRecipes } from "./ZWBFRecipes";
 jest.mock("@asledgehammer/pipewrench");
-jest.mock("../client/ZWBF/ZWBF");
+jest.mock("../client/ZWBF/ZWBF", () => ({
+	lactation: {
+		milkAmount: 0,
+		bottleAmount: 0,
+		useMilk: jest.fn()
+	},
+	womb: {
+		spermAmount: 0
+	}
+}));
 
 describe("ZWBFRecipes.ts", () => {
 	const isFemaleSpy = jest.fn();
