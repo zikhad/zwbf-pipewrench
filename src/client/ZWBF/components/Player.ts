@@ -19,6 +19,7 @@ export abstract class Player<T> {
 		
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
+		Events.everyHours.addListener(() => this.onEveryMinute());
 		new Events.EventEmitter<(data: PregnancyData) => void>(ZWBFEvents.PREGNANCY_UPDATE)
 			.addListener((data) => this.onPregnancyUpdate(data));
 	}
@@ -33,10 +34,16 @@ export abstract class Player<T> {
 		this.data = this.modData.data;
 	}
 
+	/**
+	* Handles pregnancy progress updates
+	*/
 	protected onPregnancyUpdate(data: PregnancyData) {
 		this.pregnancy = data;
 	}
 	
+	/**
+	* Periodic minute update: Syncs and triggers event
+	*/
 	protected onEveryMinute() {
 		this.modData!.data = this.data!;
 	}
