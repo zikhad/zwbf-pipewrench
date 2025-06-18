@@ -12,7 +12,7 @@ jest.mock("../client/ZWBF/ZWBF", () => ({
 		useMilk: jest.fn()
 	},
 	womb: {
-		spermAmount: 0
+		amount: 0
 	}
 }));
 
@@ -46,7 +46,7 @@ describe("ZWBFRecipes.ts", () => {
 					configurable: true,
 				});
 		
-				Object.defineProperty(SpyZWBF.womb, 'spermAmount', {
+				Object.defineProperty(SpyZWBF.womb, 'amount', {
 					get: jest.fn(() => 100),
 					configurable: true,
 				});
@@ -77,7 +77,7 @@ describe("ZWBFRecipes.ts", () => {
 						configurable: true,
 					});
 		
-					Object.defineProperty(SpyZWBF.womb, 'spermAmount', {
+					Object.defineProperty(SpyZWBF.womb, 'amount', {
 						get: jest.fn(() => 0),
 						configurable: true,
 					});
@@ -99,10 +99,10 @@ describe("ZWBFRecipes.ts", () => {
 			});
 		});
 		describe("Womb recipes", () => {
-			const spermAmountSetter = jest.fn()
+			const amountSetter = jest.fn()
 			beforeEach(() => {
-				Object.defineProperty(SpyZWBF.womb, 'spermAmount', {
-					set: spermAmountSetter,
+				Object.defineProperty(SpyZWBF.womb, 'amount', {
+					set: amountSetter,
 					configurable: true,
 				});
 			});
@@ -110,7 +110,7 @@ describe("ZWBFRecipes.ts", () => {
 			const filteredScenarios = scenarios.filter( ({type}) => type == "womb" );
 			it.each(filteredScenarios)("should call womb functions on $name", ({name}) => {
 				ZWBFRecipes.OnCreate[name]();
-				expect(spermAmountSetter).toHaveBeenCalled();
+				expect(amountSetter).toHaveBeenCalled();
 			});
 		});
 	});

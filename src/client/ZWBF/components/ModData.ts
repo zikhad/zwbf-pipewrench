@@ -6,7 +6,7 @@ import { ModDataProps } from "types";
 export class ModData<T> {
 	private object: ModDataProps<T>['object'];
 	private readonly modKey: string;
-	private readonly defaultData: T;
+	private readonly defaultData?: T;
 
 	constructor({ object, modKey, defaultData }: ModDataProps<T>) {
 		this.object = object;

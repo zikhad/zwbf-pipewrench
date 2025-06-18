@@ -6,7 +6,7 @@ type ModDataProps<T> = {
 	/** The key to be used in `getModData()` */
 	modKey: string;
 	/** The data that shall be returned by default */
-	defaultData: T;
+	defaultData?: T;
 };
 
 /* export enum ZWBFTraits {
@@ -49,4 +49,16 @@ type LactationImage = {
 type PregnancyData = {
 	isPregnant: boolean;
 	progress: number;
+}
+
+type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
+
+type WombData = {
+	amount: number;
+	total: number;
+	cycleDay: number;
+	phase: CyclePhase;
+	fertility: number;
+	onContraceptive: boolean;
+	chances: Map<CyclePhase, number>;
 }

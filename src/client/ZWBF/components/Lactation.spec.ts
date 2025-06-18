@@ -5,12 +5,7 @@ import * as SpyEvents from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./ModData", () => ({
-	ModData: class<T> {
-		get data() { return jest.fn() as T }
-		set data(value: T) {}
-	}
-}));
+jest.mock("./ModData");
 jest.mock("@utils", () => ({
 	...jest.requireActual("@utils"),
 	getSkinColor: jest.fn().mockReturnValue(1),
@@ -111,7 +106,7 @@ describe("Lactation", () => {
 			it.each([
 				{ pregnancy: false, progress: 0, expected: false },
 				{ pregnancy: true, progress: 0.4, expected: false },
-				{ pregnancy: true, progress: 0.6, expected: true },
+				{ pregnancy: true, progress: 0.8, expected: true },
 			])("with isPregnant: $pregnancy and progress: $progress", ({ pregnancy, progress, expected }) => {
 				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
 					isActive: false,
@@ -119,11 +114,8 @@ describe("Lactation", () => {
 					expiration: 0,
 					multiplier: 0
 				});
-				jest.spyOn(SpyEvents.EventEmitter.prototype, 'addListener').mockImplementation(cb => {
-					cb({ isPregnant: pregnancy, progress });
-				});
-
 				const lactation = new Lactation();
+				lactation.onPregnancyUpdate({ isPregnant: pregnancy, progress });
 				expect(lactation.isLactating).toBe(expected);
 			});
 		});
