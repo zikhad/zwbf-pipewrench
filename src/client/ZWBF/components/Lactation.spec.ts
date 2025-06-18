@@ -5,12 +5,7 @@ import * as SpyEvents from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./ModData", () => ({
-	ModData: class<T> {
-		get data() { return jest.fn() as T }
-		set data(value: T) {}
-	}
-}));
+jest.mock("./ModData");
 jest.mock("@utils", () => ({
 	...jest.requireActual("@utils"),
 	getSkinColor: jest.fn().mockReturnValue(1),
