@@ -23,9 +23,8 @@ export class Womb extends Player<WombData> {
 			amount: 0,
 			total: 0,
 			cycleDay: defaultDay,
-			phase: this.getCyclePhase(defaultDay),
 			onContraceptive: false,
-			chances: this.chances,
+			chances: Womb.chances,
 			fertility: 0,
 		};
 		super.onCreatePlayer(player);
@@ -33,6 +32,9 @@ export class Womb extends Player<WombData> {
 
 	onPregnancyUpdate(data:PregnancyData) {
 		super.onPregnancyUpdate(data);
+
+		if(!this.pregnancy?.isPregnant) return;
+		
 		this.cycleDay = -this.options.recovery;
 		if (this.pregnancy!.progress > 0.5) {
 			this.amount = 0;
@@ -48,7 +50,7 @@ export class Womb extends Player<WombData> {
 		return "Luteal";
 	}
 
-	get chances(): Map<CyclePhase, number> {
+	static get chances(): Map<CyclePhase, number> {
 		const phases: { phase: CyclePhase, value: number }[] = [
 			{ phase: "Recovery", value: 0 },
 			{ phase: "Menstruation", value: ZombRandFloat(0, 0.3) },
@@ -79,5 +81,21 @@ export class Womb extends Player<WombData> {
 
 	get amount() {
 		return this.data?.amount ?? 0;
+	}
+
+	get total() {
+		return this.data?.total ?? 0;
+	}
+
+	get fertility() {
+		return this.data?.fertility ?? 0;
+	}
+
+	get onContraceptive() {
+		return this.data?.onContraceptive ?? false;
+	}
+
+	get phase() {
+		return this.getCyclePhase(this.cycleDay);
 	}
 }

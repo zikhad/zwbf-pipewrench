@@ -57,7 +57,6 @@ type WombData = {
 	amount: number;
 	total: number;
 	cycleDay: number;
-	phase: CyclePhase;
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Map<CyclePhase, number>;
