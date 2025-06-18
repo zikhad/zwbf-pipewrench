@@ -49,6 +49,7 @@ type LactationImage = {
 type PregnancyData = {
 	isPregnant: boolean;
 	progress: number;
+	isInLabor?: boolean;
 }
 
 type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
