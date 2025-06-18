@@ -1,4 +1,4 @@
-import { getPlayer, IsoPlayer } from "@asledgehammer/pipewrench";
+import { IsoPlayer } from "@asledgehammer/pipewrench";
 
 /**
  * Given a percentage and an arbitrary number, returns the corresponding number between 0 and the number

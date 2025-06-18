@@ -141,7 +141,7 @@ export class Lactation extends Player<LactationData> {
     };
 
     const skinColor = getSkinColor(this.player!);
-    const fullness = (this.milkAmount > this.capacity / 2) ? "full" : "empty";
+    const fullness = (this.milkAmount > (this.capacity / 2)) ? "full" : "empty";
     const state = getState();
     const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
 
