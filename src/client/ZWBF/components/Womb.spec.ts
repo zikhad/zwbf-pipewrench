@@ -53,6 +53,7 @@ beforeEach(() => {
 });
 
 describe("Womb", () => {
+
 	describe("without player or data", () => {
 		it("Should instantiate with default values", () => {
 			const womb = new Womb();
