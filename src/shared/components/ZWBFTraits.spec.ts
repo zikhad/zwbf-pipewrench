@@ -1,15 +1,12 @@
-import { mock } from "jest-mock-extended";
 import * as Events from "@asledgehammer/pipewrench-events";
 
 import { ZWBFTraits } from "./ZWBFTraits";
-import { Trait, TraitFactory } from "@asledgehammer/pipewrench";
+import { TraitFactory } from "@asledgehammer/pipewrench";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("@asledgehammer/pipewrench");
 
-
 describe("ZWBFTraits", () => {
-
 	const spyAddTrait = jest.fn();
 	const spySetMutialExclusive = jest.fn();
 	beforeEach(() => {

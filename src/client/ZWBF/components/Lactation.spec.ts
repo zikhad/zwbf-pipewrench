@@ -8,7 +8,7 @@ jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./ModData");
 jest.mock("@utils", () => ({
 	...jest.requireActual("@utils"),
-	getSkinColor: jest.fn().mockReturnValue(1),
+	getSkinColor: jest.fn().mockReturnValue(1)
 }));
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
@@ -49,7 +49,9 @@ describe("Lactation", () => {
 				multiplier: 0
 			});
 			SpyHasTrait.mockReturnValue(true);
-			jest.spyOn(SpyEvents.onCreatePlayer, 'addListener').mockImplementation(cb => cb(0, mockedPlayer()));
+			jest.spyOn(SpyEvents.onCreatePlayer, "addListener").mockImplementation(cb =>
+				cb(0, mockedPlayer())
+			);
 		});
 
 		it("should initialize correctly and use traits", () => {
@@ -74,8 +76,9 @@ describe("Lactation", () => {
 					expiration: 1,
 					multiplier: 0
 				});
-				jest.spyOn(SpyEvents.everyHours, 'addListener').mockImplementation(cb => {
-					cb(); cb(); // simulate two ticks
+				jest.spyOn(SpyEvents.everyHours, "addListener").mockImplementation(cb => {
+					cb();
+					cb(); // simulate two ticks
 				});
 			});
 
@@ -106,26 +109,29 @@ describe("Lactation", () => {
 			it.each([
 				{ pregnancy: false, progress: 0, expected: false },
 				{ pregnancy: true, progress: 0.4, expected: false },
-				{ pregnancy: true, progress: 0.8, expected: true },
-			])("with isPregnant: $pregnancy and progress: $progress", ({ pregnancy, progress, expected }) => {
-				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
-					isActive: false,
-					milkAmount: 0,
-					expiration: 0,
-					multiplier: 0
-				});
-				const lactation = new Lactation();
-				lactation.onPregnancyUpdate({ isPregnant: pregnancy, progress });
-				expect(lactation.isLactating).toBe(expected);
-			});
+				{ pregnancy: true, progress: 0.8, expected: true }
+			])(
+				"with isPregnant: $pregnancy and progress: $progress",
+				({ pregnancy, progress, expected }) => {
+					jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
+						isActive: false,
+						milkAmount: 0,
+						expiration: 0,
+						multiplier: 0
+					});
+					const lactation = new Lactation();
+					lactation.onPregnancyUpdate({ isPregnant: pregnancy, progress });
+					expect(lactation.isLactating).toBe(expected);
+				}
+			);
 		});
 
 		describe("Debug functions", () => {
-			it.each<{operation: "add" | "remove" | "set", expected: number}>([
-				{ operation: "add", expected: 500},
-				{ operation: "remove", expected: 300},
-				{ operation: "set", expected: 100},
-			])("should $operation milk", ({operation, expected}) => {
+			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
+				{ operation: "add", expected: 500 },
+				{ operation: "remove", expected: 300 },
+				{ operation: "set", expected: 100 }
+			])("should $operation milk", ({ operation, expected }) => {
 				const lactation = new Lactation();
 				lactation.Debug.set(400);
 				lactation.Debug[operation](100);
@@ -142,25 +148,68 @@ describe("Lactation", () => {
 
 	describe("Image resolution", () => {
 		it.each([
-			{ state: "normal", fullness: "empty", progress: 0.3, amount: 300, expected: "normal_empty.png" },
-			{ state: "normal", fullness: "full", progress: 0.3, amount: 900, expected: "normal_full.png" },
-			{ state: "early", fullness: "empty", progress: 0.5, amount: 300, expected: "pregnant_early_empty.png" },
-			{ state: "early", fullness: "full", progress: 0.5, amount: 900, expected: "pregnant_early_full.png" },
-			{ state: "late", fullness: "empty", progress: 0.9, amount: 300, expected: "pregnant_late_empty.png" },
-			{ state: "late", fullness: "full", progress: 0.9, amount: 900, expected: "pregnant_late_full.png" },
-		])("returns correct image for $state pregnancy and $fullness", ({ progress, amount, expected }) => {
-			jest.spyOn(SpyEvents.EventEmitter.prototype, 'addListener').mockImplementation(cb => {
-				cb({ isPregnant: true, progress });
-			});
-			jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValueOnce({
-				isActive: true,
-				milkAmount: amount,
-				expiration: 8,
-				multiplier: 1
-			});
+			{
+				state: "normal",
+				fullness: "empty",
+				progress: 0.3,
+				amount: 300,
+				expected: "normal_empty.png"
+			},
+			{
+				state: "normal",
+				fullness: "full",
+				progress: 0.3,
+				amount: 900,
+				expected: "normal_full.png"
+			},
+			{
+				state: "early",
+				fullness: "empty",
+				progress: 0.5,
+				amount: 300,
+				expected: "pregnant_early_empty.png"
+			},
+			{
+				state: "early",
+				fullness: "full",
+				progress: 0.5,
+				amount: 900,
+				expected: "pregnant_early_full.png"
+			},
+			{
+				state: "late",
+				fullness: "empty",
+				progress: 0.9,
+				amount: 300,
+				expected: "pregnant_late_empty.png"
+			},
+			{
+				state: "late",
+				fullness: "full",
+				progress: 0.9,
+				amount: 900,
+				expected: "pregnant_late_full.png"
+			}
+		])(
+			"returns correct image for $state pregnancy and $fullness",
+			({ progress, amount, expected }) => {
+				jest.spyOn(SpyEvents.EventEmitter.prototype, "addListener").mockImplementation(
+					cb => {
+						cb({ isPregnant: true, progress });
+					}
+				);
+				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValueOnce({
+					isActive: true,
+					milkAmount: amount,
+					expiration: 8,
+					multiplier: 1
+				});
 
-			const lactation = new Lactation();
-			expect(lactation.images.breasts).toBe(`media/ui/lactation/boob/color-1/${expected}`);
-		});
+				const lactation = new Lactation();
+				expect(lactation.images.breasts).toBe(
+					`media/ui/lactation/boob/color-1/${expected}`
+				);
+			}
+		);
 	});
 });

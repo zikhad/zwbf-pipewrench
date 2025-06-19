@@ -24,5 +24,7 @@ export const onPreDistributionMerge = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
-	addListener() { return jest.fn() }
+	addListener() {
+		return jest.fn();
+	}
 }

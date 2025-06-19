@@ -1,8 +1,8 @@
 import { mock } from "jest-mock-extended";
-import { ModData } from "./ModData";;
+import { ModData } from "./ModData";
 
 describe("ModData", () => {
-	let mockObject: ModData<unknown>['object'];
+	let mockObject: ModData<unknown>["object"];
 	let modData: Record<string, unknown>;
 
 	beforeEach(() => {

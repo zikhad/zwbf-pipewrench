@@ -19,38 +19,39 @@ type ModDataProps<T> = {
 	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
 } */
 
-type ZWBFTraits = "Infertile"
-| "Fertile"
-| "Hyperfertile"
-| "Pregnancy"
-| "DairyCow"
-| "StrongMenstrualCramps"
-| "NoMenstrualCramps";
+type ZWBFTraits =
+	| "Infertile"
+	| "Fertile"
+	| "Hyperfertile"
+	| "Pregnancy"
+	| "DairyCow"
+	| "StrongMenstrualCramps"
+	| "NoMenstrualCramps";
 
 type TraitType = {
 	id: ZWBFTraits;
 	cost: number;
-	profession?: boolean,
-	exclusives?: ZWBFTraits[]
-}
+	profession?: boolean;
+	exclusives?: ZWBFTraits[];
+};
 
 type LactationData = {
 	isActive: boolean;
 	milkAmount: number;
 	multiplier: number;
 	expiration: number;
-}
+};
 
 type LactationImage = {
 	breasts: string;
 	level: string;
-}
+};
 
 type PregnancyData = {
 	isPregnant: boolean;
 	progress: number;
 	isInLabor?: boolean;
-}
+};
 
 type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
 
@@ -61,4 +62,4 @@ type WombData = {
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Map<CyclePhase, number>;
-}
+};

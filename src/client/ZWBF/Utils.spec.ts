@@ -8,10 +8,13 @@ describe("Utils", () => {
 			{ num: 10, max: 100, expected: 10 },
 			{ num: 10, max: 10, expected: 1 },
 			{ num: 20, max: 10, expected: 2 }
-		])("should return $expected when number is $num and max is $max", ({ num, max, expected }) => {
-			const result = percentageToNumber(num, max);
-			expect(result).toBe(expected);
-		});
+		])(
+			"should return $expected when number is $num and max is $max",
+			({ num, max, expected }) => {
+				const result = percentageToNumber(num, max);
+				expect(result).toBe(expected);
+			}
+		);
 	});
 	it("getSkinColor", () => {
 		const getSkinTextureIndex = jest.fn().mockReturnValue(1);
@@ -25,16 +28,16 @@ describe("Utils", () => {
 		expect(result).toBe(1);
 	});
 	describe("Inventory", () => {
-		it.each([true, false])("hasItem should return %s", (hasItem) => {
+		it.each([true, false])("hasItem should return %s", hasItem => {
 			const player = mock<IsoPlayer>({
 				getInventory: jest.fn().mockImplementation(() => ({
 					contains: jest.fn().mockImplementation(() => hasItem)
 				}))
 			});
-			
+
 			const nonRecursive = Inventory.hasItem(player, "mocked");
 			const recursive = Inventory.hasItem(player, "mocked");
-			
+
 			expect(nonRecursive).toBe(hasItem);
 			expect(recursive).toBe(hasItem);
 		});

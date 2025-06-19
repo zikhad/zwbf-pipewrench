@@ -1,4 +1,4 @@
 type Recipe = {
-	OnTest: Record<string, () => boolean>
-	OnCreate: Record<string, () => void>
-} 
+	OnTest: Record<string, () => boolean>;
+	OnCreate: Record<string, () => void>;
+};

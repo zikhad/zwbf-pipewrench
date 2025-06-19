@@ -6,21 +6,23 @@ import { Player } from "./Player";
 import { Inventory, percentageToNumber } from "@utils";
 import { ZWBFTraitsEnum } from "@constants";
 
-
 type AnimationStatus = {
 	isActive: boolean;
 	delta: number;
 	duration: number;
-}
+};
 
-type AnimationSettings = Record<string, {
-	steps: number[],
-	loop?: number
-}>;
+type AnimationSettings = Record<
+	string,
+	{
+		steps: number[];
+		loop?: number;
+	}
+>;
 
 export class Womb extends Player<WombData> {
 	private readonly _capacity: number;
-	
+
 	private readonly options = {
 		recovery: 7,
 		capacity: 1000,
@@ -40,38 +42,27 @@ export class Womb extends Player<WombData> {
 			duration: 0
 		};
 		this.animations = {
-			'normal': {
+			normal: {
 				steps: [
-					0, 1, 2, 3, 4, 3, 2, 1, /* */
-					0, 1, 2, 3, 4, 3, 2, 1, /* */
-					0, 1, 2, 3, 4, 3, 2, 1, /* */
-					0, 1, 2, 3, 4, 3, 2, 1, /* */
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+					0, 1, 2, 3, 4, 3, 2, 1 /* */, 0, 1, 2, 3, 4, 3, 2, 1 /* */, 0, 1, 2, 3, 4, 3, 2,
+					1 /* */, 0, 1, 2, 3, 4, 3, 2, 1 /* */, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 				]
 			},
-			'pregnant': {
+			pregnant: {
 				steps: [
-					0, 1, 2, 3, 2, 1, /* */
-					0, 1, 2, 3, 2, 1, /* */
-					0, 1, 2, 3, 2, 1, /* */
-					0, 1, 2, 3, 2, 1, /* */
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
+					0, 1, 2, 3, 2, 1 /* */, 0, 1, 2, 3, 2, 1 /* */, 0, 1, 2, 3, 2, 1 /* */, 0, 1, 2,
+					3, 2, 1 /* */, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 				]
 			},
-			'condom': {
-				steps: [
-					0, 1, 2, 3, 4, 5, 6
-				],
+			condom: {
+				steps: [0, 1, 2, 3, 4, 5, 6],
 				loop: 4
 			},
-			'birth': {
-				steps: [
-					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
-				]
+			birth: {
+				steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 			}
-		}
+		};
 	}
-	
 
 	onCreatePlayer(player: IsoPlayer) {
 		const defaultDay = ZombRand(1, 28);
@@ -81,22 +72,23 @@ export class Womb extends Player<WombData> {
 			cycleDay: defaultDay,
 			onContraceptive: false,
 			chances: Womb.chances,
-			fertility: 0,
+			fertility: 0
 		};
 		super.onCreatePlayer(player);
-		new Events.EventEmitter<(data: AnimationStatus) => void>("ZWBFAnimationUpdate")
-		.addListener((data) => this.onAnimationUpdate(data));
+		new Events.EventEmitter<(data: AnimationStatus) => void>("ZWBFAnimationUpdate").addListener(
+			data => this.onAnimationUpdate(data)
+		);
 	}
 
 	onAnimationUpdate(data: AnimationStatus) {
 		this.animation = data;
 	}
 
-	onPregnancyUpdate(data:PregnancyData) {
+	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
 
-		if(!this.pregnancy?.isPregnant) return;
-		
+		if (!this.pregnancy?.isPregnant) return;
+
 		this.cycleDay = -this.options.recovery;
 		if (this.pregnancy!.progress > 0.5) {
 			this.amount = 0;
@@ -110,45 +102,40 @@ export class Womb extends Player<WombData> {
 
 	private getFertility() {
 		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
-		if (
-			!this.data ||
-			this.data.onContraceptive ||
-			this.pregnancy?.isPregnant ||
-			isInfertile
-		) {
+		if (!this.data || this.data.onContraceptive || this.pregnancy?.isPregnant || isInfertile) {
 			return 0;
 		}
-		
+
 		const chance = this.data.chances.get(this.phase)!;
 		const isFertile = this.player?.HasTrait(ZWBFTraitsEnum.FERTILE);
 		const isHyperFertile = this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE);
-		if( isFertile || isHyperFertile ) {
-			return Math.min(1, chance * (1 + (this.options.fertilityBonus / 100)));
+		if (isFertile || isHyperFertile) {
+			return Math.min(1, chance * (1 + this.options.fertilityBonus / 100));
 		}
 
 		return chance;
 	}
 
 	private getCyclePhase(day: number): CyclePhase {
-		if(this.pregnancy!.isPregnant) return "Pregnant";
+		if (this.pregnancy!.isPregnant) return "Pregnant";
 		if (day < 1) return "Recovery";
-		if (day < 6 ) return "Menstruation";
-		if (day < 13 ) return "Follicular";
+		if (day < 6) return "Menstruation";
+		if (day < 13) return "Follicular";
 		if (day < 16) return "Ovulation";
 		return "Luteal";
 	}
 
 	static get chances(): Map<CyclePhase, number> {
-		const phases: { phase: CyclePhase, value: number }[] = [
+		const phases: { phase: CyclePhase; value: number }[] = [
 			{ phase: "Recovery", value: 0 },
 			{ phase: "Menstruation", value: ZombRandFloat(0, 0.3) },
 			{ phase: "Follicular", value: ZombRandFloat(0, 0.4) },
 			{ phase: "Ovulation", value: ZombRandFloat(0.85, 1) },
-			{ phase: "Luteal", value: ZombRandFloat(0, 0.3) },
+			{ phase: "Luteal", value: ZombRandFloat(0, 0.3) }
 		];
 
 		const _chances = new Map<CyclePhase, number>();
-		for( const { phase, value } of phases ) {
+		for (const { phase, value } of phases) {
 			_chances.set(phase, value);
 		}
 
@@ -191,7 +178,7 @@ export class Womb extends Player<WombData> {
 	}
 
 	set animation(value: AnimationStatus) {
-		this._animation = value
+		this._animation = value;
 	}
 
 	get animation() {
@@ -208,7 +195,7 @@ export class Womb extends Player<WombData> {
 			return "normal";
 		};
 		const status = getStatus();
-		
+
 		const getImageIndex = () => {
 			if (status == "pregnant") {
 				const progress = this.pregnancy!.progress < 0.9 ? this.pregnancy!.progress : 1;
@@ -222,28 +209,27 @@ export class Womb extends Player<WombData> {
 			return index;
 		};
 		const imageIndex = getImageIndex();
-		
+
 		return `media/ui/womb/${status}/womb_${status}_${imageIndex}.png`;
 	}
 
-	
-	private getAnimationSetting(): { animation: AnimationSettings[string], type: string } {
+	private getAnimationSetting(): { animation: AnimationSettings[string]; type: string } {
 		if (Inventory.hasItem(this.player!, "ZWBF.Condom")) {
 			return {
 				animation: this.animations["condom"],
 				type: "condom"
-			}
+			};
 		} else if (this.pregnancy?.isPregnant) {
-			if(this.pregnancy.isInLabor) {
+			if (this.pregnancy.isInLabor) {
 				return {
-					animation: this.animations['birth'],
-					type: 'birth'
+					animation: this.animations["birth"],
+					type: "birth"
 				};
-			} else if(this.pregnancy.progress > 0.5) {
+			} else if (this.pregnancy.progress > 0.5) {
 				return {
-					animation: this.animations['pregnant'],
-					type: 'pregnant'
-				}
+					animation: this.animations["pregnant"],
+					type: "pregnant"
+				};
 			}
 		}
 		return {
@@ -251,18 +237,18 @@ export class Womb extends Player<WombData> {
 			type: "normal"
 		};
 	}
-	
+
 	private sceneImage(): string {
 		const { duration, delta } = this.animation;
 		const { animation, type } = this.getAnimationSetting();
 		const { steps, loop = 1 } = animation;
-		
+
 		// Calculate the total duration of one loop
 		const loopDuration = duration / loop;
 
 		// Calculate the current position in the loop
 		const currentLoopDelta = (delta * duration) % loopDuration;
-		
+
 		// Calculate the step duration
 		const stepDuration = loopDuration / steps.length;
 
@@ -270,20 +256,19 @@ export class Womb extends Player<WombData> {
 		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
 		const step = steps[stepIndex];
 
-		
 		const getFullness = () => {
 			if (type !== "normal") return "";
-			if (this.amount > (this.options.capacity / 2)) return "/full";
+			if (this.amount > this.options.capacity / 2) return "/full";
 			return "/empty";
-		}
-		
+		};
+
 		const fullness = getFullness();
 
 		return `media/ui/animation/${type}${fullness}/${step}.png`;
 	}
 
 	get image() {
-		if(!this.data) return "";
+		if (!this.data) return "";
 
 		if (this.animation.isActive) return this.sceneImage();
 		return this.stillImage();

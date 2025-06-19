@@ -1,12 +1,12 @@
 export enum ZWBFTraitsEnum {
 	INFERTILE = "Infertile",
-	FERTILE ="Fertile",
+	FERTILE = "Fertile",
 	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY ="Pregnancy",
+	PREGNANCY = "Pregnancy",
 	DAIRY_COW = "DairyCow",
 	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
 	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-};
+}
 
 export enum ZWBFEvents {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
