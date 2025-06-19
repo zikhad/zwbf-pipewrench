@@ -1,7 +1,7 @@
 # Zombowin Being Female
 
-<p align="center">
-  <img width="350" src="./src/root/poster.png">
+<p style="text-align: center">
+  <img alt="poster" style="width: 300px;border: 5px solid" src="./src/root/poster.png">
 </p>
 
 ---
