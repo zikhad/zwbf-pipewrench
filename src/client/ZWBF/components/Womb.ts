@@ -1,11 +1,5 @@
 /* @noSelfInFile */
 
-/**
- * Manages reproductive functions, fertility, and pregnancy-related animations
- * for a player character in the game. Handles cycle tracking, fertility logic,
- * and dynamic image rendering for different states.
- */
-
 import { CyclePhase, PregnancyData, WombData } from "@types";
 import { IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
@@ -33,6 +27,11 @@ type AnimationSettings = Record<
 	}
 >;
 
+/**
+ * Manages reproductive functions, fertility, and pregnancy-related animations
+ * for a player character in the game. Handles cycle tracking, fertility logic,
+ * and dynamic image rendering for different states.
+ */
 export class Womb extends Player<WombData> {
 	private readonly _capacity: number;
 	
