@@ -1,10 +1,9 @@
 /* @noSelfInFile */
 import { CyclePhase, PregnancyData, WombData } from "@types";
-import { Event, IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player } from "./Player";
 import { Inventory, percentageToNumber } from "@utils";
-import { ZWBFTraits } from "@shared/components/ZWBFTraits";
 import { ZWBFTraitsEnum } from "@constants";
 
 
@@ -20,7 +19,7 @@ type AnimationSettings = Record<string, {
 }>;
 
 export class Womb extends Player<WombData> {
-	private _capacity: number;
+	private readonly _capacity: number;
 	
 	private readonly options = {
 		recovery: 7,
@@ -30,7 +29,7 @@ export class Womb extends Player<WombData> {
 
 	private _animation: AnimationStatus;
 
-	private animations: AnimationSettings;
+	private readonly animations: AnimationSettings;
 
 	constructor() {
 		super("ZWBFWomb");
@@ -110,21 +109,20 @@ export class Womb extends Player<WombData> {
 	}
 
 	private getFertility() {
+		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
 		if (
 			!this.data ||
 			this.data.onContraceptive ||
 			this.pregnancy?.isPregnant ||
-			this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE)
+			isInfertile
 		) {
 			return 0;
 		}
 		
 		const chance = this.data.chances.get(this.phase)!;
-
-		if( 
-			this.player?.HasTrait(ZWBFTraitsEnum.FERTILE) ||
-			this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE
-			) ) {
+		const isFertile = this.player?.HasTrait(ZWBFTraitsEnum.FERTILE);
+		const isHyperFertile = this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE);
+		if( isFertile || isHyperFertile ) {
 			return Math.min(1, chance * (1 + (this.options.fertilityBonus / 100)));
 		}
 

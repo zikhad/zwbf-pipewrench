@@ -181,14 +181,14 @@ describe("Womb", () => {
   });
 
   // TODO: fix this test
-  describe.skip("Fertility", () => {
+  describe("Fertility", () => {
     it.each([
       { traits: { [ZWBFTraitsEnum.INFERTILE]: true }, expected: 0 },
       { traits: { [ZWBFTraitsEnum.FERTILE]: true }, expected: 1 },
       { traits: { [ZWBFTraitsEnum.HYPERFERTILE]: true }, expected: 1 },
       { traits: {}, expected: Womb.chances.get("Ovulation") },
     ])("Fertility should be $expected for traits $traits", ({ traits, expected }) => {
-      const womb = setupWombWithPlayer(traits);
+      const womb = setupWombWithPlayer(traits, { cycleDay: 15, onContraceptive: false });
       womb.onPregnancyUpdate({ isPregnant: false, progress: 0 });
       womb.onEveryMinute();
       expect(womb.fertility).toBe(expected);
