@@ -5,6 +5,7 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { WombData } from "../../../types";
 import { Womb } from "./Womb";
 import * as SpyUtils from "../Utils";
+import {ZWBFTraitsEnum} from "../../../constants";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./ModData");
@@ -16,10 +17,23 @@ jest.mock("@utils", () => ({
 }));
 
 describe("Womb", () => {
+
+	const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) => mock<IsoPlayer>({ ...overrides });
+	const mockedModData =  (overrides: Partial<WombData> = {}): WombData => ({
+		amount: 200,
+		total: 400,
+		cycleDay: 1,
+		fertility: 0,
+		onContraceptive: true,
+		chances: Womb.chances,
+		...overrides
+	});
+
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});
-	describe("without plauer or data", () => {
+
+	describe("without player or data", () => {
 		it("Should instantiate with default values", () => {
 			const womb = new Womb();
 			expect(womb.amount).toBe(0);
@@ -31,27 +45,23 @@ describe("Womb", () => {
 			expect(womb.image).toBe("");
 		});
 	});
+
 	describe("With player & data are defined", () => {
-		const mockedPlayer = () => mock<IsoPlayer>();
 		const mockedAnimationUpdateEvent = jest.fn();
-		const mockedModData =  (overrides: Partial<WombData> = {}): WombData => ({
-			amount: 200,
-			total: 400,
-			cycleDay: 1,
-			fertility: 0,
-			onContraceptive: true,
-			chances: Womb.chances,
-			...overrides
-		});
+
 		beforeEach(() => {
-			jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue(mockedModData())
-			jest.spyOn(SpyEvents.onCreatePlayer, 'addListener').mockImplementation(cb => cb(0, mockedPlayer()));
+			jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue(mockedModData());
+			jest.spyOn(SpyEvents.onCreatePlayer, 'addListener')
+				.mockImplementation(cb => cb(0, mockedPlayer()));
+			jest.spyOn(SpyEvents.everyOneMinute, 'addListener')
+				.mockImplementation(cb => cb());
 			jest.spyOn(SpyEvents.EventEmitter.prototype, 'addListener')
 				.mockImplementation(cb => {
 					mockedAnimationUpdateEvent();
 					cb({ isActive: true, delta: 500, duration: 1000 });
 				});
 		});
+
 		it("should instantiate with data", () => {
 			const womb = new Womb();
 			expect(womb.amount).toBe(200);
@@ -62,6 +72,7 @@ describe("Womb", () => {
 			expect(womb.phase).toBe("Menstruation");
 			expect(mockedAnimationUpdateEvent).toHaveBeenCalled();
 		});
+
 		it.each(
 			[
 				{ day: 0, phase: "Recovery" },
@@ -151,4 +162,47 @@ describe("Womb", () => {
 			});
 		});
 	});
+
+	describe("Fertility", () => {
+			const spyHasTrait = jest.fn().mockImplementation(() => true); 
+			beforeEach(() => {
+				spyHasTrait.mockClear();
+				jest.spyOn(SpyModData.ModData.prototype, "data", "get")
+					.mockReturnValue(mockedModData({
+						onContraceptive: false,
+						cycleDay: 15
+					}));
+			});
+
+			// TODO: fix the following test
+			it.each([
+				{ trait: ZWBFTraitsEnum.INFERTILE, traitCalls: [true, false, false], expected: 0 },
+				{ trait: ZWBFTraitsEnum.FERTILE, traitCalls: [false, true, false], expected: 1  },
+				{ trait: ZWBFTraitsEnum.HYPERFERTILE, traitCalls: [false, false, true], expected: 1 },
+				{ trait: undefined, traitCalls: [false, false, false], expected: Womb.chances.get('Ovulation') },
+			])("Fertility should be $expected when player has trait $trait", ({ traitCalls, expected}) => {
+				const womb = new Womb();
+				const [isInfertile, isFertile, isHyperfertile] = traitCalls;
+				const player = mockedPlayer({
+					HasTrait: jest.fn()
+						.mockImplementationOnce(() => isInfertile)
+						.mockImplementationOnce(() => isFertile)
+						.mockImplementation(() => isHyperfertile)
+				});
+				womb.onCreatePlayer(player);
+				womb.onPregnancyUpdate({ isPregnant: false, progress: 0 });
+				womb.onEveryMinute();
+				expect(womb.fertility).toBe(expected);
+			});
+			
+			// TODO: fix the following test
+			it("Fertility should be 0 when pregnant", () => {
+				const womb = new Womb();
+				const player = mockedPlayer();
+				womb.onCreatePlayer(player);
+				womb.onPregnancyUpdate({ isPregnant: true, progress: 0.5 });
+				womb.onEveryMinute();
+				expect(womb.fertility).toBe(0);
+			});
+		});
 });

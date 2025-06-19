@@ -4,6 +4,8 @@ import { Event, IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewr
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player } from "./Player";
 import { Inventory, percentageToNumber } from "@utils";
+import { ZWBFTraits } from "@shared/components/ZWBFTraits";
+import { ZWBFTraitsEnum } from "@constants";
 
 
 type AnimationStatus = {
@@ -41,20 +43,19 @@ export class Womb extends Player<WombData> {
 		this.animations = {
 			'normal': {
 				steps: [
-					0, 1, 2, 3, 4, 3, 2, 1,
-					0, 1, 2, 3, 4, 3, 2, 1,
-					0, 1, 2, 3, 4, 3, 2, 1,
-					0, 1, 2, 3, 4, 3, 2, 1,
-					0, 1, 2, 3, 4,
-					5, 6, 7, 8, 9
+					0, 1, 2, 3, 4, 3, 2, 1, /* */
+					0, 1, 2, 3, 4, 3, 2, 1, /* */
+					0, 1, 2, 3, 4, 3, 2, 1, /* */
+					0, 1, 2, 3, 4, 3, 2, 1, /* */
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 				]
 			},
 			'pregnant': {
 				steps: [
-					0, 1, 2, 3, 2, 1,
-					0, 1, 2, 3, 2, 1,
-					0, 1, 2, 3, 2, 1,
-					0, 1, 2, 3, 2, 1,
+					0, 1, 2, 3, 2, 1, /* */
+					0, 1, 2, 3, 2, 1, /* */
+					0, 1, 2, 3, 2, 1, /* */
+					0, 1, 2, 3, 2, 1, /* */
 					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 				]
 			},
@@ -66,9 +67,7 @@ export class Womb extends Player<WombData> {
 			},
 			'birth': {
 				steps: [
-					0, 1, 2, 3, 4,
-					5, 6, 7, 8, 9,
-					10, 11
+					0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 				]
 			}
 		}
@@ -103,6 +102,33 @@ export class Womb extends Player<WombData> {
 		if (this.pregnancy!.progress > 0.5) {
 			this.amount = 0;
 		}
+	}
+
+	onEveryMinute(): void {
+		super.onEveryMinute();
+		this.fertility = this.getFertility();
+	}
+
+	private getFertility() {
+		if (
+			!this.data ||
+			this.data.onContraceptive ||
+			this.pregnancy?.isPregnant ||
+			this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE)
+		) {
+			return 0;
+		}
+		
+		const chance = this.data.chances.get(this.phase)!;
+
+		if( 
+			this.player?.HasTrait(ZWBFTraitsEnum.FERTILE) ||
+			this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE
+			) ) {
+			return Math.min(1, chance * (1 + (this.options.fertilityBonus / 100)));
+		}
+
+		return chance;
 	}
 
 	private getCyclePhase(day: number): CyclePhase {
@@ -151,6 +177,9 @@ export class Womb extends Player<WombData> {
 		return this.data?.total ?? 0;
 	}
 
+	private set fertility(value: number) {
+		this.data!.fertility = value;
+	}
 	get fertility() {
 		return this.data?.fertility ?? 0;
 	}
