@@ -3,8 +3,8 @@ import { Player } from "./Player";
 import { IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
 import { ZWBFEvents } from "@constants";
 
-class Pregnancy extends Player<PregnancyData> {
-    constructor() {
+class Pregnancy /* extends Player<PregnancyData> */ {
+    /* constructor() {
         super("ZWBFPregnancy");
     }
     protected onCreatePlayer(player: IsoPlayer): void {
@@ -17,7 +17,7 @@ class Pregnancy extends Player<PregnancyData> {
     }
     protected onEveryMinute(): void {
         super.onEveryMinute();
-        this.pregnancy = this.data;
-        triggerEvent(ZWBFEvents.PREGNANCY_UPDATE, this.pregnancy);
-    }
+        //this. = this.data;
+        triggerEvent(ZWBFEvents.PREGNANCY_UPDATE, this.pregnancyData);
+    } */
 }

@@ -3,7 +3,6 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
 import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
-import { ZWBFTraits } from "@shared/components/ZWBFTraits";
 
 /**
  * Abstract base class to manage per-player mod state, pregnancy updates,
@@ -19,13 +18,13 @@ export abstract class Player<T> {
 	protected modData?: ModData<T>;
 	
 	/** Actual typed data payload stored in ModData */
-	protected data?: T;
+	// protected data?: T;
 	
 	/** Current pregnancy state data for this player */
-	protected pregnancy?: PregnancyData;
+	protected _pregnancy?: ModData<PregnancyData>;
 	
 	/** ModData key used for storage and retrieval */
-	private readonly modKey: string;
+	private readonly modKey?: string;
 	
 	/** Default data assigned on player creation */
 	protected defaultData?: T;
@@ -35,14 +34,13 @@ export abstract class Player<T> {
 	 *
 	 * @param {string} modKey - The key used to identify this mod's data namespace.
 	 */
-	protected constructor(modKey: string) {
+	protected constructor(modKey?: string) {
 		this.modKey = modKey;
-		this.pregnancy = { isPregnant: false, progress: 0 };
 		
 		// Register Zomboid lifecycle listeners
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
-		Events.everyHours.addListener(() => this.onEveryMinute());
+		Events.everyHours.addListener(() => this.onEveryHour());
 		
 		new Events.EventEmitter<(data: PregnancyData) => void>(
 			ZWBFEvents.PREGNANCY_UPDATE
@@ -56,12 +54,22 @@ export abstract class Player<T> {
 	 */
 	protected onCreatePlayer(player: IsoPlayer): void {
 		this.player = player;
-		this.modData = new ModData<T>({
+		if(this.modKey) {
+			this.modData = new ModData({
+				object: player,
+				modKey: this.modKey,
+				defaultData: this.defaultData
+			});
+		}
+
+		this._pregnancy = new ModData({
 			object: player,
-			modKey: this.modKey,
-			defaultData: this.defaultData
+			modKey: "ZWBFPregnancy",
+			defaultData: {
+				progress: 0,
+				isInLabor: false
+			}
 		});
-		this.data = this.modData.data;
 	}
 	
 	/**
@@ -76,11 +84,27 @@ export abstract class Player<T> {
 	/**
 	 * Called every in-game minute. Used to sync mod data with the engine.
 	 */
-	protected onEveryMinute(): void {
-		this.modData!.data = this.data!;
+	protected abstract onEveryMinute(): void;
+
+	protected abstract onEveryHour(): void;
+
+	get data(): T | null {
+		return this.modData?.data ?? null;
 	}
-	
-	get isPregnant(): boolean {
-		return this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY) ?? false;
+
+	set data(value: T) {
+		if (!this.modData) return;
+		this.modData.data = value;
+	}
+
+	get pregnancy(): PregnancyData | null {
+		const isPregnant = this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY);
+		if(!isPregnant) return null;
+		return this._pregnancy?.data ?? null;
+	}
+
+	set pregnancy(value: PregnancyData) {
+		if (!this._pregnancy) return;
+		this._pregnancy.data = value;
 	}
 }

@@ -119,10 +119,10 @@ export class Womb extends Player<WombData> {
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
 		
-		if (!this.isPregnant) return;
+		if (!this.pregnancy) return;
 		
 		this.cycleDay = -this.options.recovery;
-		if (this.pregnancy!.progress > 0.5) {
+		if (this.pregnancy.progress > 0.5) {
 			this.amount = 0;
 		}
 	}
@@ -131,9 +131,10 @@ export class Womb extends Player<WombData> {
 	 * Periodic update that recalculates fertility.
 	 */
 	onEveryMinute(): void {
-		super.onEveryMinute();
 		this.fertility = this.getFertility();
 	}
+
+	onEveryHour(): void { }
 	
 	/**
 	 * Computes fertility value based on traits and state.
@@ -141,7 +142,7 @@ export class Womb extends Player<WombData> {
 	 */
 	private getFertility() {
 		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
-		if (!this.data || this.data.onContraceptive || this.isPregnant || isInfertile) {
+		if (!this.data || this.data.onContraceptive || this.pregnancy || isInfertile) {
 			return 0;
 		}
 		
@@ -163,7 +164,7 @@ export class Womb extends Player<WombData> {
 	 * @param day - The current cycle day.
 	 */
 	private getCyclePhase(day: number): CyclePhase {
-		if (this.pregnancy!.isPregnant) return "Pregnant";
+		if (this.pregnancy) return "Pregnant";
 		if (day < 1) return "Recovery";
 		if (day < 6) return "Menstruation";
 		if (day < 13) return "Follicular";
@@ -241,20 +242,18 @@ export class Womb extends Player<WombData> {
 	 * Builds image path for non-animated state.
 	 */
 	private stillImage(): string {
+		const progress = this.pregnancy?.progress ?? false;
 		const getStatus = () => {
-			if (this.isPregnant && this.pregnancy!.progress > 0.05) {
+			if(progress === false) return "normal";
+			if (progress > 0.05) {
 				return "pregnant";
-			} else if (this.isPregnant) {
-				return "conception";
 			}
-			return "normal";
+			return "conception";
 		};
-		const status = getStatus();
 		
 		const getImageIndex = () => {
-			if (status == "pregnant") {
-				const progress = this.pregnancy!.progress < 0.9 ? this.pregnancy!.progress : 1;
-				return percentageToNumber(progress * 100, 6);
+			if(progress !== false) {
+				return percentageToNumber((progress > 0.9 ? 1 : progress) * 100, 6)
 			}
 			const percentage = Math.floor((this.amount / this._capacity) * 100);
 			const index = percentageToNumber(percentage, 17);
@@ -263,6 +262,8 @@ export class Womb extends Player<WombData> {
 			}
 			return index;
 		};
+
+		const status = getStatus();
 		const imageIndex = getImageIndex();
 		
 		return `media/ui/womb/${status}/womb_${status}_${imageIndex}.png`;
@@ -277,18 +278,16 @@ export class Womb extends Player<WombData> {
 				animation: this.animations["condom"],
 				type: "condom"
 			};
-		} else if (this.isPregnant) {
-			if (this.pregnancy!.isInLabor) {
-				return {
-					animation: this.animations["birth"],
-					type: "birth"
-				};
-			} else if (this.pregnancy!.progress > 0.5) {
-				return {
-					animation: this.animations["pregnant"],
-					type: "pregnant"
-				};
-			}
+		} else if (this.pregnancy?.isInLabor) {
+			return {
+				animation: this.animations["birth"],
+				type: "birth"
+			};
+		} else if ((this.pregnancy?.progress || 0)  > 0.5) {
+			return {
+				animation: this.animations["pregnant"],
+				type: "pregnant"
+			};
 		}
 		return {
 			animation: this.animations["normal"],

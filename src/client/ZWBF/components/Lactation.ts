@@ -45,7 +45,7 @@ export class Lactation extends Player<LactationData> {
 		};
 		this._capacity = this.options.capacity;
 		this._bottleAmount = 200;
-		Events.everyHours.addListener(() => this.onEveryHour());
+		// Events.everyHours.addListener(() => this.onEveryHour());
 		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
 	}
 
@@ -62,15 +62,17 @@ export class Lactation extends Player<LactationData> {
 
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
-		if (this.pregnancy!.progress < 0.5) return;
+		
+		const progress = this.pregnancy?.progress ?? 0; 
+		if (progress < 0.5) return;
 		this.toggle(true);
-		this.useMilk(0, this.pregnancy!.progress);
+		this.useMilk(0, progress);
 	}
 
 	/**
 	 * Periodic hourly update of milk production and decay
 	 */
-	private onEveryHour() {
+	onEveryHour() {
 		if (!this.isLactating) return;
 
 		const amount = ZombRand(this.CONSTANTS.AMOUNTS.MIN, this.CONSTANTS.AMOUNTS.MAX);
@@ -84,8 +86,7 @@ export class Lactation extends Player<LactationData> {
 	}
 
 	onEveryMinute() {
-		super.onEveryMinute();
-		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data!);
+		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
 	}
 
 	/**
@@ -136,13 +137,14 @@ export class Lactation extends Player<LactationData> {
 	 */
 	get images(): LactationImages {
 		const getState = () => {
-			if (!this.isPregnant || this.pregnancy!.progress < 0.4) return "normal";
-			return `pregnant_${this.pregnancy!.progress < 0.7 ? "early" : "late"}`;
+			const progress = this.pregnancy?.progress ?? 0;
+			if (progress < 0.4) return "normal";
+			return `pregnant_${progress < 0.7 ? "early" : "late"}`;
 		};
 
 		const skinColor = getSkinColor(this.player!);
-		const fullness = this.milkAmount > this.capacity / 2 ? "full" : "empty";
 		const state = getState();
+		const fullness = this.milkAmount > this.capacity / 2 ? "full" : "empty";
 		const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
 
 		return {
@@ -158,7 +160,7 @@ export class Lactation extends Player<LactationData> {
 
 	/** Is the player currently lactating? */
 	get isLactating() {
-		return this.data?.isActive || false;
+		return this.data?.isActive ?? false;
 	}
 
 	/** Maximum milk capacity */
