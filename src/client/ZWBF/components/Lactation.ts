@@ -136,7 +136,7 @@ export class Lactation extends Player<LactationData> {
 	 */
 	get images(): LactationImages {
 		const getState = () => {
-			if (!this.pregnancy!.isPregnant || this.pregnancy!.progress < 0.4) return "normal";
+			if (!this.isPregnant || this.pregnancy!.progress < 0.4) return "normal";
 			return `pregnant_${this.pregnancy!.progress < 0.7 ? "early" : "late"}`;
 		};
 

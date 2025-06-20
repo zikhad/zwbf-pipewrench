@@ -2,7 +2,8 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { ZWBFTraits } from "@shared/components/ZWBFTraits";
 
 /**
  * Abstract base class to manage per-player mod state, pregnancy updates,
@@ -77,5 +78,9 @@ export abstract class Player<T> {
 	 */
 	protected onEveryMinute(): void {
 		this.modData!.data = this.data!;
+	}
+	
+	get isPregnant(): boolean {
+		return this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY) ?? false;
 	}
 }

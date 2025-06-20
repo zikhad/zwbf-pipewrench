@@ -119,7 +119,7 @@ export class Womb extends Player<WombData> {
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
 		
-		if (!this.pregnancy?.isPregnant) return;
+		if (!this.isPregnant) return;
 		
 		this.cycleDay = -this.options.recovery;
 		if (this.pregnancy!.progress > 0.5) {
@@ -141,7 +141,7 @@ export class Womb extends Player<WombData> {
 	 */
 	private getFertility() {
 		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
-		if (!this.data || this.data.onContraceptive || this.pregnancy?.isPregnant || isInfertile) {
+		if (!this.data || this.data.onContraceptive || this.isPregnant || isInfertile) {
 			return 0;
 		}
 		
@@ -242,9 +242,9 @@ export class Womb extends Player<WombData> {
 	 */
 	private stillImage(): string {
 		const getStatus = () => {
-			if (this.pregnancy?.isPregnant && this.pregnancy.progress > 0.05) {
+			if (this.isPregnant && this.pregnancy!.progress > 0.05) {
 				return "pregnant";
-			} else if (this.pregnancy?.isPregnant) {
+			} else if (this.isPregnant) {
 				return "conception";
 			}
 			return "normal";
@@ -277,13 +277,13 @@ export class Womb extends Player<WombData> {
 				animation: this.animations["condom"],
 				type: "condom"
 			};
-		} else if (this.pregnancy?.isPregnant) {
-			if (this.pregnancy.isInLabor) {
+		} else if (this.isPregnant) {
+			if (this.pregnancy!.isInLabor) {
 				return {
 					animation: this.animations["birth"],
 					type: "birth"
 				};
-			} else if (this.pregnancy.progress > 0.5) {
+			} else if (this.pregnancy!.progress > 0.5) {
 				return {
 					animation: this.animations["pregnant"],
 					type: "pregnant"
