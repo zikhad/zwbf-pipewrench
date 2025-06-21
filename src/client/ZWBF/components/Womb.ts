@@ -27,6 +27,11 @@ type AnimationSettings = Record<
 	}
 >;
 
+type WombOptions = {
+	recovery: number; // Days to recover after pregnancy
+	capacity: number; // Maximum capacity of the womb
+};
+
 /**
  * Manages reproductive functions, fertility, and pregnancy-related animations
  * for a player character in the game. Handles cycle tracking, fertility logic,
@@ -35,10 +40,7 @@ type AnimationSettings = Record<
 export class Womb extends Player<WombData> {
 	private readonly _capacity: number;
 	
-	private readonly options = {
-		recovery: 7,
-		capacity: 1000
-	};
+	private readonly options: WombOptions;
 	
 	private _animation: AnimationStatus;
 	
@@ -49,6 +51,10 @@ export class Womb extends Player<WombData> {
 	 */
 	constructor() {
 		super("ZWBFWomb");
+		this.options = {
+			recovery: 7,
+			capacity: 1000
+		};
 		this._capacity = this.options.capacity;
 		this._animation = {
 			isActive: false,
