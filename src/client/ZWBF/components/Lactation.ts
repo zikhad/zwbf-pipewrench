@@ -5,7 +5,6 @@
  */
 
 import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
-import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { getSkinColor, percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
@@ -63,7 +62,7 @@ export class Lactation extends Player<LactationData> {
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
 		
-		const progress = this.pregnancy?.progress ?? 0; 
+		const progress = this.pregnancy?.progress ?? 0;
 		if (progress < 0.5) return;
 		this.toggle(true);
 		this.useMilk(0, progress);
