@@ -43,13 +43,7 @@ type PregnancyData = {
 	isInLabor?: boolean;
 };
 
-type CyclePhase =
-	"Recovery"
-	| "Menstruation"
-	| "Follicular"
-	| "Ovulation"
-	| "Luteal"
-	| "Pregnant";
+type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
 
 type WombData = {
 	amount: number;

@@ -1,10 +1,10 @@
-import { PregnancyData } from "@types";
+/* import { PregnancyData } from "@types";
 import { Player } from "./Player";
 import { IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEvents } from "@constants"; */
 
 class Pregnancy /* extends Player<PregnancyData> */ {
-    /* constructor() {
+	/* constructor() {
         super("ZWBFPregnancy");
     }
     protected onCreatePlayer(player: IsoPlayer): void {

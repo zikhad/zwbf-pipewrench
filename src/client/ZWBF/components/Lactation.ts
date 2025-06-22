@@ -61,7 +61,7 @@ export class Lactation extends Player<LactationData> {
 
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
-		
+
 		const progress = this.pregnancy?.progress ?? 0;
 		if (progress < 0.5) return;
 		this.toggle(true);

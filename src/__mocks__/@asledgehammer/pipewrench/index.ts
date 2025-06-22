@@ -8,8 +8,8 @@ export const ZombRand = (a: number) => a;
 
 export const BodyPartType = {
 	Groin: "Groin",
-	Torso: "Torso",
-}
+	Torso: "Torso"
+};
 
 export const getText = jest.fn().mockImplementation((...args: string[]) => args.join());
 

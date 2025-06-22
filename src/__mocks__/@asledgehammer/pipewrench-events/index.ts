@@ -10,7 +10,7 @@ export const everyHours = {
 	addListener: jest.fn()
 };
 
-export const onDawn	 = {
+export const onDawn = {
 	addListener: jest.fn()
 };
 
