@@ -1,4 +1,4 @@
-import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { BodyPart, BodyPartType, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
@@ -41,7 +41,7 @@ export abstract class Player<T> {
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyHours.addListener(() => this.onEveryHour());
-		
+
 		new Events.EventEmitter<(data: PregnancyData) => void>(
 			ZWBFEvents.PREGNANCY_UPDATE
 		).addListener(data => this.onPregnancyUpdate(data));
@@ -70,6 +70,12 @@ export abstract class Player<T> {
 				isInLabor: false
 			}
 		});
+	}
+
+	/** Given a `BodyPartType` return the `BodyPart` to apply numerous effects */
+	getBodyPart(part: BodyPartType): BodyPart | null {
+		if (!this.player) return null;
+		return this.player.getBodyDamage().getBodyPart(part)
 	}
 	
 	/**

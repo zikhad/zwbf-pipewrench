@@ -9,16 +9,6 @@ type ModDataProps<T> = {
 	defaultData?: T;
 };
 
-/* export enum ZWBFTraits {
-	INFERTILE = "Infertile",
-	FERTILE = "Fertile",
-	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY = "Pregnancy",
-	DAIRY_COW = "DairyCow",
-	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
-	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-} */
-
 type ZWBFTraits =
 	| "Infertile"
 	| "Fertile"
@@ -53,7 +43,13 @@ type PregnancyData = {
 	isInLabor?: boolean;
 };
 
-type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
+type CyclePhase =
+	"Recovery"
+	| "Menstruation"
+	| "Follicular"
+	| "Ovulation"
+	| "Luteal"
+	| "Pregnant";
 
 type WombData = {
 	amount: number;

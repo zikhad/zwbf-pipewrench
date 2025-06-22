@@ -8,6 +8,15 @@ export enum ZWBFTraitsEnum {
 	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
 }
 
+export enum CyclePhaseEnum {
+	RECOVERY = "Recovery",
+	MENSTRUATION = "Menstruation",
+	FOLLICULAR = "Follicular",
+	OVULATION = "Ovulation",
+	LUTEAL = "Luteal",
+	PREGNANT = "Pregnant"
+}
+
 export enum ZWBFEvents {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
 	LACTATION_UPDATE = "ZWBFLactationUpdate"

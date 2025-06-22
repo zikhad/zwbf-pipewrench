@@ -1,11 +1,11 @@
 /* @noSelfInFile */
 
 import { CyclePhase, PregnancyData, WombData } from "@types";
-import { IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player } from "./Player";
 import { Inventory, percentageToNumber } from "@utils";
-import { ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFTraitsEnum } from "@constants";
 
 /**
  * Describes animation status including whether it's active and the time progress.
@@ -105,6 +105,9 @@ export class Womb extends Player<WombData> {
 			fertility: 0
 		};
 		super.onCreatePlayer(player);
+
+		Events.onDawn.addListener(() => this.onDawn());
+
 		new Events.EventEmitter<(data: AnimationStatus) => void>("ZWBFAnimationUpdate").addListener(
 			data => this.onAnimationUpdate(data)
 		);
@@ -144,6 +147,18 @@ export class Womb extends Player<WombData> {
 		if (!this.data) return;
 		this.data.chances = Womb.chances;
 	}
+
+	onDawn(): void {
+		if (!this.data) return;
+		
+		// Increment cycle day
+		this.cycleDay++;
+
+		if(this.phase != CyclePhaseEnum.MENSTRUATION) return;
+		if(this.player?.HasTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)) return;
+		
+		this.menstruationEffects();
+	}
 	
 	/**
 	 * Computes fertility value based on traits and state.
@@ -173,24 +188,39 @@ export class Womb extends Player<WombData> {
 	 * @param day - The current cycle day.
 	 */
 	private getCyclePhase(day: number): CyclePhase {
-		if (this.pregnancy) return "Pregnant";
-		if (day < 1) return "Recovery";
-		if (day < 6) return "Menstruation";
-		if (day < 13) return "Follicular";
-		if (day < 16) return "Ovulation";
-		return "Luteal";
+		if (this.pregnancy) return CyclePhaseEnum.PREGNANT;
+		if (day < 1) return CyclePhaseEnum.RECOVERY;
+		if (day < 6) return CyclePhaseEnum.MENSTRUATION;
+		if (day < 13) return CyclePhaseEnum.FOLLICULAR;
+		if (day < 16) return CyclePhaseEnum.OVULATION;
+		return CyclePhaseEnum.LUTEAL;
+	}
+
+	/** Apply menstrual effects like bleeding and pain */
+	private menstruationEffects() {
+		const maxPain = this.player?.HasTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS) ? 50 : 25;
+		const groin = this.getBodyPart(BodyPartType.Groin)!;
+		const pain = groin.getAdditionalPain();
+
+		if(ZombRand(100) > 50) {
+			const bleedTime = groin.getBleedingTime();
+			groin.setBleedingTime(Math.min(10, bleedTime));
+			groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(maxPain)))
+		}
 	}
 	
+	// === Property Accessors ===
+
 	/**
 	 * Generates randomized fertility chances for each cycle phase.
 	 */
 	static get chances(): Map<CyclePhase, number> {
 		const phases: { phase: CyclePhase; value: number }[] = [
-			{ phase: "Recovery", value: 0 },
-			{ phase: "Menstruation", value: ZombRandFloat(0, 0.3) },
-			{ phase: "Follicular", value: ZombRandFloat(0, 0.4) },
-			{ phase: "Ovulation", value: ZombRandFloat(0.85, 1) },
-			{ phase: "Luteal", value: ZombRandFloat(0, 0.3) }
+			{ phase: CyclePhaseEnum.RECOVERY, value: 0 },
+			{ phase: CyclePhaseEnum.MENSTRUATION, value: ZombRandFloat(0, 0.3) },
+			{ phase: CyclePhaseEnum.FOLLICULAR, value: ZombRandFloat(0, 0.4) },
+			{ phase: CyclePhaseEnum.OVULATION, value: ZombRandFloat(0.85, 1) },
+			{ phase: CyclePhaseEnum.LUTEAL, value: ZombRandFloat(0, 0.3) }
 		];
 		
 		const _chances = new Map<CyclePhase, number>();
@@ -200,8 +230,6 @@ export class Womb extends Player<WombData> {
 		
 		return _chances;
 	}
-	
-	// === Property Accessors ===
 	
 	set cycleDay(value: number) {
 		this.data!.cycleDay = value;

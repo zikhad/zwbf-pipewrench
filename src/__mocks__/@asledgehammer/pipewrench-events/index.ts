@@ -10,6 +10,10 @@ export const everyHours = {
 	addListener: jest.fn()
 };
 
+export const onDawn	 = {
+	addListener: jest.fn()
+};
+
 export const onCreatePlayer = {
 	addListener: jest.fn()
 };

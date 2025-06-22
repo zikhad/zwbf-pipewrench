@@ -1,4 +1,4 @@
-import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { BodyPart, IsoPlayer } from "@asledgehammer/pipewrench";
 import { PregnancyData } from "@types";
 export class Player<T = unknown> {
 	public player?: IsoPlayer;
@@ -13,7 +13,10 @@ export class Player<T = unknown> {
 		this.player = player;
 	}
 	onPregnancyUpdate() {}
-	// Add other methods as needed for your tests
+	
+	getBodyPart(part: never) {
+		return null as never;		
+	}
 	
 	get data() { return null as never; }
 	

@@ -1,19 +1,22 @@
 import { mock } from "jest-mock-extended";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { BodyPart, IsoPlayer } from "@asledgehammer/pipewrench";
 import { CyclePhase, WombData } from "../../../types";
 import { Womb } from "./Womb";
 import * as SpyUtils from "../Utils";
-import { ZWBFTraitsEnum } from "../../../constants";
+import { CyclePhaseEnum, ZWBFTraitsEnum } from "../../../constants";
 import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
-jest.mock("@asledgehammer/pipewrench-events", () => ({
+jest.mock("@asledgehammer/pipewrench-events" /*, () => ({
+    onDawn: jest.fn().mockImplementation(() => ({
+        addListener: jest.fn()
+    })),
     EventEmitter: jest.fn().mockImplementation(() => ({
         addListener: jest.fn()
     }))
-}));
+})*/);
 jest.mock("./Player");
 jest.mock("@utils", () => ({
     ...jest.requireActual("@utils"),
@@ -32,11 +35,11 @@ const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
     fertility: 0,
     onContraceptive: true,
     chances: new Map([
-        ["Recovery", 0],
-        ["Menstruation", 0.2],
-        ["Follicular", 0.3],
-        ["Ovulation", 0.85],
-        ["Luteal", 0.2]
+        [CyclePhaseEnum.RECOVERY, 0],
+        [CyclePhaseEnum.MENSTRUATION, 0.2],
+        [CyclePhaseEnum.FOLLICULAR, 0.3],
+        [CyclePhaseEnum.OVULATION, 0.85],
+        [CyclePhaseEnum.LUTEAL, 0.2]
     ]),
     ...overrides
 });
@@ -89,13 +92,46 @@ describe("Womb", () => {
                 expect(womb.cycleDay).toBe(1);
                 expect(womb.fertility).toBe(0);
                 expect(womb.onContraceptive).toBe(true);
-                expect(womb.phase).toBe("Menstruation");
+                expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
             });
         });
     });
 
     // === Event System Tests ===
     describe("Event System", () => {
+        it("should register onDawn event listener during player creation", () => {
+            const mockAddListener = jest.fn();
+            
+            (Events as any).onDawn = {
+                addListener: mockAddListener
+            };
+            
+            const womb = new Womb();
+            const player = mockedPlayer();
+            
+            womb.onCreatePlayer(player);
+            
+            expect(mockAddListener).toHaveBeenCalledWith(expect.any(Function));
+        });
+        it("should call onDawn method when dawn event fires", () => {
+            const mockAddListener = jest.fn();
+            (Events as any).onDawn = {
+                addListener: mockAddListener
+            };
+            
+            const womb = new Womb();
+            const player = mockedPlayer();
+            womb.onCreatePlayer(player);
+            
+            // Spy on the onDawn method
+            const onDawnSpy = jest.spyOn(womb as any, 'onDawn');
+            
+            // Get the registered callback and invoke it
+            const [dawnCallback] = mockAddListener.mock.calls[0];
+            dawnCallback();
+            
+            expect(onDawnSpy).toHaveBeenCalled();
+        });
         it("should setup animation update event listener on player creation", () => {
             const mockAddListener = jest.fn();
             
@@ -112,7 +148,7 @@ describe("Womb", () => {
             expect(mockAddListener).toHaveBeenCalledWith(expect.any(Function));
             
             // Test the listener function
-            const listenerFn = mockAddListener.mock.calls[0][0];
+            const [listenerFn] = mockAddListener.mock.calls[0];
             const testAnimationData = { isActive: true, delta: 0.5, duration: 1000 };
             
             listenerFn(testAnimationData);
@@ -127,11 +163,11 @@ describe("Womb", () => {
         });
 
         it.each([
-            { day: 0, phase: "Recovery" },
-            { day: 1, phase: "Menstruation" },
-            { day: 12, phase: "Follicular" },
-            { day: 15, phase: "Ovulation" },
-            { day: 17, phase: "Luteal" }
+            { day: 0, phase: CyclePhaseEnum.RECOVERY },
+            { day: 1, phase: CyclePhaseEnum.MENSTRUATION },
+            { day: 12, phase: CyclePhaseEnum.FOLLICULAR },
+            { day: 15, phase: CyclePhaseEnum.OVULATION },
+            { day: 17, phase: CyclePhaseEnum.LUTEAL },
         ])("should return $phase when cycle day is $day", ({ day, phase }) => {
             jest.spyOn(Player.prototype, "data", "get")
                 .mockReturnValue(mockedModData({ cycleDay: day }));
@@ -141,14 +177,60 @@ describe("Womb", () => {
         });
 
         it.each([
-            { pregnancy: false, progress: 0, phase: "Menstruation" },
-            { pregnancy: true, progress: 0.5, phase: "Pregnant" }
+            { pregnancy: false, progress: 0, phase: CyclePhaseEnum.MENSTRUATION },
+            { pregnancy: true, progress: 0.5, phase: CyclePhaseEnum.PREGNANT },
         ])("should return $phase when pregnancy is $pregnancy", ({ pregnancy, progress, phase }) => {
             jest.spyOn(Player.prototype, 'pregnancy', 'get')
                 .mockReturnValue(pregnancy ? { progress } : null);
             
             const womb = new Womb();
             expect(womb.phase).toBe(phase);
+        });
+    });
+
+    // === Timer Events Tests ===
+    describe("Timer Events", () => {
+        describe("onEveryHour", () => {
+            let mockChances: Map<CyclePhase, number>;
+            let chancesSpy: jest.SpyInstance;
+
+            beforeEach(() => {
+                mockChances = new Map([
+                    ["Recovery", 0],
+                    ["Menstruation", 0.2],
+                    ["Follicular", 0.3],
+                    ["Ovulation", 0.9],
+                    ["Luteal", 0.2]
+                ]);
+                chancesSpy = jest.spyOn(Womb, 'chances', 'get').mockReturnValue(mockChances);
+            });
+
+            afterEach(() => {
+                chancesSpy.mockRestore();
+            });
+
+            it("should update chances when data exists", () => {
+                jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
+                
+                const womb = new Womb();
+                chancesSpy.mockClear();
+                
+                womb.onEveryHour();
+                
+                expect(chancesSpy).toHaveBeenCalledTimes(1);
+                expect(womb.data!.chances).toBe(mockChances);
+            });
+
+            it("should not update chances when data is null", () => {
+                jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
+                
+                const womb = new Womb();
+                chancesSpy.mockClear();
+                
+                womb.onEveryHour();
+                
+                expect(chancesSpy).not.toHaveBeenCalled();
+            });
         });
     });
 
@@ -213,49 +295,60 @@ describe("Womb", () => {
         });
     });
 
-    // === Timer Events Tests ===
-    describe("Timer Events", () => {
-        describe("onEveryHour", () => {
-            let mockChances: Map<CyclePhase, number>;
-            let chancesSpy: jest.SpyInstance;
+    // === Menstruation ===
+    describe("Menstruation", () => {
+        const spySetAdditionalPain = jest.fn();
+        beforeEach(() => {
+            jest.spyOn(Player.prototype, "data", "get")
+                .mockReturnValue(mockedModData());
 
-            beforeEach(() => {
-                mockChances = new Map([
-                    ["Recovery", 0],
-                    ["Menstruation", 0.2],
-                    ["Follicular", 0.3],
-                    ["Ovulation", 0.9],
-                    ["Luteal", 0.2]
-                ]);
-                chancesSpy = jest.spyOn(Womb, 'chances', 'get').mockReturnValue(mockChances);
-            });
+            jest.spyOn(Player.prototype, "data", "get")
+                .mockReturnValue(mockedModData({ cycleDay: 1 }));
+            
+            const mockBodyPart = mock<BodyPart>({
+                getAdditionalPain: jest.fn().mockReturnValue(0),
+                setBleedingTime: jest.fn().mockReturnValue(0),
+                setAdditionalPain: spySetAdditionalPain
+            })
+            
+            jest.spyOn(Player.prototype, "getBodyPart")
+                .mockReturnValue(mockBodyPart);
+        });
 
-            afterEach(() => {
-                chancesSpy.mockRestore();
-            });
-
-            it("should update chances when data exists", () => {
-                jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
-                
-                const womb = new Womb();
-                chancesSpy.mockClear();
-                
-                womb.onEveryHour();
-                
-                expect(chancesSpy).toHaveBeenCalledTimes(1);
-                expect(womb.data!.chances).toBe(mockChances);
-            });
-
-            it("should not update chances when data is null", () => {
-                jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
-                
-                const womb = new Womb();
-                chancesSpy.mockClear();
-                
-                womb.onEveryHour();
-                
-                expect(chancesSpy).not.toHaveBeenCalled();
-            });
+        it.each([
+            {trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 50 },
+            {trait: ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS, expectedPain: 0 },
+            {trait: null, expectedPain: 25 }
+        ])("should apply pain of $expectedPain when player has trait of $trait", ({trait, expectedPain}) => {
+            const womb = new Womb();
+            
+            const menstruationEffectsSpy = jest.spyOn(womb as any, 'menstruationEffects');
+            
+            womb.onCreatePlayer(mockedPlayer({
+                HasTrait: (_trait: string) => _trait === trait
+            }));
+            womb.onDawn();
+            
+            expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
+            
+            if(trait === ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS) {
+                expect(menstruationEffectsSpy).not.toHaveBeenCalled()
+            } else {
+                expect(menstruationEffectsSpy).toHaveBeenCalled();
+                expect(spySetAdditionalPain).toHaveBeenCalledWith(expectedPain);
+            }
+        });
+        
+        it("should not apply menstruation effects outside menstruation phase", () => {
+            jest.spyOn(Player.prototype, "data", "get")
+                .mockReturnValue(mockedModData({ cycleDay: 5 }));
+            
+            const womb = new Womb();
+            const menstruationEffectsSpy = jest.spyOn(womb as any, 'menstruationEffects');
+            womb.onDawn();
+            
+            expect(womb.phase).not.toBe(CyclePhaseEnum.MENSTRUATION);
+            expect(menstruationEffectsSpy).not.toHaveBeenCalled();
         });
     });
 
