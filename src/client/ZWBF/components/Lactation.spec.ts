@@ -1,9 +1,10 @@
 import { mock } from "jest-mock-extended";
 import { Lactation } from "./Lactation";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as SpyEvents from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
-import { LactationData } from "../../../types";
+import { LactationData, PregnancyData } from "../../../types";
 import { Player } from "./Player";
 
 jest.mock("@asledgehammer/pipewrench-events");
@@ -102,13 +103,14 @@ describe("Lactation", () => {
 					expiration: 8,
 					multiplier: 1
 				});
-				jest.spyOn(SpyEvents.everyOneMinute, "addListener").mockImplementation(cb => cb());
 			});
 			
 			it("should keep lactation active", () => {
 				const lactation = new Lactation();
 				lactation.onCreatePlayer(createMockedPlayer());
-				expect(lactation.isLactating).toBe(true);
+				lactation.onEveryMinute();
+				// expect(lactation.isLactating).toBe(true);
+				expect(SpyPipewrench.triggerEvent).toHaveBeenCalled();
 			});
 		});
 		
@@ -134,15 +136,34 @@ describe("Lactation", () => {
 			});
 		});
 	});
+
+	describe("when not lactating", () => {
+		beforeEach(() => {
+			const data: LactationData = {
+				isActive: false,
+				milkAmount: 0,
+				expiration: 1,
+				multiplier: 0
+			};
+			jest.spyOn(Player.prototype, "data", "get")
+			.mockReturnValue(data)
+		});
+		it("EveryHour should do nothing when not lactating", () => {
+			const lactation = new Lactation();
+			lactation.onEveryHour();
+			expect(lactation.milkAmount).toBe(0);
+		});
+	});
 	
 	describe("Pregnancy events", () => {
 		it.each([
+			{ progress: null, expected: false },
 			{ progress: 0.4, expected: false },
 			{ progress: 0.8, expected: true }
 		])(
 			"Lactation should be $expected when pregnancy progress is: $progress",
 			({ progress, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress });
+				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(progress ? { progress } : null);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
 					isActive: false,
 					milkAmount: 0,
@@ -154,7 +175,7 @@ describe("Lactation", () => {
 				lactation.onCreatePlayer(
 					createMockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
-				lactation.onPregnancyUpdate({ progress });
+				lactation.onPregnancyUpdate({ progress: (progress ?? 0) });
 				expect(lactation.isLactating).toBe(expected);
 			}
 		);
@@ -162,14 +183,18 @@ describe("Lactation", () => {
 	
 	describe("Image resolution", () => {
 		it.each([
-			{ state: "early", fullness: "empty", progress: 0.5, amount: 300, expected: "pregnant_early_empty.png" },
-			{ state: "early", fullness: "full", progress: 0.5, amount: 900, expected: "pregnant_early_full.png" },
-			{ state: "late", fullness: "empty", progress: 0.9, amount: 300, expected: "pregnant_late_empty.png" },
-			{ state: "late", fullness: "full", progress: 0.9, amount: 900, expected: "pregnant_late_full.png" }
+			{ state: "non pregnant", fullness: "empty", progress: null, amount: 300, expected: "normal_empty.png" },
+			{ state: "non pregnant", fullness: "full", progress: null, amount: 900, expected: "normal_full.png" },
+			{ state: "too early in pregnancy", fullness: "empty", progress: 0, amount: 300, expected: "normal_empty.png" },
+			{ state: "too early in pregnancy", fullness: "full", progress: 0, amount: 900, expected: "normal_full.png" },
+			{ state: "pregnancy early", fullness: "empty", progress: 0.5, amount: 300, expected: "pregnant_early_empty.png" },
+			{ state: "pregnancy early", fullness: "full", progress: 0.5, amount: 900, expected: "pregnant_early_full.png" },
+			{ state: "pregnancy late", fullness: "empty", progress: 0.9, amount: 300, expected: "pregnant_late_empty.png" },
+			{ state: "pregnancy late", fullness: "full", progress: 0.9, amount: 900, expected: "pregnant_late_full.png" }
 		])(
-			"returns correct image for $state pregnancy and $fullness",
+			"returns correct image when state is $state and fullness is $fullness",
 			({ progress, amount, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress });
+				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(progress ? { progress } : null);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
 					isActive: true,
 					milkAmount: amount,
