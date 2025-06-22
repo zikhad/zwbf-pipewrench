@@ -140,7 +140,10 @@ export class Womb extends Player<WombData> {
 		this.fertility = this.getFertility();
 	}
 
-	// onEveryHour(): void { }
+	onEveryHour(): void {
+		if (!this.data) return;
+		this.data.chances = Womb.chances;
+	}
 	
 	/**
 	 * Computes fertility value based on traits and state.

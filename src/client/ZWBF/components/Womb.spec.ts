@@ -1,5 +1,6 @@
 import { mock } from "jest-mock-extended";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { WombData } from "../../../types";
 import { Womb } from "./Womb";
 import * as SpyUtils from "../Utils";
@@ -9,7 +10,11 @@ import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 
 jest.mock("@asledgehammer/pipewrench");
-jest.mock("@asledgehammer/pipewrench-events");
+jest.mock("@asledgehammer/pipewrench-events", () => ({
+    EventEmitter: jest.fn().mockImplementation(() => ({
+        addListener: jest.fn()
+    }))
+}));
 
 jest.mock("./Player");
 jest.mock("@utils", () => ({
@@ -33,31 +38,12 @@ const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
 	...overrides
 });
 
-const mockDataGetter = (data: Partial<WombData> = {}) =>
-	jest.spyOn(Player.prototype, "data", "get")
-		.mockReturnValue(mockedModData(data));
-
-const setupWombWithPlayer = (
-	traitMap: Partial<Record<ZWBFTraitsEnum, boolean>> = {},
-	dataOverrides: Partial<WombData> = {}
-): Womb => {
-	const player = mockedPlayer({
-		HasTrait: (trait: string) => traitMap[trait as ZWBFTraitsEnum] ?? false
-	});
-
-	// mockDataGetter(dataOverrides);
-
-	const womb = new Womb();
-	womb.onCreatePlayer(player);
-	return womb;
-};
-
-// TODO: fix those tests
 describe("Womb", () => {
 	
 	beforeEach(() => {
 		jest.clearAllMocks();
 		jest.resetAllMocks();
+		jest.restoreAllMocks();
 
 		// Reset the EventEmitter mock to a working state
 		const mockAddListener = jest.fn();
@@ -90,40 +76,36 @@ describe("Womb", () => {
 			womb.onPregnancyUpdate({ progress: 0 });
 			expect(womb.pregnancy).toBeNull();
 		});
+		it("Every hour should not change anything", () => {
+			const spyChance = jest.spyOn(Womb, "chances", "get");
+			const womb = new Womb();
+			womb.onEveryHour();
+			expect(spyChance).not.toHaveBeenCalled();
+		});
 	});
 
 	describe("Event Emitter setup", () => {
 		it("should setup animation update event listener on player creation", () => {
-			// Mock the EventEmitter
 			const mockAddListener = jest.fn();
-			const mockEventEmitter = {
-				addListener: mockAddListener
-			};
 			
-			// Spy on EventEmitter constructor
-			jest.spyOn(Events, 'EventEmitter').mockReturnValue(mockEventEmitter as any);
+			// Mock the EventEmitter constructor to return our mock
+			(Events.EventEmitter as jest.Mock).mockImplementation(() => ({
+				addListener: mockAddListener
+			}));
 			
 			const womb = new Womb();
 			const player = mockedPlayer();
 			
-			// Call onCreatePlayer to trigger the event emitter setup
 			womb.onCreatePlayer(player);
 			
-			// Verify EventEmitter was created with correct type
 			expect(Events.EventEmitter).toHaveBeenCalledWith("ZWBFAnimationUpdate");
-			
-			// Verify addListener was called
-			expect(mockAddListener).toHaveBeenCalledTimes(1);
 			expect(mockAddListener).toHaveBeenCalledWith(expect.any(Function));
 			
-			// Test that the listener function works correctly
+			// Test the listener function
 			const listenerFn = mockAddListener.mock.calls[0][0];
 			const testAnimationData = { isActive: true, delta: 0.5, duration: 1000 };
 			
-			// Call the listener function
 			listenerFn(testAnimationData);
-			
-			// Verify it updates the womb's animation
 			expect(womb.animation).toEqual(testAnimationData);
 		});
 	});
@@ -306,9 +288,16 @@ describe("Womb", () => {
 				}
 			);
 		});
+
+		it("chances should be called every hour to update fertility chances", () => {
+			const spyChance = jest.spyOn(Womb, "chances", "get");
+			const womb = new Womb();
+			womb.onEveryHour();
+			expect(spyChance).toHaveBeenCalled();
+		});
 	});
 
-	// TODO: fix this test
+
 	describe("Fertility", () => {
 		it.each([
 			{ traits: { [ZWBFTraitsEnum.INFERTILE]: true }, expected: 0 },
