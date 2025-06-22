@@ -140,7 +140,7 @@ export class Womb extends Player<WombData> {
 		this.fertility = this.getFertility();
 	}
 
-	onEveryHour(): void { }
+	// onEveryHour(): void { }
 	
 	/**
 	 * Computes fertility value based on traits and state.
@@ -148,7 +148,7 @@ export class Womb extends Player<WombData> {
 	 */
 	private getFertility() {
 		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
-		if (!this.data || this.data.onContraceptive || this.pregnancy || isInfertile) {
+		if (!this.data || isInfertile || this.onContraceptive || this.pregnancy) {
 			return 0;
 		}
 		
@@ -244,36 +244,33 @@ export class Womb extends Player<WombData> {
 		return this._animation;
 	}
 	
-	/**
-	 * Builds image path for non-animated state.
-	 */
 	private stillImage(): string {
-		const progress = this.pregnancy?.progress ?? false;
+		
+		const pregnancy = this.pregnancy;
 		const getStatus = () => {
-			if(progress === false) return "normal";
-			if (progress > 0.05) {
-				return "pregnant";
-			}
+			if(!pregnancy) return "normal";
+			if (pregnancy.progress > 0.05) return "pregnant";
 			return "conception";
 		};
 		
 		const getImageIndex = () => {
-			if(progress !== false) {
-				return percentageToNumber((progress > 0.9 ? 1 : progress) * 100, 6)
+			if(pregnancy && pregnancy?.progress > 0.05) {
+				return percentageToNumber((pregnancy.progress > 0.9 ? 1 : pregnancy.progress) * 100, 6);
 			}
+			if (this.amount === 0) return 0;
 			const percentage = Math.floor((this.amount / this._capacity) * 100);
-			const index = percentageToNumber(percentage, 17);
-			if (index === 0 && this.amount > 0) {
-				return 1;
-			}
-			return index;
+			const index = percentageToNumber( percentage, 17 );
+			return Math.max(1, index);
 		};
-
+		
 		const status = getStatus();
 		const imageIndex = getImageIndex();
 		
 		return `media/ui/womb/${status}/womb_${status}_${imageIndex}.png`;
-	}
+	}	/**
+	 * Builds image path for non-animated state.
+	 */
+	
 	
 	/**
 	 * Gets the animation type and corresponding settings.
