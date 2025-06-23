@@ -15,9 +15,13 @@ export class Player<T = unknown> {
 	}
 	onPregnancyUpdate() {}
 
-	getBodyPart(part: never) {
+	getBodyPart(arg: never) {
 		return null as never;
 	}
+
+	hasItem(arg: never): boolean { return null as never };
+
+	haloText(...args:never[]) {}
 
 	get data() {
 		return null as never;

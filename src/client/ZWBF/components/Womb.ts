@@ -1,11 +1,11 @@
 /* @noSelfInFile */
 
 import { CyclePhase, PregnancyData, WombData } from "@types";
-import { BodyPartType, IsoPlayer, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
+import { BodyPartType, getText, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player } from "./Player";
-import { Inventory, percentageToNumber } from "@utils";
-import { CyclePhaseEnum, ZWBFTraitsEnum } from "@constants";
+import { percentageToNumber } from "@utils";
+import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 
 /**
  * Describes animation status including whether it's active and the time progress.
@@ -45,6 +45,37 @@ export class Womb extends Player<WombData> {
 	private _animation: AnimationStatus;
 
 	private readonly animations: AnimationSettings;
+	
+	public Debug = {
+		sperm: {
+			add: (amount: number) => {
+				this.amount = Math.min(this._capacity, this.amount + amount)
+				this.total += amount;
+			},
+			remove: (amount: number) => this.amount = Math.max(0, this.amount - amount),
+			set: (amount: number) => this.amount = amount,
+			setTotal: (amount: number) => this.total = Math.max(0, amount),
+		},
+		cycle: {
+			addDay: (amount = 1) => this.cycleDay = Math.min(28, this.cycleDay + amount),
+			nextPhase: () => {
+				if (this.pregnancy) return;
+				if(this.cycleDay < 1) {
+					this.cycleDay = 1;
+				} else if (this.cycleDay < 6) {
+					this.cycleDay = 6;
+				} else if (this.cycleDay < 13) {
+					this.cycleDay = 13
+				} else if (this.cycleDay < 16) {
+					this.cycleDay = 16
+				} else if (this.cycleDay < 28) {
+					this.cycleDay = 28
+				} else {
+					this.cycleDay = 1;
+				}
+			}
+		}
+	}
 
 	/**
 	 * Initializes the Womb system with animation presets.
@@ -106,11 +137,16 @@ export class Womb extends Player<WombData> {
 		};
 		super.onCreatePlayer(player);
 
-		Events.onDawn.addListener(() => this.onDawn());
+		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
+		Events.everyDays.addListener(() => this.onEveryDay());
 
-		new Events.EventEmitter<(data: AnimationStatus) => void>("ZWBFAnimationUpdate").addListener(
-			data => this.onAnimationUpdate(data)
-		);
+		new Events.EventEmitter<(data: AnimationStatus) => void>(ZWBFEvents.ANIMATION_UPDATE)
+			.addListener(
+				data => this.onAnimationUpdate(data)
+			);
+		
+		new Events.EventEmitter(ZWBFEvents.INTERCOURSE)
+			.addListener(() => this.intercourse());
 	}
 
 	/**
@@ -119,6 +155,39 @@ export class Womb extends Player<WombData> {
 	 */
 	onAnimationUpdate(data: AnimationStatus) {
 		this.animation = data;
+	}
+
+	intercourse() {
+		if (this.hasItem("ZWBF.Condom")) {
+			const inventory = this.player?.getInventory()
+			inventory?.Remove("Condom");
+			inventory?.AddItem("ZWBF.CondomUsed", 1);
+		} else {
+			const amount = ZombRand(10, 50);
+			this.amount += amount;
+			this.total += amount;
+			
+			this.haloText({
+				text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
+				arrow: "up",
+				color: "green"
+			});
+
+			this.impregnate();
+		}
+	}
+
+	impregnate() {
+		const fertility = this.getFertility();
+		if (fertility <= 0) return;
+		if (ZombRandFloat(0, 1) >= (1 - fertility)) {
+			// TODO: Add Halo text
+			this.haloText({
+				text: getText("IGUI_ZWBF_UI_Fertilized"),
+				color: "green"
+			})
+			triggerEvent(ZWBFEvents.PREGNANCY_START);
+		}
 	}
 
 	/**
@@ -143,12 +212,20 @@ export class Womb extends Player<WombData> {
 		this.fertility = this.getFertility();
 	}
 
+	onEveryTenMinutes(): void {
+		// 50% of doing nothing also do nothing if empty
+		if ((ZombRand(100) < 50) || (this.amount <= 0)) return;
+		const amount = ZombRand(10, 50);
+		this.amount -= Math.min(this.amount, amount);
+		this.applyWetness();
+	}
+
 	onEveryHour(): void {
 		if (!this.data) return;
 		this.data.chances = Womb.chances;
 	}
 
-	onDawn(): void {
+	onEveryDay(): void {
 		if (!this.data) return;
 
 		// Increment cycle day
@@ -196,17 +273,25 @@ export class Womb extends Player<WombData> {
 		return CyclePhaseEnum.LUTEAL;
 	}
 
-	/** Apply menstrual effects like bleeding and pain */
-	private menstruationEffects() {
+	
+	private applyBleeding() {
 		const maxPain = this.player?.HasTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS) ? 50 : 25;
 		const groin = this.getBodyPart(BodyPartType.Groin)!;
 		const pain = groin.getAdditionalPain();
-
-		if (ZombRand(100) > 50) {
-			const bleedTime = groin.getBleedingTime();
-			groin.setBleedingTime(Math.min(10, bleedTime));
-			groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(maxPain)));
-		}
+		const bleedTime = groin.getBleedingTime();
+		groin.setBleedingTime(Math.min(10, bleedTime));
+		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(maxPain)));
+	}
+	private applyWetness() {
+		const amount = ZombRand(10,100);
+		const groin = this.getBodyPart(BodyPartType.Groin)!;
+		groin.setWetness(groin.getWetness() + amount);
+	}
+	
+	/** Apply menstrual effects like bleeding and pain */
+	private menstruationEffects() {
+		if (ZombRand(100) < 50) return;
+		this.applyBleeding();
 	}
 
 	// === Property Accessors ===
@@ -247,6 +332,9 @@ export class Womb extends Player<WombData> {
 		return this.data?.amount ?? 0;
 	}
 
+	set total(value: number) {
+		this.data!.total = value;
+	}
 	get total() {
 		return this.data?.total ?? 0;
 	}
@@ -275,6 +363,9 @@ export class Womb extends Player<WombData> {
 		return this._animation;
 	}
 
+	/**
+	 * Builds image path for non-animated state.
+	 */
 	private stillImage(): string {
 		const pregnancy = this.pregnancy;
 		const getStatus = () => {
@@ -300,15 +391,13 @@ export class Womb extends Player<WombData> {
 		const imageIndex = getImageIndex();
 
 		return `media/ui/womb/${status}/womb_${status}_${imageIndex}.png`;
-	} /**
-	 * Builds image path for non-animated state.
-	 */
+	}
 
 	/**
 	 * Gets the animation type and corresponding settings.
 	 */
 	private getAnimationSetting(): { animation: AnimationSettings[string]; type: string } {
-		if (Inventory.hasItem(this.player!, "ZWBF.Condom")) {
+		if (this.hasItem("ZWBF.Condom")) {
 			return {
 				animation: this.animations["condom"],
 				type: "condom"

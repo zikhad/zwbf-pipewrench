@@ -19,5 +19,8 @@ export enum CyclePhaseEnum {
 
 export enum ZWBFEvents {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
-	LACTATION_UPDATE = "ZWBFLactationUpdate"
+	LACTATION_UPDATE = "ZWBFLactationUpdate",
+	ANIMATION_UPDATE = "ZWBFAnimationUpdate",
+	INTERCOURSE = "ZWBFIntercourse",
+	PREGNANCY_START = "ZWBFPregnancyStart"
 }

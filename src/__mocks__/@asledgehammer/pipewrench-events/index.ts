@@ -6,7 +6,15 @@ export const everyOneMinute = {
 	addListener: jest.fn()
 };
 
+export const everyTenMinutes = {
+	addListener: jest.fn()
+};
+
 export const everyHours = {
+	addListener: jest.fn()
+};
+
+export const everyDays = {
 	addListener: jest.fn()
 };
 
