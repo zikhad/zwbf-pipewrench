@@ -1,43 +1,121 @@
 import { PregnancyData } from "@types";
-import { Player } from "./Player";
-import { IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
-class Pregnancy extends Player<PregnancyData> {
+import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
+import { ZWBFActionBirth } from "@actions/ZWBFBirth";
+import { Player, TimedEvents } from "./Player";
+export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	// TODO: how to make sandbox vars work here?
+
+    // public static readonly BIRTH_ANIMATION_DURATION = 5500;
     private options = {
-        pregnancyTime: 14 * 24 * 60 // 14 days
+        duration: 14 * 24 * 60 // 14 days
     }
+    // private laborProgress = 0;
+    
+    private readonly BABY_LIST = [
+        "Baby_01_b", "Baby_02", "Baby_02_b", "Baby_03", "Baby_03_b", "Baby_07",
+        "Baby_07_b", "Baby_08", "Baby_08_b", "Baby_09", "Baby_09_b", "Baby_10",
+        "Baby_10_b", "Baby_11", "Baby_11_b", "Baby_12", "Baby_12_b", "Baby_13",
+        "Baby_14"
+    ];
+
     constructor() {
         super();
     }
+    
     protected onCreatePlayer(player: IsoPlayer): void {
-        /* this.defaultData = {
-            isPregnant: false,
-            progress: 0,
-            isInLabor: false
-        };*/
         super.onCreatePlayer(player);
+
+        Events.everyOneMinute.addListener(() => this.onEveryMinute());
+        Events.everyHours.addListener(() => this.onEveryHour());
+        Events.everyDays.addListener(() => this.onEveryDays());
+
         new Events.EventEmitter(ZWBFEvents.PREGNANCY_START).addListener(() => this.start());
     }
-    private start() {
-        this.player?.getTraits().add(ZWBFTraitsEnum.PREGNANCY);
+    
+    /**
+     * Apply `default` values for `pregnancy` data
+     */
+    private resetVariables() {
         this.pregnancy = {
             progress: 0,
             current: 0,
-            total: this.options.pregnancyTime,
             isInLabor: false
         };
     }
-    protected onEveryMinute(): void {
-        if(!this.pregnancy) return;
-        const current = (this.pregnancy.current + 1);
+    
+    /**
+     * start Pregnancy (add Player trait)
+     */
+    private start() {
+        this.player?.getTraits().add(ZWBFTraitsEnum.PREGNANCY);
+        this.resetVariables();
+    }
+    
+    /**
+     * stop Pregnancy (remove Player trait)
+     */
+    private stop() {
+        this.player?.getTraits().remove(ZWBFTraitsEnum.PREGNANCY);
+        this.resetVariables();
+    }
+    
+    onEveryMinute(): void {
+        if(!this.player || !this.pregnancy) return;
+        const { duration } = this.options;
+        const { current = 0 } = this.pregnancy;
+        const updated = Math.min(duration, current + 1);
         this.pregnancy = {
-            ...this.pregnancy,
-            current,
-            isInLabor: (current > this.pregnancy.total)
+            current: updated,
+            progress: (updated / duration),
+            isInLabor: (updated == duration)
         };
+        if(this.pregnancy.isInLabor) {
+            this.player.setBlockMovement(true);
+            ISTimedActionQueue.add(new ZWBFActionBirth(this));
+        }
+    }
+
+    onEveryHour(): void {
+        if(!this.player || !this.pregnancy) return;
         
-        // triggerEvent(ZWBFEvents.PREGNANCY_UPDATE, this.pregnancyData);
+        const { progress } = this.pregnancy;
+        if(progress < 0.25) return;
+        
+        this.weightDebuff = progress;
+        
+        
+        // Constume extra water
+        const stats = this.player.getStats();
+        const water = (0.5 * progress) / 1440;
+        stats.setThirst(Math.min(1, stats.getThirst() + water));
+        
+        // Constume extra calories
+        const nutrition = this.player.getNutrition();
+        const calories = (600 * progress) / 1440;
+        nutrition.setCalories(Math.max(-2200, nutrition.getCalories() - calories));
+    }
+    
+    onEveryDays() {
+        if(!this.player || !this.pregnancy) return;
+        /** Apply sickness in the begining of Pregnancy */
+        const  { progress } = this.pregnancy;
+        if ((progress < 0.05) || (progress > 0.33)) return;
+        this.player.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(50));
+    }
+
+    private set weightDebuff(progress: number) {
+        this.player?.setMaxWeightBase(8 * (1 - progress / 2))
+    }
+    
+    public birth() {
+        if(!this.player) return;
+        const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
+        this.player.getInventory().AddItem(`Babies.${baby}`);
+        this.player.setBlockMovement(false);
+        this.weightDebuff = 0;
+        this.stop();
     }
 }

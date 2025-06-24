@@ -1,20 +1,11 @@
 /* @noSelfInFile */
 
-import { CyclePhase, PregnancyData, WombData } from "@types";
+import { AnimationStatus, CyclePhase, PregnancyData, WombData } from "@types";
 import { BodyPartType, getText, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Player } from "./Player";
+import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
 import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
-
-/**
- * Describes animation status including whether it's active and the time progress.
- */
-type AnimationStatus = {
-	isActive: boolean;
-	delta: number;
-	duration: number;
-};
 
 /**
  * Defines settings for animation steps and optional looping.
@@ -37,7 +28,7 @@ type WombOptions = {
  * for a player character in the game. Handles cycle tracking, fertility logic,
  * and dynamic image rendering for different states.
  */
-export class Womb extends Player<WombData> {
+export class Womb extends Player<WombData>implements TimedEvents {
 	private readonly _capacity: number;
 
 	private readonly options: WombOptions;
@@ -137,7 +128,9 @@ export class Womb extends Player<WombData> {
 		};
 		super.onCreatePlayer(player);
 
+		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
+		Events.everyHours.addListener(() => this.onEveryHour())
 		Events.everyDays.addListener(() => this.onEveryDay());
 
 		new Events.EventEmitter<(data: AnimationStatus) => void>(ZWBFEvents.ANIMATION_UPDATE)
@@ -205,9 +198,6 @@ export class Womb extends Player<WombData> {
 		}
 	}
 
-	/**
-	 * Periodic update that recalculates fertility.
-	 */
 	onEveryMinute(): void {
 		this.fertility = this.getFertility();
 	}
@@ -221,13 +211,11 @@ export class Womb extends Player<WombData> {
 	}
 
 	onEveryHour(): void {
-		if (!this.data) return;
-		this.data.chances = Womb.chances;
+		this.data!.chances = Womb.chances;
 	}
 
 	onEveryDay(): void {
-		if (!this.data) return;
-
+		
 		// Increment cycle day
 		this.cycleDay++;
 
@@ -423,11 +411,11 @@ export class Womb extends Player<WombData> {
 	 * Computes the current animation frame image based on delta and loop settings.
 	 */
 	private sceneImage(): string {
-		const { duration, delta } = this.animation;
+		const { duration = 1, delta = 0 } = this.animation;
 		const { animation, type } = this.getAnimationSetting();
 		const { steps, loop = 1 } = animation;
 
-		const loopDuration = duration / loop;
+		const loopDuration = (duration / loop);
 		const currentLoopDelta = (delta * duration) % loopDuration;
 		const stepDuration = loopDuration / steps.length;
 

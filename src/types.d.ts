@@ -39,8 +39,8 @@ type LactationImage = {
 
 type PregnancyData = {
 	progress: number;
-	current: number;
-	total: number;
+	current?: number;
+	// duration: number;
 	isInLabor?: boolean;
 };
 
@@ -53,4 +53,13 @@ type WombData = {
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Map<CyclePhase, number>;
+};
+
+/**
+ * Describes animation status including whether it's active and the time progress.
+ */
+type AnimationStatus = {
+	isActive: boolean;
+	delta?: number;
+	duration?: number;
 };

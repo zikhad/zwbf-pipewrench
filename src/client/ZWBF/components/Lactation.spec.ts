@@ -1,10 +1,10 @@
-import { mock } from "jest-mock-extended";
 import { Lactation } from "./Lactation";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
+import * as Events from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
 import { LactationData } from "../../../types";
 import { Player } from "./Player";
+import { mockedPlayer } from "../../../test/mock";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
@@ -14,8 +14,6 @@ jest.mock("@utils", () => ({
 }));
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
-
-const createMockedPlayer = (overrides: Partial<IsoPlayer> = {}) => mock<IsoPlayer>(overrides);
 
 describe("Lactation", () => {
 	beforeEach(() => {
@@ -56,7 +54,7 @@ describe("Lactation", () => {
 
 		it("should initialize correctly and use traits", () => {
 			const lactation = new Lactation();
-			lactation.onCreatePlayer(createMockedPlayer());
+			lactation.onCreatePlayer(mockedPlayer());
 			expect(lactation.isLactating).toBe(true);
 			expect(lactation.milkAmount).toBe(400);
 		});
@@ -64,7 +62,7 @@ describe("Lactation", () => {
 		it("useMilk updates milkAmount and checks trait", () => {
 			const lactation = new Lactation();
 			lactation.onCreatePlayer(
-				createMockedPlayer({
+				mockedPlayer({
 					HasTrait: SpyHasTrait.mockImplementation(() => true)
 				})
 			);
@@ -88,7 +86,7 @@ describe("Lactation", () => {
 
 			it("Should de-activate lactation when it expires", () => {
 				const lactation = new Lactation();
-				lactation.onCreatePlayer(createMockedPlayer());
+				lactation.onCreatePlayer(mockedPlayer());
 				expect(lactation.isLactating).toBe(true);
 				lactation.onEveryHour();
 				expect(lactation.isLactating).toBe(false);
@@ -107,7 +105,7 @@ describe("Lactation", () => {
 
 			it("should keep lactation active", () => {
 				const lactation = new Lactation();
-				lactation.onCreatePlayer(createMockedPlayer());
+				lactation.onCreatePlayer(mockedPlayer());
 				lactation.onEveryMinute();
 				// expect(lactation.isLactating).toBe(true);
 				expect(SpyPipewrench.triggerEvent).toHaveBeenCalled();
@@ -121,7 +119,7 @@ describe("Lactation", () => {
 				{ operation: "set", expected: 100 }
 			])("should $operation milk", ({ operation, expected }) => {
 				const lactation = new Lactation();
-				lactation.onCreatePlayer(createMockedPlayer());
+				lactation.onCreatePlayer(mockedPlayer());
 				lactation.Debug.set(400);
 				lactation.Debug[operation](100);
 				expect(lactation.milkAmount).toBe(expected);
@@ -129,7 +127,7 @@ describe("Lactation", () => {
 
 			it("should be able to toggle lactation", () => {
 				const lactation = new Lactation();
-				lactation.onCreatePlayer(createMockedPlayer());
+				lactation.onCreatePlayer(mockedPlayer());
 				expect(lactation.isLactating).toBe(true);
 				lactation.Debug.toggle(false);
 				expect(lactation.isLactating).toBe(false);
@@ -154,6 +152,36 @@ describe("Lactation", () => {
 		});
 	});
 
+	describe("Timer Events", () => {
+		describe.each([
+			{ event: "everyOneMinute", handler: "onEveryMinute" },
+			{ event: "everyHours", handler: "onEveryHour" }
+		])("For $event", ({event, handler}) => {
+			const mockEventListener = jest.fn();
+			let womb:Lactation;
+			beforeEach(() => {
+				mockEventListener.mockClear();
+				(Events as any)[event] = {
+					addListener: mockEventListener
+				};
+				const player = mockedPlayer();
+				womb = new Lactation();
+				(womb as any)[handler] = jest.fn();
+				womb.onCreatePlayer(player);
+
+			});
+			it(`should register ${event} listener during player creation`, () => {
+				expect(mockEventListener).toHaveBeenCalledWith(expect.any(Function));
+			});
+			it(`should call ${event} method when event fires`, () => {
+				const spy = jest.spyOn(womb as any, handler);
+				const [callback] = mockEventListener.mock.calls[0];
+				callback();
+				expect(spy).toHaveBeenCalled();
+			});
+		});
+	});
+
 	describe("Pregnancy events", () => {
 		it.each([
 			{ progress: null, expected: false },
@@ -174,7 +202,7 @@ describe("Lactation", () => {
 
 				const lactation = new Lactation();
 				lactation.onCreatePlayer(
-					createMockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
+					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
 				lactation.onPregnancyUpdate({ progress: progress ?? 0 });
 				expect(lactation.isLactating).toBe(expected);
@@ -255,7 +283,7 @@ describe("Lactation", () => {
 
 				const lactation = new Lactation();
 				lactation.onCreatePlayer(
-					createMockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
+					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
 				expect(lactation.images.breasts).toBe(
 					`media/ui/lactation/boob/color-1/${expected}`

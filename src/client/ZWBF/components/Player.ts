@@ -4,6 +4,25 @@ import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
 import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 
+export interface TimedEvents {
+	/**
+	 * Called every in-game minute.
+	 */
+	onEveryMinute?: () => void;
+	/**
+	 * Called every in-game 10 minutes
+	 */
+	onEveryTenMinutes?: () => void;
+	/**
+	 * Called every in-game hour
+	 */
+	onEveryHour?: () => void;
+	/**
+	 * Called every in-game day
+	 */
+	onEveryDay?: () => void;
+}
+
 /**
  * Abstract base class to manage per-player mod state, pregnancy updates,
  * and ModData lifecycle for Project Zomboid players.
@@ -12,7 +31,7 @@ import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
  */
 export abstract class Player<T> {
 	/** Reference to the current player instance */
-	protected player?: IsoPlayer;
+	public player?: IsoPlayer;
 	
 	/** ModData instance wrapping game storage for this player */
 	protected modData?: ModData<T>;
@@ -39,12 +58,6 @@ export abstract class Player<T> {
 		
 		// Register Zomboid lifecycle listeners
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
-		Events.everyOneMinute.addListener(() => this.onEveryMinute());
-		Events.everyHours.addListener(() => this.onEveryHour());
-
-		new Events.EventEmitter<(data: PregnancyData) => void>(
-			ZWBFEvents.PREGNANCY_UPDATE
-		).addListener(data => this.onPregnancyUpdate(data));
 	}
 	
 	/**
@@ -66,10 +79,17 @@ export abstract class Player<T> {
 			object: player,
 			modKey: "ZWBFPregnancy",
 			defaultData: {
+				current: 0,
 				progress: 0,
 				isInLabor: false
 			}
 		});
+		// Events.everyOneMinute.addListener(() => this.onEveryMinute());
+		// Events.everyHours.addListener(() => this.onEveryHour());
+
+		new Events.EventEmitter<(data: PregnancyData) => void>(
+			ZWBFEvents.PREGNANCY_UPDATE
+		).addListener(data => this.onPregnancyUpdate(data));
 	}
 
 	/** 
@@ -118,13 +138,6 @@ export abstract class Player<T> {
 	protected onPregnancyUpdate(data: PregnancyData): void {
 		this.pregnancy = data;
 	}
-	
-	/**
-	 * Called every in-game minute. Used to sync mod data with the engine.
-	 */
-	protected abstract onEveryMinute(): void;
-
-	protected abstract onEveryHour(): void;
 
 	get data(): T | null {
 		return this.modData?.data ?? null;
@@ -136,8 +149,7 @@ export abstract class Player<T> {
 	}
 
 	get pregnancy(): PregnancyData | null {
-		const isPregnant = this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY);
-		if(!isPregnant) return null;
+		if(!this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
 		return this._pregnancy?.data ?? null;
 	}
 

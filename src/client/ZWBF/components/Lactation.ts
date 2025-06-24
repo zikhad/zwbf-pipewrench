@@ -1,17 +1,17 @@
+import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import * as Events from "@asledgehammer/pipewrench-events";
+import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
+import { getSkinColor, percentageToNumber } from "@utils";
+import { LuaEventManager } from "@asledgehammer/pipewrench";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { Player, TimedEvents } from "./Player";
+
 /**
  * Lactation management system for a player character.
  * Handles milk production, expiration, pregnancy influence,
  * and visual image resolution based on state.
  */
-
-import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
-import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
-import { getSkinColor, percentageToNumber } from "@utils";
-import { LuaEventManager } from "@asledgehammer/pipewrench";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
-import { Player } from "./Player";
-
-export class Lactation extends Player<LactationData> {
+export class Lactation extends Player<LactationData> implements TimedEvents {
 	private readonly _capacity: number;
 	private readonly _bottleAmount;
 
@@ -44,8 +44,6 @@ export class Lactation extends Player<LactationData> {
 		};
 		this._capacity = this.options.capacity;
 		this._bottleAmount = 200;
-		// Events.everyHours.addListener(() => this.onEveryHour());
-		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
 	}
 
 	onCreatePlayer(player: IsoPlayer): void {
@@ -53,10 +51,15 @@ export class Lactation extends Player<LactationData> {
 		this.defaultData = {
 			isActive: false,
 			milkAmount: 0,
-			// TODO: why options are not working?
+			// TODO: Get options from SandboxVars
 			expiration: 7,
 			multiplier: 0
 		};
+		
+		Events.everyOneMinute.addListener(() => this.onEveryMinute());
+		Events.everyHours.addListener(() => this.onEveryHour());
+
+		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
@@ -68,9 +71,11 @@ export class Lactation extends Player<LactationData> {
 		this.useMilk(0, progress);
 	}
 
-	/**
-	 * Periodic hourly update of milk production and decay
-	 */
+	
+	onEveryMinute() {
+		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
+	}
+
 	onEveryHour() {
 		if (!this.isLactating) return;
 
@@ -82,10 +87,6 @@ export class Lactation extends Player<LactationData> {
 		this.expiration = Math.max(0, this.expiration - 1);
 
 		if (this.expiration === 0) this.toggle(false);
-	}
-
-	onEveryMinute() {
-		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
 	}
 
 	/**

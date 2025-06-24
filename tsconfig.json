@@ -20,6 +20,7 @@
 			"@shared/components/*": ["shared/components/*"],
 			"@server/components/*": ["server/components/*"],
 			"@client/components/*": ["client/ZWBF/components/*"],
+			"@actions/*": ["client/ZWBF/Actions/*"],
 			"@test/*": ["test/*"],
 			"@types": ["types.d.ts"],
 			"@utils": ["client/ZWBF/Utils.ts"],
