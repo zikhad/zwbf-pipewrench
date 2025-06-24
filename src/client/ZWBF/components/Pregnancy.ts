@@ -21,9 +21,9 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
         "Baby_14"
     ];
 
-    constructor() {
+    /* constructor() {
         super();
-    }
+    } */
     
     protected onCreatePlayer(player: IsoPlayer): void {
         super.onCreatePlayer(player);

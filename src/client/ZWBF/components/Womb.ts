@@ -304,6 +304,10 @@ export class Womb extends Player<WombData>implements TimedEvents {
 		return _chances;
 	}
 
+	set contraceptive(value: boolean) {
+		this.data!.onContraceptive = value;
+	}
+
 	set cycleDay(value: number) {
 		this.data!.cycleDay = value;
 	}

@@ -185,7 +185,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	private set multiplier(value: number) {
 		this.data!.multiplier = value;
 	}
-	private get multiplier() {
+	get multiplier() {
 		return this.data!.multiplier;
 	}
 
