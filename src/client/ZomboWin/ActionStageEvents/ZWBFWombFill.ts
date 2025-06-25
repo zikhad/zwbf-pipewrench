@@ -1,4 +1,4 @@
-import { ActionContext, ActionState, triggerEvent } from "@asledgehammer/pipewrench";
+import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
 import { ZWBFEvents } from "@constants";
 import { AnimationStatus } from "@types";
 import { ZomboWin } from "ZomboWin/ZomboWin";
@@ -6,7 +6,7 @@ const ActionEvents = ZomboWin.AnimationHandler.ActionEvents;
 
 table.insert(
     ActionEvents.Perform,
-    (action: any) => {
+    (action: ISBaseTimedAction) => {
         const character = action.character;
         // TODO: add animation allow
         if(character.isFemale()) {
@@ -17,7 +17,7 @@ table.insert(
 
 table.insert(
     ActionEvents.Update,
-    (action: any) => {
+    (action: ISBaseTimedAction) => {
         const character = action.character;
         // TODO: add animation allow
         if(character.isFemale()) {
