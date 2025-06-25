@@ -1,9 +1,9 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
 import { ZWBFEvents } from "@constants";
 import { AnimationStatus } from "@types";
-import { ZomboWin } from "ZomboWin/ZomboWin";
-const ActionEvents = ZomboWin.AnimationHandler.ActionEvents;
+import { AnimationHandler } from "ZomboWin/ZomboWin";
 
+const { ActionEvents } = AnimationHandler;
 table.insert(
     ActionEvents.Perform,
     (action: ISBaseTimedAction) => {
