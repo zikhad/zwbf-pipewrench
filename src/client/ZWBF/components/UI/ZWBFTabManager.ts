@@ -19,7 +19,7 @@ export class ZWBFTabManager {
 	 * @param tabName The name for the tab
 	 * @param ui UI component to show
 	 */
-	static addTab(tabName: string, ui: any): void {
+	addTab(tabName: string, ui: any): void {
 		const viewName = `${tabName}View`;
 
 		// Store tab information
