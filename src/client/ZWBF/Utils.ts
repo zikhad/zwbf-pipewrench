@@ -9,9 +9,15 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 export const percentageToNumber = (percentage: number, maxNumber: number) => {
 	percentage = Math.min(100, percentage);
 	percentage = Math.max(0, percentage);
-	return Math.floor(percentage/100 * maxNumber);
+	return Math.floor((percentage / 100) * maxNumber);
 }
 
 export const getSkinColor = (character: IsoPlayer) => {
 	return character.getHumanVisual().getSkinTextureIndex();
+}
+
+export const Inventory = {
+	hasItem: (player:IsoPlayer, itemName: string , recursive = false): boolean => {
+		return player.getInventory().contains(itemName, recursive);
+	}
 }

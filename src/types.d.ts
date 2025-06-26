@@ -49,6 +49,7 @@ type LactationImage = {
 type PregnancyData = {
 	isPregnant: boolean;
 	progress: number;
+	isInLabor?: boolean;
 }
 
 type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
@@ -57,7 +58,6 @@ type WombData = {
 	amount: number;
 	total: number;
 	cycleDay: number;
-	phase: CyclePhase;
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Map<CyclePhase, number>;
