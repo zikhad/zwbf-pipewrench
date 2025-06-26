@@ -9,6 +9,7 @@ import { mockedPlayer } from "../../../test/mock";
 import { mock } from "jest-mock-extended";
 
 jest.mock("@asledgehammer/pipewrench-events");
+jest.mock("./Moodles");
 jest.mock("./Player");
 jest.mock("@utils", () => ({
 	...jest.requireActual("@utils"),
