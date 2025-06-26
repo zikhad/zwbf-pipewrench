@@ -49,7 +49,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 			setTotal: (amount: number) => this.total = Math.max(0, amount),
 		},
 		cycle: {
-			addDay: (amount = 1) => this.cycleDay = Math.min(28, this.cycleDay + amount),
+			addDay: (amount = 1) => this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29),
 			nextPhase: () => {
 				if (this.pregnancy) return;
 				if(this.cycleDay < 1) {
@@ -240,7 +240,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 	onEveryTenMinutes(): void {
 		// 50% of doing nothing also do nothing if empty
-		if ((ZombRand(100) < 50) || (this.amount <= 0)) return;
+		if ((this.amount <= 0) || (ZombRand(100) < 50)) return;
 		const amount = ZombRand(10, 50);
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
@@ -248,6 +248,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 	onEveryHour(): void {
 		this.data!.chances = Womb.chances;
+		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, { player: this.player!, data: this.data!, capacity: this._capacity });	
 	}
 
 	onEveryDay(): void {
