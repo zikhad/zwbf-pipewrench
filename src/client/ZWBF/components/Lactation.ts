@@ -1,4 +1,4 @@
-import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { getSkinColor, percentageToNumber } from "@utils";
@@ -57,6 +57,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		};
 		
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
+		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
 
 		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
@@ -74,6 +75,25 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	
 	onEveryMinute() {
 		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
+	}
+
+	onEveryTenMinutes() {
+		if (!this.isLactating) return;
+		const torso = this.getBodyPart(BodyPartType.Torso_Upper)!;
+		
+		const modifier = percentageToNumber(this.percentage, 25);
+		
+		// Apply engorgement pain
+		const currentPain = torso.getAdditionalPain(); 
+		if(currentPain < 25) {
+			torso.setAdditionalPain(Math.min(25, currentPain + modifier));
+		}
+
+		// Apply wetness
+		const currentWetness = torso.getWetness();
+		if(currentWetness < 25) {
+			torso.setWetness(Math.min(25, currentWetness + modifier));
+		}
 	}
 
 	onEveryHour() {
