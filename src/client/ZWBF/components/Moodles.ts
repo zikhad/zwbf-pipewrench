@@ -39,31 +39,37 @@ export class Moodle {
         }
     }
 
+    /**
+     * Method to fallback to `HaloText` when `MoodleFramework` is not active
+     * @param level number between 0-1
+     */
     private fallbackMoodle(level: number): void {
-        const levels = {
-            [0.5]: 1,
-            [0.6]: 1,
-            [0.7]: 2,
-            [0.8]: 3,
-            [1]: 4,
-        };
-        for(let i = 0; i < this.tresholds.length; i++) {
-            const treshold = this.tresholds[i];
-            if (level < treshold) {
-                // TODO: continue to implement this
-            }
+        level = Math.min(Math.max(level, 0), 1);
+        // get a treshold from the tresholds, undefined if level not close enough
+        const mapped = new Map([
+            [this.tresholds[0], 1],
+            [this.tresholds[1], 2],
+            [this.tresholds[2], 3],
+            [this.tresholds[3], 4],
+        ]).get(+level.toFixed(1));
+        
+        if(mapped) {
+            const color = this.type === "Good" ? HaloTextHelper.getColorGreen() : HaloTextHelper.getColorRed();
+            HaloTextHelper.addText(
+                this.player,
+                getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`),
+                color
+            );
         }
-        const color = this.type === "Good" ? HaloTextHelper.getColorGreen() : HaloTextHelper.getColorRed();
-        HaloTextHelper.addText(
-            this.player,
-            getText(`Moodles_${this.name}_${this.type}_desc_${0}`),
-            color
-        );
     }
 
     
+    /**
+     * Method to return array of arguments expecteed by `moodle.setTresholds`
+     * @returns An array with 8 `number` and `null` elements, shifted depending on moodle type
+     */
     private buildTresholds() {
-        return new Array(8).fill(null).map((_, index) => {
+        return [0,0,0,0,0,0,0,0].map((_, index) => {
             if (index < 4 && this.type === "Good") {
                 return this.tresholds[index];
             } else if (index >= 4 && this.type === "Bad") {
@@ -75,9 +81,10 @@ export class Moodle {
 
     public moodle(level: number): void {
         if (!this.isMF) {
-
+            this.fallbackMoodle(level);
             return;
         }
+
         const moodle = MF.getMoodle(this.name);
         const [
             Good1,
@@ -94,7 +101,7 @@ export class Moodle {
             moodle.getGoodBadNeutral(),
             moodle.getLevel(),
             this.texture
-        )
+        );
         moodle.setValue(level);
     }
 }

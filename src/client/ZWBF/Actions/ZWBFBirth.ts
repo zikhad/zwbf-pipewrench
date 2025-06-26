@@ -1,4 +1,4 @@
-import { ISBaseTimedAction, IsoGameCharacter, IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
+import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { ZWBFEvents } from "@constants";
 import { AnimationStatus } from "@types";
