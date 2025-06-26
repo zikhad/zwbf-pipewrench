@@ -1,14 +1,26 @@
 export enum ZWBFTraitsEnum {
 	INFERTILE = "Infertile",
-	FERTILE ="Fertile",
+	FERTILE = "Fertile",
 	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY ="Pregnancy",
+	PREGNANCY = "Pregnancy",
 	DAIRY_COW = "DairyCow",
 	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
 	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-};
+}
+
+export enum CyclePhaseEnum {
+	RECOVERY = "Recovery",
+	MENSTRUATION = "Menstruation",
+	FOLLICULAR = "Follicular",
+	OVULATION = "Ovulation",
+	LUTEAL = "Luteal",
+	PREGNANT = "Pregnant"
+}
 
 export enum ZWBFEvents {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
-	LACTATION_UPDATE = "ZWBFLactationUpdate"
+	LACTATION_UPDATE = "ZWBFLactationUpdate",
+	ANIMATION_UPDATE = "ZWBFAnimationUpdate",
+	INTERCOURSE = "ZWBFIntercourse",
+	PREGNANCY_START = "ZWBFPregnancyStart"
 }

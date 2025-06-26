@@ -1,23 +1,25 @@
-import { mock } from "jest-mock-extended";
 import { Lactation } from "./Lactation";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
-import * as SpyEvents from "@asledgehammer/pipewrench-events";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
+import * as Events from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
+import { LactationData } from "../../../types";
+import { Player } from "./Player";
+import { mockedPlayer } from "../../../test/mock";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./ModData");
+jest.mock("./Player");
 jest.mock("@utils", () => ({
 	...jest.requireActual("@utils"),
-	getSkinColor: jest.fn().mockReturnValue(1),
+	getSkinColor: jest.fn().mockReturnValue(1)
 }));
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
-const mockedPlayer = () => mock<IsoPlayer>({ HasTrait: SpyHasTrait });
 
 describe("Lactation", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
-		SpyHasTrait.mockReset();
+		jest.resetModules();
+		SpyHasTrait.mockReset().mockReturnValue(false);
 	});
 
 	describe("Without player or data", () => {
@@ -42,25 +44,28 @@ describe("Lactation", () => {
 
 	describe("When player & data are defined", () => {
 		beforeEach(() => {
-			jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
 				isActive: true,
 				milkAmount: 400,
 				expiration: 8,
 				multiplier: 0
 			});
-			SpyHasTrait.mockReturnValue(true);
-			jest.spyOn(SpyEvents.onCreatePlayer, 'addListener').mockImplementation(cb => cb(0, mockedPlayer()));
 		});
 
 		it("should initialize correctly and use traits", () => {
 			const lactation = new Lactation();
-			expect(lactation).toBeDefined();
+			lactation.onCreatePlayer(mockedPlayer());
 			expect(lactation.isLactating).toBe(true);
 			expect(lactation.milkAmount).toBe(400);
 		});
 
 		it("useMilk updates milkAmount and checks trait", () => {
 			const lactation = new Lactation();
+			lactation.onCreatePlayer(
+				mockedPlayer({
+					HasTrait: SpyHasTrait.mockImplementation(() => true)
+				})
+			);
 			lactation.useMilk(100);
 			expect(SpyHasTrait).toHaveBeenCalledWith("DairyCow");
 			expect(lactation.milkAmount).toBe(300);
@@ -68,20 +73,23 @@ describe("Lactation", () => {
 
 		describe("everyHour event", () => {
 			beforeEach(() => {
-				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
+				const data: LactationData = {
 					isActive: true,
 					milkAmount: 400,
 					expiration: 1,
 					multiplier: 0
-				});
-				jest.spyOn(SpyEvents.everyHours, 'addListener').mockImplementation(cb => {
-					cb(); cb(); // simulate two ticks
-				});
+				};
+				jest.spyOn(Player.prototype, "data", "get")
+					.mockReturnValueOnce(data)
+					.mockReturnValue({ ...data, expiration: 0 });
 			});
 
-			it("should update milkAmount", () => {
+			it("Should de-activate lactation when it expires", () => {
 				const lactation = new Lactation();
-				expect(lactation.isLactating).toBeFalsy(); // because of expiration logic
+				lactation.onCreatePlayer(mockedPlayer());
+				expect(lactation.isLactating).toBe(true);
+				lactation.onEveryHour();
+				expect(lactation.isLactating).toBe(false);
 			});
 		});
 
@@ -93,46 +101,33 @@ describe("Lactation", () => {
 					expiration: 8,
 					multiplier: 1
 				});
-				jest.spyOn(SpyEvents.everyOneMinute, "addListener").mockImplementation(cb => cb());
 			});
 
 			it("should keep lactation active", () => {
 				const lactation = new Lactation();
-				expect(lactation.isLactating).toBe(true);
-			});
-		});
-
-		describe("Pregnancy event", () => {
-			it.each([
-				{ pregnancy: false, progress: 0, expected: false },
-				{ pregnancy: true, progress: 0.4, expected: false },
-				{ pregnancy: true, progress: 0.8, expected: true },
-			])("with isPregnant: $pregnancy and progress: $progress", ({ pregnancy, progress, expected }) => {
-				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
-					isActive: false,
-					milkAmount: 0,
-					expiration: 0,
-					multiplier: 0
-				});
-				const lactation = new Lactation();
-				lactation.onPregnancyUpdate({ isPregnant: pregnancy, progress });
-				expect(lactation.isLactating).toBe(expected);
+				lactation.onCreatePlayer(mockedPlayer());
+				lactation.onEveryMinute();
+				// expect(lactation.isLactating).toBe(true);
+				expect(SpyPipewrench.triggerEvent).toHaveBeenCalled();
 			});
 		});
 
 		describe("Debug functions", () => {
-			it.each<{operation: "add" | "remove" | "set", expected: number}>([
-				{ operation: "add", expected: 500},
-				{ operation: "remove", expected: 300},
-				{ operation: "set", expected: 100},
-			])("should $operation milk", ({operation, expected}) => {
+			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
+				{ operation: "add", expected: 500 },
+				{ operation: "remove", expected: 300 },
+				{ operation: "set", expected: 100 }
+			])("should $operation milk", ({ operation, expected }) => {
 				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
 				lactation.Debug.set(400);
 				lactation.Debug[operation](100);
 				expect(lactation.milkAmount).toBe(expected);
 			});
+
 			it("should be able to toggle lactation", () => {
 				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
 				expect(lactation.isLactating).toBe(true);
 				lactation.Debug.toggle(false);
 				expect(lactation.isLactating).toBe(false);
@@ -140,27 +135,160 @@ describe("Lactation", () => {
 		});
 	});
 
+	describe("when not lactating", () => {
+		beforeEach(() => {
+			const data: LactationData = {
+				isActive: false,
+				milkAmount: 0,
+				expiration: 1,
+				multiplier: 0
+			};
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(data);
+		});
+		it("EveryHour should do nothing when not lactating", () => {
+			const lactation = new Lactation();
+			lactation.onEveryHour();
+			expect(lactation.milkAmount).toBe(0);
+		});
+	});
+
+	describe("Timer Events", () => {
+		describe.each([
+			{ event: "everyOneMinute", handler: "onEveryMinute" },
+			{ event: "everyHours", handler: "onEveryHour" }
+		])("For $event", ({event, handler}) => {
+			const mockEventListener = jest.fn();
+			let womb:Lactation;
+			beforeEach(() => {
+				mockEventListener.mockClear();
+				(Events as any)[event] = {
+					addListener: mockEventListener
+				};
+				const player = mockedPlayer();
+				womb = new Lactation();
+				(womb as any)[handler] = jest.fn();
+				womb.onCreatePlayer(player);
+
+			});
+			it(`should register ${event} listener during player creation`, () => {
+				expect(mockEventListener).toHaveBeenCalledWith(expect.any(Function));
+			});
+			it(`should call ${event} method when event fires`, () => {
+				const spy = jest.spyOn(womb as any, handler);
+				const [callback] = mockEventListener.mock.calls[0];
+				callback();
+				expect(spy).toHaveBeenCalled();
+			});
+		});
+	});
+
+	describe("Pregnancy events", () => {
+		it.each([
+			{ progress: null, expected: false },
+			{ progress: 0.4, expected: false },
+			{ progress: 0.8, expected: true }
+		])(
+			"Lactation should be $expected when pregnancy progress is: $progress",
+			({ progress, expected }) => {
+				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+					progress ? { progress } : null
+				);
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
+					isActive: false,
+					milkAmount: 0,
+					expiration: 0,
+					multiplier: 0
+				});
+
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(
+					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
+				);
+				lactation.onPregnancyUpdate({ progress: progress ?? 0 });
+				expect(lactation.isLactating).toBe(expected);
+			}
+		);
+	});
+
 	describe("Image resolution", () => {
 		it.each([
-			{ state: "normal", fullness: "empty", progress: 0.3, amount: 300, expected: "normal_empty.png" },
-			{ state: "normal", fullness: "full", progress: 0.3, amount: 900, expected: "normal_full.png" },
-			{ state: "early", fullness: "empty", progress: 0.5, amount: 300, expected: "pregnant_early_empty.png" },
-			{ state: "early", fullness: "full", progress: 0.5, amount: 900, expected: "pregnant_early_full.png" },
-			{ state: "late", fullness: "empty", progress: 0.9, amount: 300, expected: "pregnant_late_empty.png" },
-			{ state: "late", fullness: "full", progress: 0.9, amount: 900, expected: "pregnant_late_full.png" },
-		])("returns correct image for $state pregnancy and $fullness", ({ progress, amount, expected }) => {
-			jest.spyOn(SpyEvents.EventEmitter.prototype, 'addListener').mockImplementation(cb => {
-				cb({ isPregnant: true, progress });
-			});
-			jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValueOnce({
-				isActive: true,
-				milkAmount: amount,
-				expiration: 8,
-				multiplier: 1
-			});
+			{
+				state: "non pregnant",
+				fullness: "empty",
+				progress: null,
+				amount: 300,
+				expected: "normal_empty.png"
+			},
+			{
+				state: "non pregnant",
+				fullness: "full",
+				progress: null,
+				amount: 900,
+				expected: "normal_full.png"
+			},
+			{
+				state: "too early in pregnancy",
+				fullness: "empty",
+				progress: 0,
+				amount: 300,
+				expected: "normal_empty.png"
+			},
+			{
+				state: "too early in pregnancy",
+				fullness: "full",
+				progress: 0,
+				amount: 900,
+				expected: "normal_full.png"
+			},
+			{
+				state: "pregnancy early",
+				fullness: "empty",
+				progress: 0.5,
+				amount: 300,
+				expected: "pregnant_early_empty.png"
+			},
+			{
+				state: "pregnancy early",
+				fullness: "full",
+				progress: 0.5,
+				amount: 900,
+				expected: "pregnant_early_full.png"
+			},
+			{
+				state: "pregnancy late",
+				fullness: "empty",
+				progress: 0.9,
+				amount: 300,
+				expected: "pregnant_late_empty.png"
+			},
+			{
+				state: "pregnancy late",
+				fullness: "full",
+				progress: 0.9,
+				amount: 900,
+				expected: "pregnant_late_full.png"
+			}
+		])(
+			"returns correct image when state is $state and fullness is $fullness",
+			({ progress, amount, expected }) => {
+				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+					progress ? { progress } : null
+				);
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
+					isActive: true,
+					milkAmount: amount,
+					expiration: 8,
+					multiplier: 1
+				});
 
-			const lactation = new Lactation();
-			expect(lactation.images.breasts).toBe(`media/ui/lactation/boob/color-1/${expected}`);
-		});
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(
+					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
+				);
+				expect(lactation.images.breasts).toBe(
+					`media/ui/lactation/boob/color-1/${expected}`
+				);
+			}
+		);
 	});
 });

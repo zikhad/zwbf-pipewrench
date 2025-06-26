@@ -9,48 +9,40 @@ type ModDataProps<T> = {
 	defaultData?: T;
 };
 
-/* export enum ZWBFTraits {
-	INFERTILE = "Infertile",
-	FERTILE = "Fertile",
-	HYPERFERTILE = "Hyperfertile",
-	PREGNANCY = "Pregnancy",
-	DAIRY_COW = "DairyCow",
-	STRONG_MENSTRUAL_CRAMPS = "StrongMenstrualCramps",
-	NO_MENSNTRUAL_CRAMPS = "NoMenstrualCramps"
-} */
-
-type ZWBFTraits = "Infertile"
-| "Fertile"
-| "Hyperfertile"
-| "Pregnancy"
-| "DairyCow"
-| "StrongMenstrualCramps"
-| "NoMenstrualCramps";
+type ZWBFTraits =
+	| "Infertile"
+	| "Fertile"
+	| "Hyperfertile"
+	| "Pregnancy"
+	| "DairyCow"
+	| "StrongMenstrualCramps"
+	| "NoMenstrualCramps";
 
 type TraitType = {
 	id: ZWBFTraits;
 	cost: number;
-	profession?: boolean,
-	exclusives?: ZWBFTraits[]
-}
+	profession?: boolean;
+	exclusives?: ZWBFTraits[];
+};
 
 type LactationData = {
 	isActive: boolean;
 	milkAmount: number;
 	multiplier: number;
 	expiration: number;
-}
+};
 
 type LactationImage = {
 	breasts: string;
 	level: string;
-}
+};
 
 type PregnancyData = {
-	isPregnant: boolean;
 	progress: number;
+	current?: number;
+	// duration: number;
 	isInLabor?: boolean;
-}
+};
 
 type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
 
@@ -61,4 +53,13 @@ type WombData = {
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Map<CyclePhase, number>;
-}
+};
+
+/**
+ * Describes animation status including whether it's active and the time progress.
+ */
+type AnimationStatus = {
+	isActive: boolean;
+	delta?: number;
+	duration?: number;
+};

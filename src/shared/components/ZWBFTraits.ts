@@ -10,7 +10,7 @@ export class ZWBFTraits {
 		{
 			id: "Infertile",
 			cost: 3,
-			exclusives: ["Fertile", "Hyperfertile", "Pregnancy"] 
+			exclusives: ["Fertile", "Hyperfertile", "Pregnancy"]
 		},
 		/** Fertile [-2]: You are very fertile <br>- Higher chance of getting pregnant <br>- +50% fertility */
 		{
@@ -41,7 +41,7 @@ export class ZWBFTraits {
 		{
 			id: "NoMenstrualCramps",
 			cost: 1
-		},
+		}
 	];
 	constructor(traits?: TraitType[]) {
 		this.traits = traits || this.defaultTraits;
@@ -51,13 +51,7 @@ export class ZWBFTraits {
 		for (const { id, cost, profession = false, exclusives = [] } of this.traits) {
 			const name = getText(`UI_Trait_${id}`);
 			const description = getText(`UI_Trait_${id}_Description`);
-			TraitFactory.addTrait(
-				id,
-				name,
-				cost,
-				description,
-				profession
-			);
+			TraitFactory.addTrait(id, name, cost, description, profession);
 			for (const exclusive of exclusives) {
 				TraitFactory.setMutualExclusive(id, exclusive);
 			}

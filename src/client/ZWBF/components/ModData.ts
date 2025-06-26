@@ -4,7 +4,7 @@ import { ModDataProps } from "types";
  * Wrapper around `object.getModData()` to ensure the data can be retrieve type safely
  */
 export class ModData<T> {
-	private object: ModDataProps<T>['object'];
+	private object: ModDataProps<T>["object"];
 	private readonly modKey: string;
 	private readonly defaultData?: T;
 
@@ -25,7 +25,7 @@ export class ModData<T> {
 		return this.object.getModData()[this.modKey] as T;
 	}
 
-	set data(value:T) {
+	set data(value: T) {
 		this.object.getModData()[this.modKey] = value;
 	}
 }

@@ -6,7 +6,19 @@ export const everyOneMinute = {
 	addListener: jest.fn()
 };
 
+export const everyTenMinutes = {
+	addListener: jest.fn()
+};
+
 export const everyHours = {
+	addListener: jest.fn()
+};
+
+export const everyDays = {
+	addListener: jest.fn()
+};
+
+export const onDawn = {
 	addListener: jest.fn()
 };
 
@@ -24,5 +36,7 @@ export const onPreDistributionMerge = {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
-	addListener() { return jest.fn() }
+	addListener() {
+		return jest.fn();
+	}
 }
