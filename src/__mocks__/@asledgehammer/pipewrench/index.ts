@@ -15,6 +15,8 @@ export const getText = jest.fn().mockImplementation((...args: string[]) => args.
 
 export const triggerEvent = jest.fn();
 
+// export const require = jest.fn();
+
 export class TraitFactory {
 	static addTrait() {
 		return mock<Trait>({
@@ -27,4 +29,12 @@ export class LuaEventManager {
 	static AddEvent() {
 		return mock<Event>();
 	}
+}
+
+export class ISBaseTimedAction {
+	isValid() { return null as never; }
+	start() {}
+	stop() {}
+	update() {}
+	perform() {}
 }

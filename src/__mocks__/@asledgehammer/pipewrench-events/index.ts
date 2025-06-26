@@ -34,6 +34,14 @@ export const onPreDistributionMerge = {
 	addListener: jest.fn()
 };
 
+export const onCreateUI = {
+	addListener: jest.fn()
+};
+
+export const onPostRender = {
+	addListener: jest.fn()
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
 	addListener() {

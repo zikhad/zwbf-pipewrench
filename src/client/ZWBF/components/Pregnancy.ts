@@ -1,10 +1,11 @@
-import { PregnancyData } from "@types";
+import type { PregnancyData } from "@types";
 import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
+import { Moodle } from "./Moodles";
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	// TODO: how to make sandbox vars work here?
 
@@ -21,13 +22,21 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
         "Baby_14"
     ];
 
-    /* constructor() {
+    private moodle?: Moodle;
+
+    constructor() {
         super();
-    } */
+    }
     
     protected onCreatePlayer(player: IsoPlayer): void {
         super.onCreatePlayer(player);
-
+        this.moodle = new Moodle({
+            player,
+            name: "Pregnancy",
+            type: "Good",
+            texture: "media/ui/Moodles/Pregnancy.png",
+            tresholds: [0.3, 0.6, 0.8, 0.9]
+        });
         Events.everyOneMinute.addListener(() => this.onEveryMinute());
         Events.everyHours.addListener(() => this.onEveryHour());
         Events.everyDays.addListener(() => this.onEveryDays());
@@ -76,6 +85,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
             this.player.setBlockMovement(true);
             ISTimedActionQueue.add(new ZWBFActionBirth(this));
         }
+        this.moodle?.moodle(this.pregnancy.progress);
     }
 
     onEveryHour(): void {
