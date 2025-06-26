@@ -32,22 +32,22 @@ export interface TimedEvents {
 export abstract class Player<T> {
 	/** Reference to the current player instance */
 	public player?: IsoPlayer;
-	
+
 	/** ModData instance wrapping game storage for this player */
 	protected modData?: ModData<T>;
-	
+
 	/** Actual typed data payload stored in ModData */
 	// protected data?: T;
-	
+
 	/** Current pregnancy state data for this player */
 	protected _pregnancy?: ModData<PregnancyData>;
-	
+
 	/** ModData key used for storage and retrieval */
 	private readonly modKey?: string;
-	
+
 	/** Default data assigned on player creation */
 	protected defaultData?: T;
-	
+
 	/**
 	 * Constructs the base Player instance and registers common game events.
 	 *
@@ -55,11 +55,11 @@ export abstract class Player<T> {
 	 */
 	protected constructor(modKey?: string) {
 		this.modKey = modKey;
-		
+
 		// Register Zomboid lifecycle listeners
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
 	}
-	
+
 	/**
 	 * Initializes mod data and hooks for a newly created player.
 	 *
@@ -67,7 +67,7 @@ export abstract class Player<T> {
 	 */
 	protected onCreatePlayer(player: IsoPlayer): void {
 		this.player = player;
-		if(this.modKey) {
+		if (this.modKey) {
 			this.modData = new ModData({
 				object: player,
 				modKey: this.modKey,
@@ -92,44 +92,50 @@ export abstract class Player<T> {
 		).addListener(data => this.onPregnancyUpdate(data));
 	}
 
-	/** 
+	/**
 	 * Given a `BodyPartType` return the `BodyPart` to apply numerous effects
-	 * @param part The `BodyPartType` to return 
-	*/
+	 * @param part The `BodyPartType` to return
+	 */
 	getBodyPart(part: BodyPartType): BodyPart | null {
 		if (!this.player) return null;
-		return this.player.getBodyDamage().getBodyPart(part)
+		return this.player.getBodyDamage().getBodyPart(part);
 	}
 
 	hasItem(itemName: string, recursive = false): boolean {
 		return this.player?.getInventory().contains(itemName, recursive) ?? false;
 	}
 
-	
-	haloText({ text, color, arrow }: { text: string, color?: "green" | "red", arrow?: "up" | "down" }) {
+	haloText({
+		text,
+		color,
+		arrow
+	}: {
+		text: string;
+		color?: "green" | "red";
+		arrow?: "up" | "down";
+	}) {
 		if (!this.player) return;
 		const getColor = (color?: "green" | "red") => {
-			switch(color) {
+			switch (color) {
 				case "green":
 					return HaloTextHelper.getColorGreen();
 				case "red":
 					return HaloTextHelper.getColorRed();
 				default:
 					return HaloTextHelper.getColorWhite();
-
 			}
-		}
+		};
 		const txtColor = getColor(color);
-		switch(arrow) {
+		switch (arrow) {
 			case "up":
 			case "down":
-				HaloTextHelper.addTextWithArrow(this.player, text, (arrow === "up"), txtColor);
+				HaloTextHelper.addTextWithArrow(this.player, text, arrow === "up", txtColor);
 				break;
 			default:
 				HaloTextHelper.addText(this.player, text, txtColor);
 		}
 	}
-	
+
 	/**
 	 * Updates pregnancy data for this player.
 	 *
@@ -149,7 +155,7 @@ export abstract class Player<T> {
 	}
 
 	get pregnancy(): PregnancyData | null {
-		if(!this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
+		if (!this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
 		return this._pregnancy?.data ?? null;
 	}
 

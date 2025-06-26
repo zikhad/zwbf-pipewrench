@@ -10,6 +10,8 @@ interface Layout {
 	current?: string;
 	[key: string]: any;
 }
+
+// TODO: is it possible to improve the typings?
 export class ZWBFTabManager {
 	private static tabs: Record<string, TabInfo> = {};
 	private static methodsOverridden = false;
@@ -72,7 +74,11 @@ export class ZWBFTabManager {
 		ISCharacterInfoWindow.prototype.onTabTornOff = function (view: any, window: any) {
 			for (const [tabName, tabInfo] of Object.entries(ZWBFTabManager.tabs)) {
 				if (this.playerNum === 0 && view === (this as any)[tabInfo.viewName]) {
-					ISLayoutManager.RegisterWindow(`charinfowindow.${tabName}`, ISCharacterInfoWindow, window);
+					ISLayoutManager.RegisterWindow(
+						`charinfowindow.${tabName}`,
+						ISCharacterInfoWindow,
+						window
+					);
 				}
 			}
 			originalOnTabTornOff.call(this, view, window);
@@ -86,7 +92,9 @@ export class ZWBFTabManager {
 				const viewName = tabInfo.viewName;
 				if ((this as any)[viewName] === this.panel.getActiveView()) {
 					this.setWidth((this as any)[viewName].getWidth());
-					this.setHeight(((ISWindow as any).TitleBarHeight * 2) + (this as any)[viewName].getHeight());
+					this.setHeight(
+						(ISWindow as any).TitleBarHeight * 2 + (this as any)[viewName].getHeight()
+					);
 				}
 			}
 		};

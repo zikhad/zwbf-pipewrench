@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Lactation } from "./Lactation";
 import { BodyPart } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
@@ -84,7 +85,7 @@ describe("Lactation", () => {
 			beforeEach(() => {
 				jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue(data);
 			});
-			
+
 			describe("everyOneMinute event", () => {
 				it("should keep lactation active", () => {
 					const lactation = new Lactation();
@@ -94,22 +95,21 @@ describe("Lactation", () => {
 				});
 			});
 			describe("everyTenMinutes", () => {
-				const spyGetAdditionalPain = jest.fn()
-					.mockImplementation(() => 24);
+				const spyGetAdditionalPain = jest.fn().mockImplementation(() => 24);
 				const spySetAdditionalPain = jest.fn();
 
-				const spyGetWetness = jest.fn()
-					.mockImplementation(() => 24);
+				const spyGetWetness = jest.fn().mockImplementation(() => 24);
 				const spySetWetness = jest.fn();
 
 				beforeEach(() => {
-					jest.spyOn(Player.prototype, 'getBodyPart')
-					.mockImplementation(() => (mock<BodyPart>({
-						getAdditionalPain: spyGetAdditionalPain,
-						setAdditionalPain: spySetAdditionalPain,
-						getWetness: spyGetWetness,
-						setWetness:  spySetWetness
-					})));
+					jest.spyOn(Player.prototype, "getBodyPart").mockImplementation(() =>
+						mock<BodyPart>({
+							getAdditionalPain: spyGetAdditionalPain,
+							setAdditionalPain: spySetAdditionalPain,
+							getWetness: spyGetWetness,
+							setWetness: spySetWetness
+						})
+					);
 				});
 				it("Should inflict pain & wetness from engorgement", () => {
 					const lactation = new Lactation();
@@ -125,7 +125,7 @@ describe("Lactation", () => {
 						.mockReturnValueOnce(data)
 						.mockReturnValue({ ...data, expiration: 0 });
 				});
-	
+
 				it("Should de-activate lactation when it expires", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
@@ -135,8 +135,6 @@ describe("Lactation", () => {
 				});
 			});
 		});
-
-
 
 		describe("Debug functions", () => {
 			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
@@ -171,14 +169,14 @@ describe("Lactation", () => {
 			};
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(data);
 		});
-		it.each([
-			{ handler: "onEveryTenMinutes" },
-			{ handler: "onEveryHour"}
-		])("$fn should do nothing when not lactating", ({ handler }) => {
-			const lactation = new Lactation();
-			(lactation as any)[handler]();
-			expect(lactation.milkAmount).toBe(0);
-		});
+		it.each([{ handler: "onEveryTenMinutes" }, { handler: "onEveryHour" }])(
+			"$fn should do nothing when not lactating",
+			({ handler }) => {
+				const lactation = new Lactation();
+				(lactation as any)[handler]();
+				expect(lactation.milkAmount).toBe(0);
+			}
+		);
 	});
 
 	describe("Timer Events", () => {
@@ -186,9 +184,9 @@ describe("Lactation", () => {
 			{ event: "everyOneMinute", handler: "onEveryMinute" },
 			{ event: "everyTenMinutes", handler: "onEveryTenMinutes" },
 			{ event: "everyHours", handler: "onEveryHour" }
-		])("For $event", ({event, handler}) => {
+		])("For $event", ({ event, handler }) => {
 			const mockEventListener = jest.fn();
-			let lactation:Lactation;
+			let lactation: Lactation;
 			beforeEach(() => {
 				mockEventListener.mockClear();
 				(Events as any)[event] = {
@@ -198,7 +196,6 @@ describe("Lactation", () => {
 				lactation = new Lactation();
 				(lactation as any)[handler] = jest.fn();
 				lactation.onCreatePlayer(player);
-
 			});
 			it(`should register ${event} listener during player creation`, () => {
 				expect(mockEventListener).toHaveBeenCalledWith(expect.any(Function));

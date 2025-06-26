@@ -32,7 +32,9 @@ export class LuaEventManager {
 }
 
 export class ISBaseTimedAction {
-	isValid() { return null as never; }
+	isValid() {
+		return null as never;
+	}
 	start() {}
 	stop() {}
 	update() {}

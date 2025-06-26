@@ -1,7 +1,14 @@
 /* @noSelfInFile */
 
 import { AnimationStatus, CyclePhase, PregnancyData, WombData } from "@types";
-import { BodyPartType, getText, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
+import {
+	BodyPartType,
+	getText,
+	IsoPlayer,
+	triggerEvent,
+	ZombRand,
+	ZombRandFloat
+} from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
@@ -29,7 +36,7 @@ type WombOptions = {
  * for a player character in the game. Handles cycle tracking, fertility logic,
  * and dynamic image rendering for different states.
  */
-export class Womb extends Player<WombData>implements TimedEvents {
+export class Womb extends Player<WombData> implements TimedEvents {
 	private readonly _capacity: number;
 
 	private readonly options: WombOptions;
@@ -37,37 +44,37 @@ export class Womb extends Player<WombData>implements TimedEvents {
 	private _animation: AnimationStatus;
 
 	private readonly animations: AnimationSettings;
-	
+
 	public Debug = {
 		sperm: {
 			add: (amount: number) => {
-				this.amount = Math.min(this._capacity, this.amount + amount)
+				this.amount = Math.min(this._capacity, this.amount + amount);
 				this.total += amount;
 			},
-			remove: (amount: number) => this.amount = Math.max(0, this.amount - amount),
-			set: (amount: number) => this.amount = amount,
-			setTotal: (amount: number) => this.total = Math.max(0, amount),
+			remove: (amount: number) => (this.amount = Math.max(0, this.amount - amount)),
+			set: (amount: number) => (this.amount = amount),
+			setTotal: (amount: number) => (this.total = Math.max(0, amount))
 		},
 		cycle: {
-			addDay: (amount = 1) => this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29),
+			addDay: (amount = 1) => (this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29)),
 			nextPhase: () => {
 				if (this.pregnancy) return;
-				if(this.cycleDay < 1) {
+				if (this.cycleDay < 1) {
 					this.cycleDay = 1;
 				} else if (this.cycleDay < 6) {
 					this.cycleDay = 6;
 				} else if (this.cycleDay < 13) {
-					this.cycleDay = 13
+					this.cycleDay = 13;
 				} else if (this.cycleDay < 16) {
-					this.cycleDay = 16
+					this.cycleDay = 16;
 				} else if (this.cycleDay < 28) {
-					this.cycleDay = 28
+					this.cycleDay = 28;
 				} else {
 					this.cycleDay = 1;
 				}
 			}
 		}
-	}
+	};
 
 	/**
 	 * Initializes the Womb system with animation presets.
@@ -131,22 +138,22 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
-		Events.everyHours.addListener(() => this.onEveryHour())
+		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
 
-		new Events.EventEmitter<(data: AnimationStatus) => void>(ZWBFEvents.ANIMATION_UPDATE)
-			.addListener(
-				data => this.onAnimationUpdate(data)
-			);
-		
-		new Events.EventEmitter(ZWBFEvents.INTERCOURSE)
-			.addListener(() => this.intercourse());
+		new Events.EventEmitter<(data: AnimationStatus) => void>(
+			ZWBFEvents.ANIMATION_UPDATE
+		).addListener(data => this.onAnimationUpdate(data));
+
+		new Events.EventEmitter(ZWBFEvents.INTERCOURSE).addListener(() => this.intercourse());
 	}
 
-	private isAllowedAnimation(excludedTags: string[] = ["Oral", "Masturbation", "Anal", "Solo", "Mast"]) {
+	private isAllowedAnimation(
+		excludedTags: string[] = ["Oral", "Masturbation", "Anal", "Solo", "Mast"]
+	) {
 		// when in labor, there is no need to check ZomboWin animations
-		if(this.pregnancy?.isInLabor) return true;
-		
+		if (this.pregnancy?.isInLabor) return true;
+
 		const getAnim = () => {
 			const { queue } = ISTimedActionQueue.getTimedActionQueue(this.player);
 			for (const { animation } of queue) {
@@ -154,15 +161,15 @@ export class Womb extends Player<WombData>implements TimedEvents {
 			}
 			return null;
 		};
-		
+
 		const getAnimInfo = () => {
 			const currentAnim = getAnim();
-			if(!currentAnim) return null;
-			
-			for(const data of ZomboWinAnimationData) {
-				for(const { stages } of data.actors) {
+			if (!currentAnim) return null;
+
+			for (const data of ZomboWinAnimationData) {
+				for (const { stages } of data.actors) {
 					const { perform } = stages[0];
-					if(perform == currentAnim) {
+					if (perform == currentAnim) {
 						return data;
 					}
 				}
@@ -170,8 +177,8 @@ export class Womb extends Player<WombData>implements TimedEvents {
 			return null;
 		};
 		const tags = getAnimInfo()?.tags;
-		if(!tags) return false;
-		return !(tags.some(tag => excludedTags.includes(tag)));
+		if (!tags) return false;
+		return !tags.some(tag => excludedTags.includes(tag));
 	}
 
 	/**
@@ -180,7 +187,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 	 */
 	onAnimationUpdate(data: AnimationStatus) {
 		this.animation = data;
-		if(!this.isAllowedAnimation()) {
+		if (!this.isAllowedAnimation()) {
 			this.animation = {
 				isActive: false
 			};
@@ -189,14 +196,14 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 	intercourse() {
 		if (this.hasItem("ZWBF.Condom")) {
-			const inventory = this.player?.getInventory()
+			const inventory = this.player?.getInventory();
 			inventory?.Remove("Condom");
 			inventory?.AddItem("ZWBF.CondomUsed", 1);
 		} else {
 			const amount = ZombRand(10, 50);
 			this.amount += amount;
 			this.total += amount;
-			
+
 			this.haloText({
 				text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
 				arrow: "up",
@@ -210,11 +217,11 @@ export class Womb extends Player<WombData>implements TimedEvents {
 	impregnate() {
 		const fertility = this.getFertility();
 		if (fertility <= 0) return;
-		if (ZombRandFloat(0, 1) >= (1 - fertility)) {
+		if (ZombRandFloat(0, 1) >= 1 - fertility) {
 			this.haloText({
 				text: getText("IGUI_ZWBF_UI_Fertilized"),
 				color: "green"
-			})
+			});
 			triggerEvent(ZWBFEvents.PREGNANCY_START);
 		}
 	}
@@ -240,7 +247,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 	onEveryTenMinutes(): void {
 		// 50% of doing nothing also do nothing if empty
-		if ((this.amount <= 0) || (ZombRand(100) < 50)) return;
+		if (this.amount <= 0 || ZombRand(100) < 50) return;
 		const amount = ZombRand(10, 50);
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
@@ -248,11 +255,14 @@ export class Womb extends Player<WombData>implements TimedEvents {
 
 	onEveryHour(): void {
 		this.data!.chances = Womb.chances;
-		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, { player: this.player!, data: this.data!, capacity: this._capacity });	
+		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, {
+			player: this.player!,
+			data: this.data!,
+			capacity: this._capacity
+		});
 	}
 
 	onEveryDay(): void {
-		
 		// Increment cycle day
 		this.cycleDay++;
 
@@ -298,7 +308,6 @@ export class Womb extends Player<WombData>implements TimedEvents {
 		return CyclePhaseEnum.LUTEAL;
 	}
 
-	
 	private applyBleeding() {
 		const maxPain = this.player?.HasTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS) ? 50 : 25;
 		const groin = this.getBodyPart(BodyPartType.Groin)!;
@@ -308,11 +317,11 @@ export class Womb extends Player<WombData>implements TimedEvents {
 		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(maxPain)));
 	}
 	private applyWetness() {
-		const amount = ZombRand(10,100);
+		const amount = ZombRand(10, 100);
 		const groin = this.getBodyPart(BodyPartType.Groin)!;
 		groin.setWetness(groin.getWetness() + amount);
 	}
-	
+
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
 		if (ZombRand(100) < 50) return;
@@ -467,7 +476,7 @@ export class Womb extends Player<WombData>implements TimedEvents {
 		const { animation, type } = this.getAnimationSetting();
 		const { steps, loop = 1 } = animation;
 
-		const loopDuration = (duration / loop);
+		const loopDuration = duration / loop;
 		const currentLoopDelta = (delta * duration) % loopDuration;
 		const stepDuration = loopDuration / steps.length;
 

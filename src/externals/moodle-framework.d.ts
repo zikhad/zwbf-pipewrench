@@ -1,22 +1,24 @@
 type Moodle = {
-    setThresholds:(...args:[
-        number | null,
-        number | null,
-        number | null,
-        number | null,
-        number | null,
-        number | null,
-        number | null,
-        number | null
-    ]) => void;
-    setPicture: (trasholds: any, level: number, texture: string) => void;
-    setValue: (level: number) => void;
-    getGoodBadNeutral: () => unknown;
-    getLevel: () => number;
-}
+	setThresholds: (
+		...args: [
+			number | null,
+			number | null,
+			number | null,
+			number | null,
+			number | null,
+			number | null,
+			number | null,
+			number | null
+		]
+	) => void;
+	setPicture: (trasholds: unknown, level: number, texture: string) => void;
+	setValue: (level: number) => void;
+	getGoodBadNeutral: () => unknown;
+	getLevel: () => number;
+};
 
 /** @noResolution */
 declare const MF: {
-    createMoodle: (name: string) => void,
-    getMoodle: (name: string) => Moodle
+	createMoodle: (name: string) => void;
+	getMoodle: (name: string) => Moodle;
 };

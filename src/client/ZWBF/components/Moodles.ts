@@ -1,107 +1,101 @@
-import { getActivatedMods, getText, HaloTextHelper, IsoPlayer, require as pipeWrenchRequire } from "@asledgehammer/pipewrench";
+import {
+	getActivatedMods,
+	getText,
+	HaloTextHelper,
+	IsoPlayer,
+	require as pipeWrenchRequire
+} from "@asledgehammer/pipewrench";
 // import module from "MF_ISMoodle";
 
 // type moodleValues =
 type MoodleProps = {
-    player: IsoPlayer;
-    name: string;
-    texture: string;
-    type: "Good" | "Bad";
-    tresholds: [number, number, number, number ]
-}
+	player: IsoPlayer;
+	name: string;
+	texture: string;
+	type: "Good" | "Bad";
+	tresholds: [number, number, number, number];
+};
 export class Moodle {
-    
-    private isMF = false;
-    private player: IsoPlayer;
-    private name: string;
-    private type: "Good" | "Bad";
-    private texture: string;
-    private tresholds: [number, number, number, number];
+	private isMF = false;
+	private player: IsoPlayer;
+	private name: string;
+	private type: "Good" | "Bad";
+	private texture: string;
+	private tresholds: [number, number, number, number];
 
-    constructor(props: MoodleProps) {
-        const { player, name, type, texture, tresholds } = props;
-        this.player = player;
-        this.name = name;
-        this.type = type;
-        this.texture = texture;
-        this.tresholds = tresholds;
-        if (getActivatedMods().contains("MoodleFramework")) {
-            this.isMF = true;
-            // require("MF_ISMoodle")
-            pipeWrenchRequire("MF_ISMoodle");
-            MF.createMoodle(this.name);
-            /* const moodle = MF.getMoodle(name); 
+	constructor(props: MoodleProps) {
+		const { player, name, type, texture, tresholds } = props;
+		this.player = player;
+		this.name = name;
+		this.type = type;
+		this.texture = texture;
+		this.tresholds = tresholds;
+		if (getActivatedMods().contains("MoodleFramework")) {
+			this.isMF = true;
+			// require("MF_ISMoodle")
+			pipeWrenchRequire("MF_ISMoodle");
+			MF.createMoodle(this.name);
+			/* const moodle = MF.getMoodle(name); 
             moodle.setPicture(
                 moodle.getGoodBadNeutral(),
                 moodle.getLevel(),
                 texture
             )*/
-        }
-    }
+		}
+	}
 
-    /**
-     * Method to fallback to `HaloText` when `MoodleFramework` is not active
-     * @param level number between 0-1
-     */
-    private fallbackMoodle(level: number): void {
-        level = Math.min(Math.max(level, 0), 1);
-        // get a treshold from the tresholds, undefined if level not close enough
-        const mapped = new Map([
-            [this.tresholds[0], 1],
-            [this.tresholds[1], 2],
-            [this.tresholds[2], 3],
-            [this.tresholds[3], 4],
-        ]).get(+level.toFixed(1));
-        
-        if(mapped) {
-            const color = this.type === "Good" ? HaloTextHelper.getColorGreen() : HaloTextHelper.getColorRed();
-            HaloTextHelper.addText(
-                this.player,
-                getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`),
-                color
-            );
-        }
-    }
+	/**
+	 * Method to fallback to `HaloText` when `MoodleFramework` is not active
+	 * @param level number between 0-1
+	 */
+	private fallbackMoodle(level: number): void {
+		level = Math.min(Math.max(level, 0), 1);
+		// get a treshold from the tresholds, undefined if level not close enough
+		const mapped = new Map([
+			[this.tresholds[0], 1],
+			[this.tresholds[1], 2],
+			[this.tresholds[2], 3],
+			[this.tresholds[3], 4]
+		]).get(+level.toFixed(1));
 
-    
-    /**
-     * Method to return array of arguments expecteed by `moodle.setTresholds`
-     * @returns An array with 8 `number` and `null` elements, shifted depending on moodle type
-     */
-    private buildTresholds() {
-        return [0,0,0,0,0,0,0,0].map((_, index) => {
-            if (index < 4 && this.type === "Good") {
-                return this.tresholds[index];
-            } else if (index >= 4 && this.type === "Bad") {
-                return this.tresholds[index - 4];
-            }
-            return null;
-        });
-    }
+		if (mapped) {
+			const color =
+				this.type === "Good"
+					? HaloTextHelper.getColorGreen()
+					: HaloTextHelper.getColorRed();
+			HaloTextHelper.addText(
+				this.player,
+				getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`),
+				color
+			);
+		}
+	}
 
-    public moodle(level: number): void {
-        if (!this.isMF) {
-            this.fallbackMoodle(level);
-            return;
-        }
+	/**
+	 * Method to return array of arguments expecteed by `moodle.setTresholds`
+	 * @returns An array with 8 `number` and `null` elements, shifted depending on moodle type
+	 */
+	private buildTresholds() {
+		return [0, 0, 0, 0, 0, 0, 0, 0].map((_, index) => {
+			if (index < 4 && this.type === "Good") {
+				return this.tresholds[index];
+			} else if (index >= 4 && this.type === "Bad") {
+				return this.tresholds[index - 4];
+			}
+			return null;
+		});
+	}
 
-        const moodle = MF.getMoodle(this.name);
-        const [
-            Good1,
-            Good2,
-            Good3,
-            Good4,
-            Bad1,
-            Bad2,
-            Bad3,
-            Bad4
-        ] = this.buildTresholds();
-        moodle.setThresholds(Good1, Good2, Good3, Good4, Bad1, Bad2, Bad3, Bad4);
-        moodle.setPicture(
-            moodle.getGoodBadNeutral(),
-            moodle.getLevel(),
-            this.texture
-        );
-        moodle.setValue(level);
-    }
+	public moodle(level: number): void {
+		if (!this.isMF) {
+			this.fallbackMoodle(level);
+			return;
+		}
+
+		const moodle = MF.getMoodle(this.name);
+		const [Good1, Good2, Good3, Good4, Bad1, Bad2, Bad3, Bad4] = this.buildTresholds();
+		moodle.setThresholds(Good1, Good2, Good3, Good4, Bad1, Bad2, Bad3, Bad4);
+		moodle.setPicture(moodle.getGoodBadNeutral(), moodle.getLevel(), this.texture);
+		moodle.setValue(level);
+	}
 }

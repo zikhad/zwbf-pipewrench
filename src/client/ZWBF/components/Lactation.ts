@@ -66,7 +66,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 			texture: "media/ui/Moodles/Engorgement.png",
 			tresholds: [0.3, 0.6, 0.8, 0.9]
 		});
-		
+
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
@@ -83,7 +83,6 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		this.useMilk(0, progress);
 	}
 
-	
 	onEveryMinute() {
 		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
 	}
@@ -91,21 +90,21 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	onEveryTenMinutes() {
 		if (!this.isLactating) return;
 		const torso = this.getBodyPart(BodyPartType.Torso_Upper)!;
-		
+
 		const modifier = percentageToNumber(this.percentage, 25);
-		
+
 		// Apply engorgement pain
-		const currentPain = torso.getAdditionalPain(); 
-		if(currentPain < 25) {
+		const currentPain = torso.getAdditionalPain();
+		if (currentPain < 25) {
 			torso.setAdditionalPain(Math.min(25, currentPain + modifier));
 		}
 
 		// Apply wetness
 		const currentWetness = torso.getWetness();
-		if(currentWetness < 25) {
+		if (currentWetness < 25) {
 			torso.setWetness(Math.min(25, currentWetness + modifier));
 		}
-		
+
 		// Apply moodle
 		this.moodle?.moodle(this.percentage);
 	}

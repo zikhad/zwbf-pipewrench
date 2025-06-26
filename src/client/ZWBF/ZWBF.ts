@@ -10,7 +10,7 @@ export const pregnancy = new Pregnancy();
 export const effects = new Effects();
 
 export const UI = new ZWBFUI({
-    lactation,
-    womb,
-    pregnancy
+	lactation,
+	womb,
+	pregnancy
 });

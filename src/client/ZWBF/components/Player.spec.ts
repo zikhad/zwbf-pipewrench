@@ -6,32 +6,32 @@ import * as SpyModData from "./ModData";
 jest.mock("./ModData");
 
 type MockData = {
-    mock: string;
-}
+	mock: string;
+};
 class MockPlayer extends Player<MockData> {
-    constructor() {
-        super("MockPlayer");
-    }
-    public onCreatePlayer(player: IsoPlayer): void {
-        super.onCreatePlayer(player);
-    }
-    onEveryMinute() { }
-    onEveryHour() { }
+	constructor() {
+		super("MockPlayer");
+	}
+	public onCreatePlayer(player: IsoPlayer): void {
+		super.onCreatePlayer(player);
+	}
+	onEveryMinute() {}
+	onEveryHour() {}
 }
 
 describe("Player", () => {
-    it("should initialize player with mod data", () => {
-        const player = mock<IsoPlayer>();
-        const playerInstance = new MockPlayer();
+	it("should initialize player with mod data", () => {
+		const player = mock<IsoPlayer>();
+		const playerInstance = new MockPlayer();
 
-        jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
-            mock: "mocked-data"
-        });
+		jest.spyOn(SpyModData.ModData.prototype, "data", "get").mockReturnValue({
+			mock: "mocked-data"
+		});
 
-        playerInstance.onCreatePlayer(player);
+		playerInstance.onCreatePlayer(player);
 
-        // expect(playerInstance.player).toBe(player);
-        expect(playerInstance.data).toBeDefined();
-        expect(playerInstance.data?.mock).toBe("mocked-data");
-    });
+		// expect(playerInstance.player).toBe(player);
+		expect(playerInstance.data).toBeDefined();
+		expect(playerInstance.data?.mock).toBe("mocked-data");
+	});
 });

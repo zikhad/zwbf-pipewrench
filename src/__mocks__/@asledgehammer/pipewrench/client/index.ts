@@ -1,3 +1,5 @@
 export class ISTimedActionQueue {
-	static getTimedActionQueue() { return null as never; }
+	static getTimedActionQueue() {
+		return null as never;
+	}
 }
