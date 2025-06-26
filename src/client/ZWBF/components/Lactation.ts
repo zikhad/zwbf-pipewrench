@@ -1,10 +1,11 @@
-import { IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { getSkinColor, percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
 import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { Player, TimedEvents } from "./Player";
+import { Moodle } from "./Moodles";
 
 /**
  * Lactation management system for a player character.
@@ -14,6 +15,8 @@ import { Player, TimedEvents } from "./Player";
 export class Lactation extends Player<LactationData> implements TimedEvents {
 	private readonly _capacity: number;
 	private readonly _bottleAmount;
+
+	private moodle?: Moodle;
 
 	private readonly CONSTANTS = {
 		MAX_LEVEL: 5,
@@ -55,8 +58,17 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 			expiration: 7,
 			multiplier: 0
 		};
+
+		this.moodle = new Moodle({
+			player,
+			name: "Engorgement",
+			type: "Bad",
+			texture: "media/ui/Moodles/Engorgement.png",
+			tresholds: [0.3, 0.6, 0.8, 0.9]
+		});
 		
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
+		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
 
 		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
@@ -74,6 +86,28 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	
 	onEveryMinute() {
 		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
+	}
+
+	onEveryTenMinutes() {
+		if (!this.isLactating) return;
+		const torso = this.getBodyPart(BodyPartType.Torso_Upper)!;
+		
+		const modifier = percentageToNumber(this.percentage, 25);
+		
+		// Apply engorgement pain
+		const currentPain = torso.getAdditionalPain(); 
+		if(currentPain < 25) {
+			torso.setAdditionalPain(Math.min(25, currentPain + modifier));
+		}
+
+		// Apply wetness
+		const currentWetness = torso.getWetness();
+		if(currentWetness < 25) {
+			torso.setWetness(Math.min(25, currentWetness + modifier));
+		}
+		
+		// Apply moodle
+		this.moodle?.moodle(this.percentage);
 	}
 
 	onEveryHour() {

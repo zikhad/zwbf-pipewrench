@@ -15,7 +15,7 @@ export const getText = jest.fn().mockImplementation((...args: string[]) => args.
 
 export const triggerEvent = jest.fn();
 
-// export const require = jest.fn();
+export const getActivatedMods = jest.fn();
 
 export class TraitFactory {
 	static addTrait() {
