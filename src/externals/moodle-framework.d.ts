@@ -12,6 +12,7 @@ type Moodle = {
     setPicture: (trasholds: any, level: number, texture: string) => void;
     setValue: (level: number) => void;
     getGoodBadNeutral: () => unknown;
+    getLevel: () => number;
 }
 
 /** @noResolution */
