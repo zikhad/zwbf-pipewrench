@@ -1,7 +1,7 @@
 /* @noSelfInFile */
 
 import { AnimationStatus, CyclePhase, PregnancyData, WombData } from "@types";
-import { AnimationAsset, AnimationAssetParams, AnimationClip, BodyPartType, getText, IsoGameCharacter, IsoPlayer, KeyEventQueue, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
+import { BodyPartType, getText, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
@@ -143,32 +143,21 @@ export class Womb extends Player<WombData>implements TimedEvents {
 			.addListener(() => this.intercourse());
 	}
 
-	/**
-	 * Applies animation updates to internal state.
-	 * @param data - New animation status.
-	 */
-	onAnimationUpdate(data: AnimationStatus) {
-		this.animation = data;
-		// TODO: check if animation is allowed
-		if(!this.pregnancy?.isInLabor && !this.isAllowedAnimation()) {
-			this.animation = {
-				// ...data,
-				isActive: false
-			};
-		}
-	}
-
 	private isAllowedAnimation(excludedTags: string[] = ["Oral", "Masturbation", "Anal", "Solo", "Mast"]) {
+		// when in labor, there is no need to check ZomboWin animations
+		if(this.pregnancy?.isInLabor) return true;
+		
 		const getAnim = () => {
 			const { queue } = ISTimedActionQueue.getTimedActionQueue(this.player);
 			for (const { animation } of queue) {
 				return animation as string;
 			}
 			return null;
-		}
+		};
+		
 		const getAnimInfo = () => {
 			const currentAnim = getAnim();
-			if(!currentAnim) return;
+			if(!currentAnim) return null;
 			
 			for(const data of ZomboWinAnimationData) {
 				for(const { stages } of data.actors) {
@@ -178,9 +167,24 @@ export class Womb extends Player<WombData>implements TimedEvents {
 					}
 				}
 			}
+			return null;
+		};
+		const tags = getAnimInfo()?.tags;
+		if(!tags) return false;
+		return !(tags.some(tag => excludedTags.includes(tag)));
+	}
+
+	/**
+	 * Applies animation updates to internal state.
+	 * @param data - New animation status.
+	 */
+	onAnimationUpdate(data: AnimationStatus) {
+		this.animation = data;
+		if(!this.isAllowedAnimation()) {
+			this.animation = {
+				isActive: false
+			};
 		}
-		const { tags } = getAnimInfo() || {};
-		return !(tags?.some(tag => excludedTags.includes(tag)));
 	}
 
 	intercourse() {

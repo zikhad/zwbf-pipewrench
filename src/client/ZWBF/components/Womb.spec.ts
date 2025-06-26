@@ -2,6 +2,7 @@
 import { mock } from "jest-mock-extended";
 import { BodyPart, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
+import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { CyclePhase, WombData } from "../../../types";
 import { Womb } from "./Womb";
 import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "../../../constants";
@@ -9,8 +10,11 @@ import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mockedPlayer } from "../../../test/mock";
 
+
+const spyGetTimedActionQueue = jest.fn();
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
+jest.mock("@asledgehammer/pipewrench/client");
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
 
@@ -45,6 +49,25 @@ describe("Womb", () => {
 		// Default: no pregnancy, no data
 		jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(null);
 		jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
+
+		// getTimedActionQueue should always return an valid value
+		ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() =>({
+			queue: [
+				{ animation: "allowed"}
+			]
+		}));
+
+		// should mock ZomboWin animation data
+		const ZomboWinAnimationData = [{
+			prefix: "mocked",
+			id: "mocked",
+			tags:  ["allowed"],
+			actors: [
+				{ gender: "Female", stages: [ { perform: "allowed", duration: 1000 } ] },
+				{ gender: "Male", stages: [ { perform: "allowed", duration: 1000 } ] },
+			]
+		}];
+		Object.defineProperty(global, 'ZomboWinAnimationData', { value: ZomboWinAnimationData, writable: true });
 	});
 
 	// === Basic Instantiation Tests ===
@@ -451,6 +474,7 @@ describe("Womb", () => {
 		});
 
 		describe("scene images", () => {
+			
 			const sceneTestCases = [
 				{
 					amount: 0,
@@ -531,8 +555,42 @@ describe("Womb", () => {
 
 				expect(womb.image).toBe("media/ui/animation/birth/0.png");
 			});
+
+			it("should not animate when animation is not queued", () => {
+				ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() => ({
+					queue: []
+				}));
+				const womb = new Womb();
+				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
+				expect(womb.animation.isActive).toBe(false);
+
+			});
+
+			it("should not animate when ZomboWin animation data is not present", () => {
+				Object.defineProperty(global, 'ZomboWinAnimationData', { value: [], writable: true });
+				const womb = new Womb();
+				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
+				expect(womb.animation.isActive).toBe(false);
+			});
 		});
 	});
+
+	// === External getters & setters ===
+	describe("External getters & setters", () => {
+		beforeEach(() => {
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData({ onContraceptive: false, cycleDay: 1 }));
+		});
+		it("should be able to set contraceptive externally", () => {
+			const womb = new Womb();
+			expect(womb.onContraceptive).toBe(false);
+			womb.contraceptive = true;
+			expect(womb.onContraceptive).toBe(true);
+		});
+		it("Should be able to retrieve phaseTranslation", () => {
+			const womb = new Womb();
+			expect(womb.phaseTranslation).toBe("IGUI_ZWBF_UI_Menstruation");
+		});
+	})
 
 	// === Debug Functions ===
 	describe("Debug", () => {

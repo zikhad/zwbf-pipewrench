@@ -1,4 +1,4 @@
-import { getActivatedMods, getText, HaloTextHelper, IsoPlayer, require } from "@asledgehammer/pipewrench";
+import { getActivatedMods, getText, HaloTextHelper, IsoPlayer, require as pipeWrenchRequire } from "@asledgehammer/pipewrench";
 // import module from "MF_ISMoodle";
 
 // type moodleValues =
@@ -28,7 +28,7 @@ export class Moodle {
         if (getActivatedMods().contains("MoodleFramework")) {
             this.isMF = true;
             // require("MF_ISMoodle")
-            require("MF_ISMoodle");
+            pipeWrenchRequire("MF_ISMoodle");
             MF.createMoodle(this.name);
             /* const moodle = MF.getMoodle(name); 
             moodle.setPicture(

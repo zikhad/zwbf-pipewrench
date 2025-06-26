@@ -1,11 +1,15 @@
 jest.mock("@client/components/Lactation");
 jest.mock("@client/components/Womb");
-import { lactation, womb } from "./ZWBF";
+jest.mock("@client/components/Pregnancy");
+import { lactation, womb, pregnancy, UI } from "./ZWBF";
 describe("ZWBF", () => {
-	it("Lactation should be defined", () => {
-		expect(lactation).toBeDefined();
-	});
-	it("Womb should be defined", () => {
-		expect(womb).toBeDefined();
+	it.each([
+		{ name: "Lactation", component: lactation },
+		{ name: "Pregnancy", component: lactation },
+		{ name: "Womb", component: lactation },
+		{ name: "UI", component: lactation },
+
+	])("$component should be defined", ({ component }) => {
+		expect(component).toBeDefined();
 	});
 });
