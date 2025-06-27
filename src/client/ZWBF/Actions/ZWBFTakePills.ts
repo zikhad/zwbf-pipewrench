@@ -49,7 +49,7 @@ export abstract class ZWBFTakePills extends ISBaseTimedAction {
 	}
 	perform() {
 		super.perform();
-		this.pills.getContainer().setDrawDirty(true);
+		// this.pills.getContainer().setDrawDirty(true);
 		this.pills.setJobDelta(0);
 		this.pills.Use();
 	}

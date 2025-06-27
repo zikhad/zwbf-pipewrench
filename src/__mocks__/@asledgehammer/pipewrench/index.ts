@@ -5,10 +5,11 @@ export const getPlayer = jest.fn();
 
 export const ZombRandFloat = (a: number) => a;
 export const ZombRand = (a: number) => a;
+export const isDebugEnabled = jest.fn();
 
 export const BodyPartType = {
 	Groin: "Groin",
-	Torso: "Torso"
+	Torso_Upper: "Torso_Upper"
 };
 
 export const getText = jest.fn().mockImplementation((...args: string[]) => args.join());
@@ -32,11 +33,32 @@ export class LuaEventManager {
 }
 
 export class ISBaseTimedAction {
-	isValid() {
-		return null as never;
-	}
+	derive() {}
+	setActionAnim() {}
+	setOverrideHandModels() {}
+	getJobDelta() { return null as never; }
+	isValid() { return null as never; }
 	start() {}
 	stop() {}
 	update() {}
 	perform() {}
 }
+
+export class BaseCharacterSoundEmitter {
+	isPlaying() { return null as never; }
+	stopSoundByName() {}
+}
+
+export class GameTime {
+	static getInstance() {
+		return {
+			getHour:  () => jest.fn()
+		}
+	}
+}
+
+export const getGametimeTimestamp = jest.fn();
+
+(globalThis as any).table = {
+	insert: jest.fn((arr, fn) => arr.push(fn))
+};
