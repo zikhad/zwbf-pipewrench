@@ -1,4 +1,4 @@
 /** @noResolution */
-declare const ISContextMenu : {
-    getNew: (context: unknown) => void
-}
+declare const ISContextMenu: {
+	getNew: (context: unknown) => void;
+};

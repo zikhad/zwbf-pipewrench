@@ -7,7 +7,6 @@ import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
-	
 	// TODO: how to make sandbox vars work here?
 	private options = {
 		duration: 14 * 24 * 60 // 14 days
@@ -41,8 +40,8 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		start: () => this.start(),
 		stop: () => this.stop(),
 		advance: (minutes: number) => {
-			if(!this.pregnancy) return;
-			
+			if (!this.pregnancy) return;
+
 			const { current = 0, isInLabor } = this.pregnancy;
 			const { duration } = this.options;
 			const updated = Math.min(duration, current + minutes);
@@ -53,12 +52,12 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			};
 		},
 		advanceToLabor: () => {
-			if(!this.pregnancy) return;
+			if (!this.pregnancy) return;
 			const { current = 0 } = this.pregnancy;
 			const { duration } = this.options;
-			this.Debug.advance((duration - current) - 1);
+			this.Debug.advance(duration - current - 1);
 		}
-	}
+	};
 
 	constructor() {
 		super();
