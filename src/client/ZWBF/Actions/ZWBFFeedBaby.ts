@@ -3,7 +3,6 @@ import {
 	GameTime,
 	getGametimeTimestamp,
 	getText,
-	InventoryItem,
 	ISBaseTimedAction,
 	IsoGameCharacter,
 	ZombRandFloat

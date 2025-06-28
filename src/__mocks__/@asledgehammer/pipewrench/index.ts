@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { mock } from "jest-mock-extended";
 import { Trait } from "@asledgehammer/pipewrench";
 
@@ -36,8 +38,12 @@ export class ISBaseTimedAction {
 	derive() {}
 	setActionAnim() {}
 	setOverrideHandModels() {}
-	getJobDelta() { return null as never; }
-	isValid() { return null as never; }
+	getJobDelta() {
+		return null as never;
+	}
+	isValid() {
+		return null as never;
+	}
 	start() {}
 	stop() {}
 	update() {}
@@ -45,15 +51,17 @@ export class ISBaseTimedAction {
 }
 
 export class BaseCharacterSoundEmitter {
-	isPlaying() { return null as never; }
+	isPlaying() {
+		return null as never;
+	}
 	stopSoundByName() {}
 }
 
 export class GameTime {
 	static getInstance() {
 		return {
-			getHour:  () => jest.fn()
-		}
+			getHour: () => jest.fn()
+		};
 	}
 }
 
@@ -64,5 +72,5 @@ export const getGametimeTimestamp = jest.fn();
 };
 
 export enum CharacterActionAnims {
-	TakePills = "TakePills",
+	TakePills = "TakePills"
 }

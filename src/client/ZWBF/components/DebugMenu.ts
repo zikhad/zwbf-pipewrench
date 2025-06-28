@@ -30,8 +30,8 @@ export class DebugMenu {
 		this.womb = womb;
 
 		if (!isDebugEnabled()) return;
-		Events.onFillWorldObjectContextMenu.addListener((playerId, context, items) =>
-			this.createDebugContextMenu(playerId, context, items)
+		Events.onFillWorldObjectContextMenu.addListener((playerId, context /*, items */) =>
+			this.createDebugContextMenu(playerId, context /*, items */)
 		);
 	}
 
@@ -47,7 +47,10 @@ export class DebugMenu {
 		option.toolTip = tooltip;
 	}
 
-	private createDebugContextMenu(playerId: number, context: KahluaTable, items: KahluaTable) {
+	private createDebugContextMenu(
+		playerId: number,
+		context: KahluaTable /*, items: KahluaTable */
+	) {
 		const player = getSpecificPlayer(playerId);
 		if (!player.isFemale()) return;
 

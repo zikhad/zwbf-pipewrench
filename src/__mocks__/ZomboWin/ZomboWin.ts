@@ -1,7 +1,7 @@
 export const AnimationHandler = {
-  ActionEvents: {
-    Perform: [],
-    Update: [],
-    Stop: []
-  }
+	ActionEvents: {
+		Perform: [],
+		Update: [],
+		Stop: []
+	}
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { triggerEvent } from "@asledgehammer/pipewrench";
 import { ZWBFEvents } from "../../../constants";
 import { AnimationStatus } from "../../../types";
@@ -11,10 +12,10 @@ describe("AnimationHandler Event Insertion", () => {
 		Update: ((action: any) => void)[];
 		Stop: (() => void)[];
 	} = {
-        Perform: [],
-        Update: [],
-        Stop: []
-    };
+		Perform: [],
+		Update: [],
+		Stop: []
+	};
 
 	beforeEach(() => {
 		jest.clearAllMocks();
@@ -45,17 +46,17 @@ describe("AnimationHandler Event Insertion", () => {
 		};
 
 		ActionEvents.Update[0](mockAction);
-		expect(triggerEvent).toHaveBeenCalledWith(
-			ZWBFEvents.ANIMATION_UPDATE,
-			{ isActive: true, delta: 0.5, duration: 30 } as AnimationStatus
-		);
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEvents.ANIMATION_UPDATE, {
+			isActive: true,
+			delta: 0.5,
+			duration: 30
+		} as AnimationStatus);
 	});
 
 	it("should trigger ANIMATION_UPDATE false on Stop", () => {
 		ActionEvents.Stop[0]();
-		expect(triggerEvent).toHaveBeenCalledWith(
-			ZWBFEvents.ANIMATION_UPDATE,
-			{ isActive: false } as AnimationStatus
-		);
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEvents.ANIMATION_UPDATE, {
+			isActive: false
+		} as AnimationStatus);
 	});
 });

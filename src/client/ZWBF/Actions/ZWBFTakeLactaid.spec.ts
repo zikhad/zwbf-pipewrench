@@ -7,11 +7,11 @@ jest.mock("@asledgehammer/pipewrench");
 jest.mock("@actions/ZWBFTakePills");
 
 describe("ZWBTakeLactaid", () => {
-    it("Perform should update lactation status", () => {
-        const lactation = mock<Lactation>();
-        const pills = mock<InventoryItem>();
-        const action = new ZWBTakeLactaid(lactation, pills);
-        action.perform();
-        expect(lactation.useMilk).toHaveBeenCalled();
-    });
+	it("Perform should update lactation status", () => {
+		const lactation = mock<Lactation>();
+		const pills = mock<InventoryItem>();
+		const action = new ZWBTakeLactaid(lactation, pills);
+		action.perform();
+		expect(lactation.useMilk).toHaveBeenCalled();
+	});
 });
