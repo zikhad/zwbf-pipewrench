@@ -9,7 +9,6 @@ jest.mock("@actions/ZWBFTakePills");
 describe("ZWBTakeLactaid", () => {
     it("Perform should update lactation status", () => {
         const lactation = mock<Lactation>();
-        const spyUseMilk = jest.spyOn(lactation, 'useMilk');
         const pills = mock<InventoryItem>();
         const action = new ZWBTakeLactaid(lactation, pills);
         action.perform();

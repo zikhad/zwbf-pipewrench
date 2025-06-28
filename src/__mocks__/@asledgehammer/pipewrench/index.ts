@@ -62,3 +62,7 @@ export const getGametimeTimestamp = jest.fn();
 (globalThis as any).table = {
 	insert: jest.fn((arr, fn) => arr.push(fn))
 };
+
+export enum CharacterActionAnims {
+	TakePills = "TakePills",
+}

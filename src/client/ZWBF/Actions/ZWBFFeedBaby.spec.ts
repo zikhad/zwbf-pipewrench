@@ -8,8 +8,6 @@ jest.mock("@asledgehammer/pipewrench");
 
 describe("ZWBFFeedBaby", () => {
     
-
-    
     let action: ZWBFFeedBaby;
     const spySoundIsPlaying = jest.fn().mockImplementation(() => true);
     const spyStopSoundByName = jest.fn();
@@ -27,8 +25,9 @@ describe("ZWBFFeedBaby", () => {
     
     const baby = mock<AlarmClock>({
         getModData: jest.fn().mockImplementation(() => ({
-            feedTime: 0
-        }))
+            feedTime: 1200
+        })),
+        isRinging: () => true,
     });
 
     const spyTriggerEvent = jest.spyOn(SpyPipewrench, 'triggerEvent');
@@ -37,7 +36,6 @@ describe("ZWBFFeedBaby", () => {
         jest.spyOn(SpyPipewrench, 'getGametimeTimestamp').mockImplementation(() => 0);
         action = new ZWBFFeedBaby(lactation, baby);
         action.character = player
-        // jest.replaceProperty(action, 'character', player);
     });
     
     it("isValid should be true", () => {
@@ -56,10 +54,9 @@ describe("ZWBFFeedBaby", () => {
         expect(spy).toHaveBeenCalled();
     });
     
-    it("Perform should trigger ANIMATION_UPDATE & Pregnancy Birth", () => {
+    it("Perform should call useMilk", () => {
         const spy = jest.spyOn(lactation, 'useMilk');
         action.perform();
         expect(spy).toHaveBeenCalled();
-        // expect(spyPregnancyBirth).toHaveBeenCalled();
     });
 });
