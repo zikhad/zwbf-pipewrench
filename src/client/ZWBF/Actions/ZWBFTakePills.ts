@@ -31,10 +31,7 @@ export abstract class ZWBFTakePills extends ISBaseTimedAction {
 	isValid() {
 		return (this.character as IsoGameCharacter).getInventory().contains(this.pills);
 	}
-	update() {
-		super.update();
-		this.pills.setJobDelta(this.getJobDelta());
-	}
+
 	start() {
 		super.start();
 		this.pills.setJobType(getText(this.contextMenu));
@@ -43,13 +40,20 @@ export abstract class ZWBFTakePills extends ISBaseTimedAction {
 		this.setOverrideHandModels(null, this.pills, null);
 		(this.character as IsoGameCharacter).playSound("Pills_A");
 	}
+
 	stop() {
 		super.stop();
 		this.pills.setJobDelta(0);
 	}
+
+	update() {
+		super.update();
+		this.pills.setJobDelta(this.getJobDelta());
+	}
+
 	perform() {
 		super.perform();
-		this.pills.getContainer().setDrawDirty(true);
+		// this.pills.getContainer().setDrawDirty(true);
 		this.pills.setJobDelta(0);
 		this.pills.Use();
 	}

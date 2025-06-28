@@ -3,7 +3,6 @@ import {
 	GameTime,
 	getGametimeTimestamp,
 	getText,
-	InventoryItem,
 	ISBaseTimedAction,
 	IsoGameCharacter,
 	ZombRandFloat
@@ -12,8 +11,8 @@ import { Lactation } from "@client/components/Lactation";
 
 export class ZWBFFeedBaby extends ISBaseTimedAction {
 	private lactation: Lactation;
-	private baby: InventoryItem;
-	constructor(lactation: Lactation, baby: InventoryItem) {
+	private baby: AlarmClock;
+	constructor(lactation: Lactation, baby: AlarmClock) {
 		super(lactation.player);
 		super.derive("ZWBFActionFeedBaby");
 		this.lactation = lactation;
@@ -26,7 +25,7 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 
 	private feedBaby() {
 		const player = this.character as IsoGameCharacter;
-		const baby = this.baby as AlarmClock;
+		const baby = this.baby;
 		const gameTime = GameTime.getInstance();
 
 		const soundEmitter = player.getEmitter();
@@ -72,7 +71,7 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 	}
 	perform() {
 		super.perform();
-		this.baby.getContainer().setDrawDirty(true);
+		// this.baby.getContainer().setDrawDirty(true);
 		this.baby.setJobDelta(0);
 		this.lactation.useMilk(this.lactation.bottleAmount, ZombRandFloat(0.1, 0.3));
 		this.feedBaby();

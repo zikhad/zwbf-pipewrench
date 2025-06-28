@@ -1,5 +1,5 @@
 import { Womb } from "@client/components/Womb";
-import { ZWBFTakePills } from "./ZWBFTakePills";
+import { ZWBFTakePills } from "@actions/ZWBFTakePills";
 import { InventoryItem } from "@asledgehammer/pipewrench";
 
 export class ZWBTakeContraceptive extends ZWBFTakePills {

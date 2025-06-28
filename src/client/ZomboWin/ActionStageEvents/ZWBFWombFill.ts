@@ -6,7 +6,6 @@ import { AnimationHandler } from "ZomboWin/ZomboWin";
 const { ActionEvents } = AnimationHandler;
 table.insert(ActionEvents.Perform, (action: ISBaseTimedAction) => {
 	const character = action.character;
-	// TODO: add animation allow
 	if (character.isFemale()) {
 		triggerEvent(ZWBFEvents.INTERCOURSE);
 	}
@@ -14,7 +13,6 @@ table.insert(ActionEvents.Perform, (action: ISBaseTimedAction) => {
 
 table.insert(ActionEvents.Update, (action: ISBaseTimedAction) => {
 	const character = action.character;
-	// TODO: add animation allow
 	if (character.isFemale()) {
 		const duration = action.duration;
 		const delta = action.getJobDelta();
