@@ -3,3 +3,9 @@ export class ISTimedActionQueue {
 		return null as never;
 	}
 }
+
+export class ISToolTip {
+	description = "";
+	initialise() {}
+	setVisible() {}
+}

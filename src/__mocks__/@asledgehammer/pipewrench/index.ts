@@ -4,6 +4,7 @@ import { mock } from "jest-mock-extended";
 import { Trait } from "@asledgehammer/pipewrench";
 
 export const getPlayer = jest.fn();
+export const getSpecificPlayer = jest.fn();
 
 export const ZombRandFloat = (a: number) => a;
 export const ZombRand = (a: number) => a;

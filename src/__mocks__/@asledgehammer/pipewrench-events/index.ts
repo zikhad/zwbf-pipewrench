@@ -42,6 +42,11 @@ export const onPostRender = {
 	addListener: jest.fn()
 };
 
+export const onFillWorldObjectContextMenu = {
+	addListener: jest.fn()
+};
+
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
 	addListener() {
