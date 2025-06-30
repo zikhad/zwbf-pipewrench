@@ -3,12 +3,12 @@ import { mock } from "jest-mock-extended";
 import { BodyPart } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { CyclePhase, WombData } from "../../../types";
+import { CyclePhase, WombData } from "@types";
 import { Womb } from "./Womb";
-import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "../../../constants";
+import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { mockedPlayer } from "../../../test/mock";
+import { mockedPlayer } from "@test/mock";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");

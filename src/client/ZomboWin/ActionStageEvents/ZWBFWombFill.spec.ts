@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { triggerEvent } from "@asledgehammer/pipewrench";
-import { ZWBFEvents } from "../../../constants";
-import { AnimationStatus } from "../../../types";
+import { ZWBFEvents } from "@constants";
+import { AnimationStatus } from "@types";
 
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("ZomboWin/ZomboWin");

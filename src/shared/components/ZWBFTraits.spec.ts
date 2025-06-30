@@ -17,7 +17,7 @@ describe("ZWBFTraits", () => {
 
 	it("Registers addTraits on game boot", () => {
 		new ZWBFTraits();
-		expect(Events.onGameBoot.addListener).toHaveBeenCalledTimes(1);
+		expect(Events.onCreateLivingCharacter.addListener).toHaveBeenCalledTimes(1);
 	});
 
 	it("Should not call SetMutualExclusive if not needed", () => {
@@ -29,7 +29,7 @@ describe("ZWBFTraits", () => {
 		]);
 
 		// simulate boot event
-		const [addTraits] = (Events.onGameBoot.addListener as jest.Mock).mock.calls[0];
+		const [addTraits] = (Events.onCreateLivingCharacter.addListener as jest.Mock).mock.calls[0];
 		addTraits();
 
 		expect(spySetMutialExclusive).not.toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe("ZWBFTraits", () => {
 		]);
 
 		// simulate boot event
-		const [addTraits] = (Events.onGameBoot.addListener as jest.Mock).mock.calls[0];
+		const [addTraits] = (Events.onCreateLivingCharacter.addListener as jest.Mock).mock.calls[0];
 		addTraits();
 
 		expect(spySetMutialExclusive).toHaveBeenCalledWith("Infertile", "Fertile");

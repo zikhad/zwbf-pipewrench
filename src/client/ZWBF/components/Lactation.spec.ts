@@ -4,9 +4,9 @@ import { BodyPart } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
-import { LactationData } from "../../../types";
+import { LactationData } from "@types";
 import { Player } from "./Player";
-import { mockedPlayer } from "../../../test/mock";
+import { mockedPlayer } from "@test/mock";
 import { mock } from "jest-mock-extended";
 
 jest.mock("@asledgehammer/pipewrench-events");

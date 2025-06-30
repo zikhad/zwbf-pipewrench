@@ -1,4 +1,4 @@
-/** @noSelfInFile */
+
 import {
 	getSpecificPlayer,
 	getText,
@@ -11,7 +11,7 @@ import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
 import { ISInventoryPaneContextMenu, ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ZWBFFeedBaby } from "@actions/ZWBFFeedBaby";
-import { CyclePhaseEnum } from "shared/constants";
+import { CyclePhaseEnum } from "@constants";
 import { ZWBTakeContraceptive } from "@actions/ZWBFTakeContraceptive";
 import { ZWBTakeLactaid } from "@actions/ZWBFTakeLactaid";
 import * as Events from "@asledgehammer/pipewrench-events";

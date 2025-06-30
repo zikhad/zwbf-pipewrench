@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { Womb } from "../components/Womb";
+import { Womb } from "@client/components/Womb";
 import { ZWBTakeContraceptive } from "./ZWBFTakeContraceptive";
 import { InventoryItem } from "@asledgehammer/pipewrench";
 

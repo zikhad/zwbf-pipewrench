@@ -8,7 +8,7 @@ import {
 	ItemContainer,
 	BaseCharacterSoundEmitter
 } from "@asledgehammer/pipewrench";
-import { Lactation } from "../components/Lactation";
+import { Lactation } from "@client/components/Lactation";
 
 jest.mock("@asledgehammer/pipewrench");
 

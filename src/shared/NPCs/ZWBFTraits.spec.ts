@@ -1,5 +1,5 @@
-import { ZWBFTraits } from "../components/ZWBFTraits";
-jest.mock("../components/ZWBFTraits");
+import { ZWBFTraits } from "@shared/components/ZWBFTraits";
+jest.mock("@shared/components/ZWBFTraits");
 
 describe("TraitClass event registration", () => {
 	it("The TraitClass should be initialized", () => {

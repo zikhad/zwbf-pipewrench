@@ -2,7 +2,7 @@ import { BodyPart, BodyPartType, HaloTextHelper, IsoPlayer } from "@asledgehamme
 import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
-import { ZWBFEvents, ZWBFTraitsEnum } from "shared/constants";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 
 export interface TimedEvents {
 	/**

@@ -1,6 +1,6 @@
 import { getActivatedMods, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFEvents } from "shared/constants";
+import { ZWBFEvents } from "@constants";
 import { WombData } from "@types";
 import { percentageToNumber } from "@utils";
 

@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "tstl": {
+		"luaLibImport": "require",
+		"noHeader": true,
+		"tstlVerbose": false,
+		"noImplicitSelf": true,
+		"luaPlugins": [
+			{
+				"name": "@asledgehammer/tstl-pipewrench"
+			}
+		],
+	},
+  "exclude": ["**/*.spec.*", "**/__mocks__/**/*.ts", "src/test/**/*.ts", "src/root/"]
+}

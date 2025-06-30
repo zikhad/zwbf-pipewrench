@@ -3,7 +3,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { getSkinColor, percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
-import { ZWBFEvents, ZWBFTraitsEnum } from "shared/constants";
+import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
 

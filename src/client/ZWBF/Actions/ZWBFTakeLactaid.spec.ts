@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { Lactation } from "../components/Lactation";
+import { Lactation } from "@client/components/Lactation";
 import { ZWBTakeLactaid } from "./ZWBFTakeLactaid";
 import { InventoryItem } from "@asledgehammer/pipewrench";
 
