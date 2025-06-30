@@ -20,9 +20,8 @@ export class Effects {
 	 * Sexperiment trait, make infection 0 8 when sperm is present in the womb
 	 */
 	private ZWUnblessing(player: IsoPlayer, data: WombData) {
-		if (player.HasTrait("unblessing") && data.amount > 0) {
-			player.getBodyDamage().setInfectionLevel(0);
-		}
+		if (!player.HasTrait("unblessing") || data.amount <= 0) return;
+		player.getBodyDamage().setInfectionLevel(0);
 	}
 
 	/**
