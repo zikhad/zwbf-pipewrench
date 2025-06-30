@@ -1,5 +1,5 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEvents } from "shared/constants";
 import { AnimationStatus } from "@types";
 import { AnimationHandler } from "ZomboWin/ZomboWin";
 

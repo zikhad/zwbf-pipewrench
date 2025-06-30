@@ -1,6 +1,6 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
 import { Pregnancy } from "@client/components/Pregnancy";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEvents } from "shared/constants";
 import { AnimationStatus } from "@types";
 
 export class ZWBFActionBirth extends ISBaseTimedAction {

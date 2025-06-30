@@ -1,5 +1,3 @@
-/* @noSelfInFile */
-
 import { AnimationStatus, CyclePhase, PregnancyData, WombData } from "@types";
 import {
 	BodyPartType,
@@ -12,7 +10,7 @@ import {
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
-import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "shared/constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
@@ -247,7 +245,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryTenMinutes(): void {
 		// 50% of doing nothing also do nothing if empty
-		if (this.amount <= 0 || ZombRand(100) < 50) return;
+		if (this.amount <= 0 || ZombRand(0, 100) < 50) return;
 		const amount = ZombRand(10, 50);
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
@@ -324,7 +322,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
-		if (ZombRand(100) < 50) return;
+		if (ZombRand(0, 100) < 50) return;
 		this.applyBleeding();
 	}
 

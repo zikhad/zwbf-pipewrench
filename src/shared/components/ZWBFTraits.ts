@@ -45,7 +45,8 @@ export class ZWBFTraits {
 	];
 	constructor(traits?: TraitType[]) {
 		this.traits = traits || this.defaultTraits;
-		Events.onGameBoot.addListener(() => this.addTraits());
+
+		Events.onCreateLivingCharacter.addListener(() => this.addTraits());
 	}
 	private addTraits() {
 		for (const { id, cost, profession = false, exclusives = [] } of this.traits) {

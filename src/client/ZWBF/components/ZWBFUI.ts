@@ -1,7 +1,7 @@
 /** @noSelfInFile */
 import { getText, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFTraitsEnum } from "@constants";
+import { ZWBFTraitsEnum } from "shared/constants";
 import { ZWBFTabManager } from "./UI/ZWBFTabManager";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";

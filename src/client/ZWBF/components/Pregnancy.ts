@@ -2,7 +2,7 @@ import type { PregnancyData } from "@types";
 import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { ZWBFEvents, ZWBFTraitsEnum } from "shared/constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
