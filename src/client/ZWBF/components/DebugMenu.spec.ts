@@ -134,12 +134,11 @@ describe("DebugMenu", () => {
                 },
                 {
                     title: "Add_Cycle_Day",
-                    mockCondition: () => jest.spyOn(pregnancy as any, "pregnancy").mockReturnValue(null),
+                    mockCondition: () => (pregnancy as any).pregnancy = null,
                     expected: () => expect(womb.Debug.cycle.addDay).toHaveBeenCalled()
                 },
                 {
                     title: "Next_Cycle",
-                    mockCondition: () => jest.spyOn(pregnancy as any, "pregnancy").mockReturnValue(null),
                     expected: () => expect(womb.Debug.cycle.nextPhase).toHaveBeenCalled()
                 },
                 {
@@ -156,21 +155,22 @@ describe("DebugMenu", () => {
                 },
                 {
                     title: "Add_Pregnancy",
+                    mockCondition: () => (pregnancy as any).pregnancy = null,
                     expected: () => expect(pregnancy.Debug.start).toHaveBeenCalled()
                 },
                 {
                     title: "Remove_Pregnancy",
-                    mockCondition: () => pregnancy.pregnancy = mock<PregnancyData>(),
+                    mockCondition: () => (pregnancy as any).pregnancy = mock(),
                     expected: () => expect(pregnancy.Debug.stop).toHaveBeenCalled()
                 },
                 {
                     title: "Advance_Pregnancy",
-                    mockCondition: () => pregnancy.pregnancy = mock<PregnancyData>(),
+                    mockCondition: () => (pregnancy as any).pregnancy = mock(),
                     expected: () => expect(pregnancy.Debug.advance).toHaveBeenCalled()
                 },
                 {
                     title: "Advance_Pregnancy_Labor",
-                    mockCondition: () => pregnancy.pregnancy = mock<PregnancyData>(),
+                    mockCondition: () => (pregnancy as any).pregnancy = mock(),
                     expected: () => expect(pregnancy.Debug.advanceToLabor).toHaveBeenCalled()
                 }
             ])("option $title should trigger correct", ({title, mockCondition, expected}) => {
@@ -185,11 +185,8 @@ describe("DebugMenu", () => {
                 const addOptions = mockSubmenu.addOption.mock.calls;
                 const menuCall = addOptions.find(([call]) => (call as string).includes(title)) || [];
                 const [,, action] = menuCall;
-                // TODO: fix cycle & pregnancy tests
-                if(action) {
-                    action();
-                    expected();
-                }
+                action();
+                expected();
             });
         });
     });
