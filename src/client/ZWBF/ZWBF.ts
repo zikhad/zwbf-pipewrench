@@ -3,7 +3,7 @@ import { Womb } from "@client/components/Womb";
 import { ZWBFUI } from "@client/components/ZWBFUI";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { Effects } from "@client/components/Effects";
-import { DebugMenu } from "./components/DebugMenu";
+import { DebugMenu } from "@client/components/DebugMenu";
 
 export const lactation = new Lactation();
 export const womb = new Womb();

@@ -84,7 +84,8 @@ export class DebugMenu {
 			{
 				option: "Next_Cycle",
 				fn: () => this.womb.Debug.cycle.nextPhase(),
-				condition: () => this.pregnancy.pregnancy == null
+				condition: () => 
+					this.pregnancy.pregnancy == null
 			},
 			{
 				option: "Milk_Toggle",

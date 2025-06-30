@@ -3,6 +3,7 @@ import {
 	GameTime,
 	getGametimeTimestamp,
 	getText,
+	InventoryItem,
 	ISBaseTimedAction,
 	IsoGameCharacter,
 	ZombRandFloat
@@ -12,11 +13,11 @@ import { Lactation } from "@client/components/Lactation";
 export class ZWBFFeedBaby extends ISBaseTimedAction {
 	private lactation: Lactation;
 	private baby: AlarmClock;
-	constructor(lactation: Lactation, baby: AlarmClock) {
+	constructor(lactation: Lactation, baby: InventoryItem) {
 		super(lactation.player);
 		super.derive("ZWBFActionFeedBaby");
 		this.lactation = lactation;
-		this.baby = baby;
+		this.baby = baby as AlarmClock;
 		this.maxTime = 1500;
 		this.stopOnAim = false;
 		this.stopOnRun = false;
