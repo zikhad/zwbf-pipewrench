@@ -15,9 +15,3 @@ export const percentageToNumber = (percentage: number, maxNumber: number) => {
 export const getSkinColor = (character: IsoPlayer) => {
 	return character.getHumanVisual().getSkinTextureIndex();
 };
-
-export const Inventory = {
-	hasItem: (player: IsoPlayer, itemName: string, recursive = false): boolean => {
-		return player.getInventory().contains(itemName, recursive);
-	}
-};

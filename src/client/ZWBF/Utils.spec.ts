@@ -1,4 +1,4 @@
-import { getSkinColor, percentageToNumber, Inventory } from "./Utils";
+import { getSkinColor, percentageToNumber } from "./Utils";
 import { mock } from "jest-mock-extended";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
 
@@ -26,20 +26,5 @@ describe("Utils", () => {
 		const result = getSkinColor(mockedPlayer);
 		expect(getSkinTextureIndex).toHaveBeenCalledWith();
 		expect(result).toBe(1);
-	});
-	describe("Inventory", () => {
-		it.each([true, false])("hasItem should return %s", hasItem => {
-			const player = mock<IsoPlayer>({
-				getInventory: jest.fn().mockImplementation(() => ({
-					contains: jest.fn().mockImplementation(() => hasItem)
-				}))
-			});
-
-			const nonRecursive = Inventory.hasItem(player, "mocked");
-			const recursive = Inventory.hasItem(player, "mocked");
-
-			expect(nonRecursive).toBe(hasItem);
-			expect(recursive).toBe(hasItem);
-		});
 	});
 });
