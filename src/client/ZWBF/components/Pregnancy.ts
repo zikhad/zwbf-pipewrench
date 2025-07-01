@@ -42,13 +42,13 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		advance: (minutes: number) => {
 			if (!this.pregnancy) return;
 
-			const { current = 0, isInLabor } = this.pregnancy;
+			const { current = 0 } = this.pregnancy;
 			const { duration } = this.options;
 			const updated = Math.min(duration, current + minutes);
 			this.pregnancy = {
 				current: updated,
 				progress: updated / duration,
-				isInLabor
+				isInLabor: (updated == duration)
 			};
 		},
 		advanceToLabor: () => {
@@ -74,7 +74,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		});
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyHours.addListener(() => this.onEveryHour());
-		Events.everyDays.addListener(() => this.onEveryDays());
+		Events.everyDays.addListener(() => this.onEveryDay());
 
 		new Events.EventEmitter(ZWBFEvents.PREGNANCY_START).addListener(() => this.start());
 	}
@@ -107,7 +107,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	}
 
 	onEveryMinute(): void {
-		if (!this.player || !this.pregnancy) return;
+		if (!this.pregnancy) return;
 		const { duration } = this.options;
 		const { current = 0 } = this.pregnancy;
 		const updated = Math.min(duration, current + 1);
@@ -117,14 +117,14 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			isInLabor: updated == duration
 		};
 		if (this.pregnancy.isInLabor) {
-			this.player.setBlockMovement(true);
+			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
 		this.moodle?.moodle(this.pregnancy.progress);
 	}
 
 	onEveryHour(): void {
-		if (!this.player || !this.pregnancy) return;
+		if (!this.pregnancy) return;
 
 		const { progress } = this.pregnancy;
 		if (progress < 0.25) return;
@@ -132,22 +132,22 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		this.weightDebuff = progress;
 
 		// Constume extra water
-		const stats = this.player.getStats();
+		const stats = this.player!.getStats();
 		const water = (0.5 * progress) / 1440;
 		stats.setThirst(Math.min(1, stats.getThirst() + water));
 
 		// Constume extra calories
-		const nutrition = this.player.getNutrition();
+		const nutrition = this.player!.getNutrition();
 		const calories = (600 * progress) / 1440;
 		nutrition.setCalories(Math.max(-2200, nutrition.getCalories() - calories));
 	}
 
-	onEveryDays() {
-		if (!this.player || !this.pregnancy) return;
+	onEveryDay() {
+		if (!this.pregnancy) return;
 		/** Apply sickness in the begining of Pregnancy */
 		const { progress } = this.pregnancy;
 		if (progress < 0.05 || progress > 0.33) return;
-		this.player.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(50));
+		this.player!.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(50));
 	}
 
 	private set weightDebuff(progress: number) {
