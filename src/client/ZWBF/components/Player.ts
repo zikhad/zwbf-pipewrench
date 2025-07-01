@@ -84,8 +84,6 @@ export abstract class Player<T> {
 				isInLabor: false
 			}
 		});
-		// Events.everyOneMinute.addListener(() => this.onEveryMinute());
-		// Events.everyHours.addListener(() => this.onEveryHour());
 
 		new Events.EventEmitter<(data: PregnancyData) => void>(
 			ZWBFEvents.PREGNANCY_UPDATE

@@ -33,14 +33,7 @@ describe("Pregnancy", () => {
 			expect(spy).not.toHaveBeenCalled();
 		});
 	});
-	
-	it.skip("Should instantiate with player data", () => {
-		new Pregnancy();
-		const [callback] = addListener.mock.calls[0];
-		callback(player);
-		expect(addListener).toHaveBeenCalled();
-	});
-	
+
 	// === Event System Tests ===
 	describe("Event System", () => {
 		describe("Timer Events", () => {
