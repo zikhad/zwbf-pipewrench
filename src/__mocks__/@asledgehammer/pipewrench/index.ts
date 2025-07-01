@@ -66,6 +66,12 @@ export class GameTime {
 	}
 }
 
+export class HaloTextHelper {
+	static addText () {}
+	static getColorGreen () { return "green" };
+	static getColorRed () { return "red" };
+}
+
 export const getGametimeTimestamp = jest.fn();
 
 (globalThis as any).table = {

@@ -6,7 +6,6 @@ import {
 	require as pipeWrenchRequire
 } from "@asledgehammer/pipewrench";
 
-// type moodleValues =
 type MoodleProps = {
 	player: IsoPlayer;
 	name: string;
