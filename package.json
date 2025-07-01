@@ -8,7 +8,8 @@
 		"clean": "rimraf dist",
 		"check": "prettier --check . && eslint .",
 		"lint": "prettier --write . && eslint .",
-		"watch": "tstl -p ./tsconfig.build.json --watch --outDir ~/Zomboid/mods",
+		"watch": "npm-watch",
+		"watch:build": "tstl -p ./tsconfig.build.json --watch --outDir ~/Zomboid/mods",
 		"release": "standard-version",
 		"postrelease": "npm run zip",
 		"zip": "node scripts/zip.js",
@@ -17,11 +18,10 @@
 		"coverage": "npm run test -- --coverage"
 	},
 	"watch": {
-		"build": {
-			"patterns": [
-				"src"
-			],
-			"extensions": "ts,js,jsx,lua,json,png"
+		"watch:build": {
+			"patterns": ["src"],
+			"extensions": "ts,js,jsx,lua,json,png",
+			"postbuild": "postbuild"
 		}
 	},
 	"repository": {
