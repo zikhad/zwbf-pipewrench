@@ -52,20 +52,20 @@ export class ZWBFTraits {
 	 * This method is called when a living character is created.
 	 */
 	private addTraits() {
-		for (const { id, cost, profession = false, exclusives = [] } of this.traits) {
+		for (const { id, cost, profession = false } of this.traits) {
 			const name = getText(`UI_Trait_${id}`);
 			const description = getText(`UI_Trait_${id}_Description`);
 			TraitFactory.addTrait(id, name, cost, description, profession);
 		}
 		this.setMultualExclusive();
 	}
-	
+
 	/**
 	 * Sets mutual exclusives for traits.
 	 * This method iterates through the traits and sets mutual exclusives using the TraitFactory.
 	 */
 	private setMultualExclusive() {
-		for ( const { id, exclusives = [] } of this.traits) {
+		for (const { id, exclusives = [] } of this.traits) {
 			for (const exclusive of exclusives) {
 				TraitFactory.setMutualExclusive(id, exclusive);
 			}

@@ -48,7 +48,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			this.pregnancy = {
 				current: updated,
 				progress: updated / duration,
-				isInLabor: (updated == duration)
+				isInLabor: updated == duration
 			};
 		},
 		advanceToLabor: () => {

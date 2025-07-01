@@ -1,4 +1,3 @@
-
 import { getText, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFTraitsEnum } from "@constants";

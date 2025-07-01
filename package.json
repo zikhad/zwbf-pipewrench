@@ -19,7 +19,9 @@
 	},
 	"watch": {
 		"watch:build": {
-			"patterns": ["src"],
+			"patterns": [
+				"src"
+			],
 			"extensions": "ts,js,jsx,lua,json,png",
 			"postbuild": "postbuild"
 		}

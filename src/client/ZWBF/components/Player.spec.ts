@@ -1,19 +1,22 @@
-import { mock } from 'jest-mock-extended';
-import { Player } from './Player'; // Adjust path as needed
-import { IsoPlayer, BodyPartType, BodyPart, InventoryItem, InventoryContainer, BodyDamage, ItemContainer } from '@asledgehammer/pipewrench';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { mock } from "jest-mock-extended";
+import { Player } from "./Player"; // Adjust path as needed
+import {
+	IsoPlayer,
+	BodyPartType,
+	BodyPart,
+	BodyDamage,
+	ItemContainer
+} from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
-import * as SpyModData from './ModData';
-import { PregnancyData } from '@types';
-import { ZWBFEvents, ZWBFTraitsEnum } from '@constants';
-import * as Events from '@asledgehammer/pipewrench-events';
+import { PregnancyData } from "@types";
 
 // Mocks
-// jest.mock('./ModData');
-jest.mock('@asledgehammer/pipewrench');
-jest.mock('@asledgehammer/pipewrench-events');
+jest.mock("@asledgehammer/pipewrench");
+jest.mock("@asledgehammer/pipewrench-events");
 
 class ConcretePlayer extends Player<Record<string, unknown>> {
-	constructor(key?: string ) {
+	constructor(key?: string) {
 		super(key);
 	}
 	public triggerOnCreatePlayer(player: IsoPlayer) {
@@ -24,9 +27,9 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 	}
 }
 
-describe('Player class', () => {
+describe("Player class", () => {
 	const mockPlayer = mock<IsoPlayer>({
-		getModData: () => ({ 'TEST_KEY': "someting" })
+		getModData: () => ({ TEST_KEY: "someting" })
 	});
 	const mockBodyDamage = mock<BodyDamage>();
 	const mockBodyPart = mock<BodyPart>();
@@ -37,11 +40,10 @@ describe('Player class', () => {
 		mockPlayer.HasTrait.mockReturnValue(true);
 		mockPlayer.getBodyDamage.mockReturnValue(mockBodyDamage);
 		mockBodyDamage.getBodyPart.mockReturnValue(mockBodyPart);
-		
 	});
 
-	it('initializes and creates mod data', () => {
-		const instance = new ConcretePlayer('TEST_KEY');
+	it("initializes and creates mod data", () => {
+		const instance = new ConcretePlayer("TEST_KEY");
 		instance.triggerOnCreatePlayer(mockPlayer);
 
 		expect(instance.player).toBe(mockPlayer);
@@ -49,37 +51,38 @@ describe('Player class', () => {
 	});
 
 	describe("getBodyPart", () => {
-		it('getBodyPart returns body part if player exists', () => {
-			const instance = new ConcretePlayer('TEST_KEY');
+		it("getBodyPart returns body part if player exists", () => {
+			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
-			
+
 			const part = instance.getBodyPart(BodyPartType.Torso_Upper);
 			expect(part).toBe(mockBodyPart);
 		});
-		it('getBodyPart return null if player does not exists', () => {
-			const instance = new ConcretePlayer('TEST_KEY');
+		it("getBodyPart return null if player does not exists", () => {
+			const instance = new ConcretePlayer("TEST_KEY");
 			const part = instance.getBodyPart(BodyPartType.Torso_Upper);
 			expect(part).toBeNull();
-
 		});
 	});
 
 	describe("hasItem", () => {
-		it.each([
-			{ hasItem: false },
-			{ hasItem: true },
-		])('should return $hasItem if if inventory.contains is $hasItem', ({ hasItem }) => {
-			mockPlayer.getInventory.mockReturnValue(mock<ItemContainer>({
-				contains: () => hasItem
-			}));
-			const instance = new ConcretePlayer('TEST_KEY');
-			instance.triggerOnCreatePlayer(mockPlayer);
-	
-			const result = instance.hasItem('MockedItem');
-			expect(result).toBe(hasItem);
-		});
+		it.each([{ hasItem: false }, { hasItem: true }])(
+			"should return $hasItem if if inventory.contains is $hasItem",
+			({ hasItem }) => {
+				mockPlayer.getInventory.mockReturnValue(
+					mock<ItemContainer>({
+						contains: () => hasItem
+					})
+				);
+				const instance = new ConcretePlayer("TEST_KEY");
+				instance.triggerOnCreatePlayer(mockPlayer);
+
+				const result = instance.hasItem("MockedItem");
+				expect(result).toBe(hasItem);
+			}
+		);
 		it("should return false if player is not defined", () => {
-			const instance = new ConcretePlayer('TEST_KEY');
+			const instance = new ConcretePlayer("TEST_KEY");
 			const result = instance.hasItem("MockedItem");
 			expect(result).toBe(false);
 		});
@@ -91,26 +94,45 @@ describe('Player class', () => {
 			color?: "green" | "red";
 			arrow?: "up" | "down";
 		}>([
-			{color: "green", arrow: "up", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addTextWithArrow')},
-			{color: "green", arrow: "down", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addTextWithArrow')},
-			{color: "red", arrow: "up", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addTextWithArrow')},
-			{color: "red", arrow: "down", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addTextWithArrow')},
-			{color: "green", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addText')},
-			{color: "red", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addText')},
-			{spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, 'addText')},
-		])("haloText should call HaloTextHelper with color $color and arrow $arrow", ({color, arrow, spyOn}) => {
-			const spy = spyOn();
-			const instance = new ConcretePlayer();
-			instance.triggerOnCreatePlayer(mockPlayer);
-			instance.haloText({
-				text: "mock",
-				color,
-				arrow
-			});
-			expect(spy).toHaveBeenCalled();
-		});
+			{
+				color: "green",
+				arrow: "up",
+				spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addTextWithArrow")
+			},
+			{
+				color: "green",
+				arrow: "down",
+				spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addTextWithArrow")
+			},
+			{
+				color: "red",
+				arrow: "up",
+				spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addTextWithArrow")
+			},
+			{
+				color: "red",
+				arrow: "down",
+				spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addTextWithArrow")
+			},
+			{ color: "green", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addText") },
+			{ color: "red", spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addText") },
+			{ spyOn: () => jest.spyOn(SpyPipewrench.HaloTextHelper, "addText") }
+		])(
+			"haloText should call HaloTextHelper with color $color and arrow $arrow",
+			({ color, arrow, spyOn }) => {
+				const spy = spyOn();
+				const instance = new ConcretePlayer();
+				instance.triggerOnCreatePlayer(mockPlayer);
+				instance.haloText({
+					text: "mock",
+					color,
+					arrow
+				});
+				expect(spy).toHaveBeenCalled();
+			}
+		);
 		it("should do nothing if player is not defined", () => {
-			const spy = jest.spyOn(SpyPipewrench.HaloTextHelper, 'addText');
+			const spy = jest.spyOn(SpyPipewrench.HaloTextHelper, "addText");
 			const instance = new ConcretePlayer();
 			instance.haloText({
 				text: "mock"
@@ -126,20 +148,20 @@ describe('Player class', () => {
 			expect(instance.data).toBeNull();
 		});
 		it("Should return null by default", () => {
-			const instance = new ConcretePlayer('TEST_KEY');
+			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
-			instance.data = {'foo': 'mocked'};
+			instance.data = { foo: "mocked" };
 			expect(instance.data).toBeDefined();
 		});
 	});
-	
+
 	describe("Pregnancy", () => {
 		it.each([
 			{ pregnancy: true, data: { progress: 0.5, current: 1, isInLabor: false } },
-			{ pregnancy: false, data: null },
+			{ pregnancy: false, data: null }
 		])("Should return $data when pregnancy is $pregnancy", ({ pregnancy, data }) => {
 			mockPlayer.HasTrait.mockReturnValue(pregnancy);
-			const instance = new ConcretePlayer('TEST_KEY');
+			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			data && (instance.pregnancy = data);
 			(instance as any)._pregnancy = { data };
@@ -147,14 +169,14 @@ describe('Player class', () => {
 		});
 		it("Pregnancy should return null if player is not pregnant", () => {
 			mockPlayer.HasTrait.mockReturnValue(false);
-			const instance = new ConcretePlayer('TEST_KEY');
+			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			instance.pregnancy = mock();
 			expect(instance.pregnancy).toBeNull();
 		});
 		it("Pregnancy should return null if pregnancy data is not present", () => {
 			mockPlayer.HasTrait.mockReturnValue(true);
-			const instance = new ConcretePlayer('TEST_KEY');
+			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			(instance as any)._pregnancy = undefined;
 			instance.pregnancy = mock();

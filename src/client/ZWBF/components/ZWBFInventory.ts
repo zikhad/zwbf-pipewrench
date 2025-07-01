@@ -1,4 +1,3 @@
-
 import {
 	getSpecificPlayer,
 	getText,

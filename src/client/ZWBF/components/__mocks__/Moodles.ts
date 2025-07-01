@@ -1,4 +1,4 @@
 export class Moodle {
-    constructor() {}
-    moodle() {}
+	constructor() {}
+	moodle() {}
 }
