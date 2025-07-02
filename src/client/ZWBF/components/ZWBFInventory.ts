@@ -48,7 +48,7 @@ export class ZWBFInventory {
 		ISInventoryPaneContextMenu.transferIfNeeded(player, item);
 		ISTimedActionQueue.add(action);
 	}
-	public buildInventoryContextMenu(
+	private buildInventoryContextMenu(
 		playerId: number,
 		context: MenuContext,
 		items: InventoryItem[]

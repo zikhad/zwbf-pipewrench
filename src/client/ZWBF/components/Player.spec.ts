@@ -46,7 +46,7 @@ describe("Player class", () => {
 	it("initializes and creates mod data", () => {
 		const instance = new ConcretePlayer("TEST_KEY");
 		instance.triggerOnCreatePlayer(mockPlayer);
-		
+
 		expect(instance.player).toBe(mockPlayer);
 		expect(instance.data).toBeDefined();
 	});
@@ -55,9 +55,9 @@ describe("Player class", () => {
 		const addListener = jest.fn();
 		beforeEach(() => {
 			(Events as any).onCreatePlayer = { addListener };
-		})
+		});
 		it("should register onCreatePlayer event", () => {
-			const instance = new ConcretePlayer("TEST_KEY");
+			new ConcretePlayer("TEST_KEY");
 			const [callback] = addListener.mock.calls[0];
 			callback(mockPlayer);
 
@@ -71,7 +71,7 @@ describe("Player class", () => {
 			jest.spyOn(Events, "EventEmitter").mockReturnValue({ addListener } as any);
 		});
 		it("should register PREGNANCY_UPDATE event", () => {
-			const instance = new ConcretePlayer("TEST_KEY");
+			new ConcretePlayer("TEST_KEY");
 			const [callback] = addListener.mock.calls[0];
 			callback(mock<PregnancyData>());
 			expect(addListener).toHaveBeenCalledWith(expect.any(Function));

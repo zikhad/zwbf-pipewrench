@@ -58,7 +58,7 @@ export abstract class Player<T> {
 
 		// Register Zomboid lifecycle listeners
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
-		
+
 		// Register custom events
 		new Events.EventEmitter<(data: PregnancyData) => void>(
 			ZWBFEvents.PREGNANCY_UPDATE

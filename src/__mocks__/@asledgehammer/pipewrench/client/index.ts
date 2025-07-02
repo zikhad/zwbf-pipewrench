@@ -5,6 +5,10 @@ export class ISTimedActionQueue {
 	static add() {}
 }
 
+export class ISInventoryPaneContextMenu {
+	static transferIfNeeded() {}
+}
+
 export class ISToolTip {
 	description = "";
 	initialise() {}
