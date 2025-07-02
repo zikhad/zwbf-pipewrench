@@ -5,6 +5,7 @@ jest.mock("@client/components/Womb");
 jest.mock("@client/components/Pregnancy");
 jest.mock("@client/components/Effects");
 jest.mock("@client/components/DebugMenu");
+jest.mock("@client/components/ZWBFUI");
 
 describe("ZWBF", () => {
 	it.each([

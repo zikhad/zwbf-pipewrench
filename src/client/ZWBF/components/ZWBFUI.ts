@@ -1,10 +1,10 @@
 import { getText, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFTraitsEnum } from "@constants";
-import { ZWBFTabManager } from "./UI/ZWBFTabManager";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
+import { ZWBFTabManager } from "./UI/ZWBFTabManager";
 
 type ZWBFUIProps = {
 	// player. IsoPlayer;
