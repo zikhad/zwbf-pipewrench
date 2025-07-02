@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { Player } from "./Player"; // Adjust path as needed
+import * as Events from "@asledgehammer/pipewrench-events";
+import { Player } from "./Player";
 import {
 	IsoPlayer,
 	BodyPartType,
@@ -45,9 +46,36 @@ describe("Player class", () => {
 	it("initializes and creates mod data", () => {
 		const instance = new ConcretePlayer("TEST_KEY");
 		instance.triggerOnCreatePlayer(mockPlayer);
-
+		
 		expect(instance.player).toBe(mockPlayer);
 		expect(instance.data).toBeDefined();
+	});
+
+	describe("Timer Events", () => {
+		const addListener = jest.fn();
+		beforeEach(() => {
+			(Events as any).onCreatePlayer = { addListener };
+		})
+		it("should register onCreatePlayer event", () => {
+			const instance = new ConcretePlayer("TEST_KEY");
+			const [callback] = addListener.mock.calls[0];
+			callback(mockPlayer);
+
+			expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+		});
+	});
+
+	describe("Custom Events", () => {
+		const addListener = jest.fn();
+		beforeEach(() => {
+			jest.spyOn(Events, "EventEmitter").mockReturnValue({ addListener } as any);
+		});
+		it("should register PREGNANCY_UPDATE event", () => {
+			const instance = new ConcretePlayer("TEST_KEY");
+			const [callback] = addListener.mock.calls[0];
+			callback(mock<PregnancyData>());
+			expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+		});
 	});
 
 	describe("getBodyPart", () => {

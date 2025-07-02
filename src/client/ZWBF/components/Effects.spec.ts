@@ -17,15 +17,16 @@ describe("Effects", () => {
 		jest.spyOn(Events, "EventEmitter").mockReturnValue({ addListener } as any);
 	});
 
-	describe("Debug Disabled", () => {
+	describe("ZomboWin Defeat deactivated", () => {
 		beforeEach(() => {
 			jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
 				mock<ArrayList>({
-					contains: jest.fn().mockImplementation(() => false)
+					contains: () => false
 				})
 			);
 		});
 		it("Should NOT call WOMB_HOURLY_UPDATE", () => {
+			new Effects();
 			expect(addListener).not.toHaveBeenCalled();
 		});
 	});
