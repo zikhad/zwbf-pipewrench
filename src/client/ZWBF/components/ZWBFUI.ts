@@ -80,17 +80,17 @@ export class ZWBFUI {
 		return `${getText(txt)}:`;
 	}
 	private toggleLactationPanel() {
-		if (!this.UI) return;
+		// if (!this.UI) return;
 		this.activePanels.lactation = !this.activePanels.lactation;
 		for (const element of Object.values(this.UIElements.lactation)) {
-			if (this.UI[element]) {
-				this.UI[element].setVisible(this.activePanels.lactation);
+			if (this.UI![element]) {
+				this.UI![element].setVisible(this.activePanels.lactation);
 			}
 		}
 		if (this.activePanels.lactation) {
-			this.UI.setHeight(this.heights.lactation);
+			this.UI!.setHeight(this.heights.lactation);
 		} else {
-			this.UI.setHeight(this.heights.womb);
+			this.UI!.setHeight(this.heights.womb);
 		}
 	}
 	onCreatePlayer(player: IsoPlayer) {
@@ -193,39 +193,31 @@ export class ZWBFUI {
 	}
 	onUpdateUI() {
 		// Update UI elements here
-		if (
-			!this.womb ||
-			!this.lactation ||
-			!this.pregnancy ||
-			!this.UI ||
-			!this.UI.isUIVisible ||
-			!this.player ||
-			!this.player.isFemale()
-		)
-			return;
+		if (!this.UI?.isUIVisible) return;
+		
 		// lactation
 		if (this.activePanels.lactation) {
-			const { breasts, level } = this.lactation.images;
+			const { breasts, level } = this.lactation!.images;
 			this.UI[this.UIElements.lactation.image].setPath(breasts);
 			this.UI[this.UIElements.lactation.level].setPath(level);
 		}
+		
 		// Womb
-		const { image, phaseTranslation, fertility, amount, total } = this.womb;
-		const { pregnancy } = this.pregnancy;
-		this.UI[this.UIElements.womb.sperm.current.amount].setText(string.format("%s ml", amount));
-		this.UI[this.UIElements.womb.sperm.total.amount].setText(string.format("%s ml", total));
+		const { image, phaseTranslation, fertility, amount, total } = this.womb!;
+		const { pregnancy } = this.pregnancy!;
+		
+		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amount} ml`);
+		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${total} ml`);
 		this.UI[this.UIElements.womb.image].setPath(image);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
-		if (!this.player.HasTrait("Infertile")) {
-			this.UI[this.UIElements.womb.fertility.title].setText(
-				getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`)
-			);
-			this.UI[this.UIElements.womb.fertility.bar].setValue(
-				pregnancy ? pregnancy.progress : fertility
-			);
-			this.UI[this.UIElements.womb.fertility.value].setText(
-				`${math.floor(fertility * 100)}%`
-			);
+		
+		if (!this.player!.HasTrait(ZWBFTraitsEnum.INFERTILE)) {
+			const title = getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
+			const progress = pregnancy ? pregnancy.progress : fertility;
+			
+			this.UI[this.UIElements.womb.fertility.title].setText(title);
+			this.UI[this.UIElements.womb.fertility.bar].setValue(progress);
+			this.UI[this.UIElements.womb.fertility.value].setText(`${Math.floor(progress * 100)}%`);
 		}
 	}
 }
