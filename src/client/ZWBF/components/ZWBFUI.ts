@@ -4,7 +4,7 @@ import { ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
-import { ZWBFTabManager } from "./UI/ZWBFTabManager";
+import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
 
 type ZWBFUIProps = {
 	// player. IsoPlayer;
