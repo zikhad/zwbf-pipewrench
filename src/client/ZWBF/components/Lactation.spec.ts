@@ -12,10 +12,6 @@ import { mock } from "jest-mock-extended";
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Moodles");
 jest.mock("./Player");
-jest.mock("@utils", () => ({
-	...jest.requireActual("@utils"),
-	getSkinColor: jest.fn().mockReturnValue(1)
-}));
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
 
@@ -313,7 +309,7 @@ describe("Lactation", () => {
 					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
 				expect(lactation.images.breasts).toBe(
-					`media/ui/lactation/boob/color-1/${expected}`
+					`media/ui/lactation/boob/color-0/${expected}`
 				);
 			}
 		);

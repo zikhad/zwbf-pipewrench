@@ -169,6 +169,24 @@ describe("Player class", () => {
 		});
 	});
 
+	describe("skinColorIndex", () => {
+		it("should get player skin color", () => {
+			const player = mock<IsoPlayer>({
+				getHumanVisual: jest.fn().mockImplementation(() => ({
+					getSkinTextureIndex: jest.fn().mockReturnValue(2)
+				}))
+			});
+
+			const instance = new ConcretePlayer();
+			instance.triggerOnCreatePlayer(player);
+			expect(instance.skinColorIndex).toBe(2);
+		});
+		it("should return 0 by default", () => {
+			const instance = new ConcretePlayer();
+			expect(instance.skinColorIndex).toBe(0);
+		});
+	});
+
 	describe("data", () => {
 		it("Should return null when modData is undefined", () => {
 			const instance = new ConcretePlayer();

@@ -194,27 +194,27 @@ export class ZWBFUI {
 	onUpdateUI() {
 		// Update UI elements here
 		if (!this.UI?.isUIVisible) return;
-		
+
 		// lactation
 		if (this.activePanels.lactation) {
 			const { breasts, level } = this.lactation!.images;
 			this.UI[this.UIElements.lactation.image].setPath(breasts);
 			this.UI[this.UIElements.lactation.level].setPath(level);
 		}
-		
+
 		// Womb
 		const { image, phaseTranslation, fertility, amount, total } = this.womb!;
 		const { pregnancy } = this.pregnancy!;
-		
+
 		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amount} ml`);
 		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${total} ml`);
 		this.UI[this.UIElements.womb.image].setPath(image);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
-		
+
 		if (!this.player!.HasTrait(ZWBFTraitsEnum.INFERTILE)) {
 			const title = getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
 			const progress = pregnancy ? pregnancy.progress : fertility;
-			
+
 			this.UI[this.UIElements.womb.fertility.title].setText(title);
 			this.UI[this.UIElements.womb.fertility.bar].setValue(progress);
 			this.UI[this.UIElements.womb.fertility.value].setText(`${Math.floor(progress * 100)}%`);

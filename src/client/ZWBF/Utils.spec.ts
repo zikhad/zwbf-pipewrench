@@ -1,7 +1,4 @@
-import { getSkinColor, percentageToNumber } from "./Utils";
-import { mock } from "jest-mock-extended";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
-
+import { percentageToNumber } from "./Utils";
 describe("Utils", () => {
 	describe("percentageToNumber", () => {
 		it.each([
@@ -15,16 +12,5 @@ describe("Utils", () => {
 				expect(result).toBe(expected);
 			}
 		);
-	});
-	it("getSkinColor", () => {
-		const getSkinTextureIndex = jest.fn().mockReturnValue(1);
-		const mockedPlayer = mock<IsoPlayer>({
-			getHumanVisual: jest.fn().mockImplementation(() => ({
-				getSkinTextureIndex
-			}))
-		});
-		const result = getSkinColor(mockedPlayer);
-		expect(getSkinTextureIndex).toHaveBeenCalledWith();
-		expect(result).toBe(1);
 	});
 });

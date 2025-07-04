@@ -95,25 +95,30 @@ export abstract class Player<T> {
 	 * Given a `BodyPartType` return the `BodyPart` to apply numerous effects
 	 * @param part The `BodyPartType` to return
 	 */
-	getBodyPart(part: BodyPartType): BodyPart | null {
+	public getBodyPart(part: BodyPartType): BodyPart | null {
 		if (!this.player) return null;
 		return this.player.getBodyDamage().getBodyPart(part);
 	}
 
-	hasItem(itemName: string, recursive = false): boolean {
+	/**
+	 * Check if player has a given item in their Inventory
+	 * @param itemName Name of the item to search
+	 * @param recursive check recursively in Inventory
+	 * @returns True if player has item, false otherwise
+	 */
+	public hasItem(itemName: string, recursive = false): boolean {
 		return this.player?.getInventory().contains(itemName, recursive) ?? false;
 	}
 
-	haloText({
-		text,
-		color,
-		arrow
-	}: {
-		text: string;
-		color?: "green" | "red";
-		arrow?: "up" | "down";
-	}) {
+	/**
+	 * Helper function to create `HaloText` in player
+	 * @param props Properties to `HaloText`
+	 */
+	public haloText(props: { text: string; color?: "green" | "red"; arrow?: "up" | "down" }) {
 		if (!this.player) return;
+
+		const { text, color, arrow } = props;
+
 		const getColor = (color?: "green" | "red") => {
 			switch (color) {
 				case "green":
@@ -142,6 +147,14 @@ export abstract class Player<T> {
 	 */
 	protected onPregnancyUpdate(data: PregnancyData): void {
 		this.pregnancy = data;
+	}
+
+	/**
+	 * Get a skin color index of the player
+	 * @returns Skin color index of the player [0-4]
+	 */
+	public get skinColorIndex() {
+		return this.player?.getHumanVisual().getSkinTextureIndex() ?? 0;
 	}
 
 	get data(): T | null {

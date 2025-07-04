@@ -25,6 +25,10 @@ export class Player<T = unknown> {
 
 	haloText(...args: never[]) {}
 
+	get skinColorIndex() {
+		return 0;
+	}
+
 	get data() {
 		return null as never;
 	}

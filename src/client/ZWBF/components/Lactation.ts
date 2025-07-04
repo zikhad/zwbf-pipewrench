@@ -1,7 +1,7 @@
 import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
-import { getSkinColor, percentageToNumber } from "@utils";
+import { percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
 import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
 import { Player, TimedEvents } from "./Player";
@@ -175,13 +175,12 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 			return `pregnant_${progress < 0.7 ? "early" : "late"}`;
 		};
 
-		const skinColor = getSkinColor(this.player!);
 		const state = getState();
 		const fullness = this.milkAmount > this.capacity / 2 ? "full" : "empty";
 		const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
 
 		return {
-			breasts: `media/ui/lactation/boob/color-${skinColor}/${state}_${fullness}.png`,
+			breasts: `media/ui/lactation/boob/color-${this.skinColorIndex}/${state}_${fullness}.png`,
 			level: `media/ui/lactation/level/milk_level_${level}.png`
 		};
 	}
