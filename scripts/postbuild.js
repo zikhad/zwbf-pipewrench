@@ -37,9 +37,10 @@ copyFolder(srcPath("src/translations"), distPath("lua/shared/Translate"))
 		console.error("Error copying translations folder:", err);
 	});
 
+// Copy root folder to dist
 copyFolder(srcPath("src/root"), distPath("", false))
 	.then(() => {
-		console.info("copy root folder copied successfully.");
+		console.info("root folder copied successfully.");
 	})
 	.catch(err => {
 		console.error("Error copying root folder:", err);
