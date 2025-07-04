@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { ZWBFInventory } from "./ZWBFInventory";
+import { Inventory } from "./Inventory";
 
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Lactation } from "./Lactation";
@@ -11,7 +11,7 @@ import { InventoryItem, ISBaseTimedAction, IsoGameCharacter } from "@asledgehamm
 
 jest.mock("@asledgehammer/pipewrench-events");
 
-describe("ZWBFInventory", () => {
+describe("Inventory", () => {
 	const addListener = jest.fn();
 	const addOption = jest.fn();
 	const context = { addOption };
@@ -21,7 +21,7 @@ describe("ZWBFInventory", () => {
 		(Events as any).onFillInventoryObjectContextMenu = { addListener };
 	});
 	it("should call listener correctly", () => {
-		new ZWBFInventory({
+		new Inventory({
 			lactation: mock(),
 			pregnancy: mock(),
 			womb: mock()
@@ -73,7 +73,7 @@ describe("ZWBFInventory", () => {
 			womb = mock<Womb>()
 		} = props;
 
-		new ZWBFInventory({
+		new Inventory({
 			lactation,
 			pregnancy,
 			womb

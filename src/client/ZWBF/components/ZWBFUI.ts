@@ -6,8 +6,7 @@ import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
 import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
 
-type ZWBFUIProps = {
-	// player. IsoPlayer;
+type UIProps = {
 	lactation: Lactation;
 	pregnancy: Pregnancy;
 	womb: Womb;
@@ -66,7 +65,7 @@ export class ZWBFUI {
 		womb: 0
 	};
 
-	constructor(props: ZWBFUIProps) {
+	constructor(props: UIProps) {
 		this.lactation = props.lactation;
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
@@ -79,6 +78,7 @@ export class ZWBFUI {
 	private label(txt: string): string {
 		return `${getText(txt)}:`;
 	}
+	
 	private toggleLactationPanel() {
 		// if (!this.UI) return;
 		this.activePanels.lactation = !this.activePanels.lactation;
@@ -93,6 +93,7 @@ export class ZWBFUI {
 			this.UI!.setHeight(this.heights.womb);
 		}
 	}
+	
 	onCreatePlayer(player: IsoPlayer) {
 		this.player = player;
 	}

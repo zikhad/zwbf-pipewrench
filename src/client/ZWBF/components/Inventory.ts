@@ -19,18 +19,18 @@ type MenuContext = {
 	addOption: (text: string, item: InventoryItem, handler: (item: InventoryItem) => void) => void;
 };
 
-type ZWBFInventoryProps = {
+type InventoryProps = {
 	lactation: Lactation;
 	pregnancy: Pregnancy;
 	womb: Womb;
 };
 
-export class ZWBFInventory {
+export class Inventory {
 	private lactation: Lactation;
 	private pregnancy: Pregnancy;
 	private womb: Womb;
 
-	constructor(props: ZWBFInventoryProps) {
+	constructor(props: InventoryProps) {
 		this.lactation = props.lactation;
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
