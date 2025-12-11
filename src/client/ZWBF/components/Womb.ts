@@ -293,7 +293,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			return 0;
 		}
 
-		print(`phase is: ${this.phase}`)
 		const chance = this.data.chances[this.phase];
 
 		const bonus = this.getFertilityBonus();
