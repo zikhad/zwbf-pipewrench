@@ -54,7 +54,7 @@ export class ZWBFUI {
 
 	private UI?: SimpleUI;
 
-	// private readonly tabManager: ZWBFTabManager;
+	private readonly tabManager: ZWBFTabManager;
 
 	private activePanels = {
 		lactation: true,
@@ -69,7 +69,7 @@ export class ZWBFUI {
 		this.lactation = props.lactation;
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
-		this.tabManager = props.tabManager || new ZWBFTabManager();
+		this.tabManager = props.tabManager || ZWBFTabManager.new();
 		Events.onCreateUI.addListener(() => this.onCreateUI());
 		Events.onPostRender.addListener(() => this.onUpdateUI());
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
