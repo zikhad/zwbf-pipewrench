@@ -22,13 +22,14 @@ const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
 	cycleDay: 1,
 	fertility: 0,
 	onContraceptive: true,
-	chances: new Map([
-		[CyclePhaseEnum.RECOVERY, 0],
-		[CyclePhaseEnum.MENSTRUATION, 0.2],
-		[CyclePhaseEnum.FOLLICULAR, 0.3],
-		[CyclePhaseEnum.OVULATION, 0.85],
-		[CyclePhaseEnum.LUTEAL, 0.2]
-	]),
+	chances: {
+		[CyclePhaseEnum.PREGNANT]: 0,
+		[CyclePhaseEnum.RECOVERY]: 0,
+		[CyclePhaseEnum.MENSTRUATION]: 0.2,
+		[CyclePhaseEnum.FOLLICULAR]: 0.3,
+		[CyclePhaseEnum.OVULATION]: 0.85,
+		[CyclePhaseEnum.LUTEAL]: 0.2
+	},
 	...overrides
 });
 
@@ -276,17 +277,18 @@ describe("Womb", () => {
 	// === Timer Events Tests ===
 	describe("Timer Events", () => {
 		describe("onEveryHour", () => {
-			let mockChances: Map<CyclePhase, number>;
+			let mockChances: Record<CyclePhase, number>;
 			let chancesSpy: jest.SpyInstance;
 
 			beforeEach(() => {
-				mockChances = new Map([
-					["Recovery", 0],
-					["Menstruation", 0.2],
-					["Follicular", 0.3],
-					["Ovulation", 0.9],
-					["Luteal", 0.2]
-				]);
+				mockChances = {
+					"Pregnant": 0,
+					"Recovery": 0,
+					"Menstruation": 0.2,
+					"Follicular": 0.3,
+					"Ovulation": 0.9,
+					"Luteal": 0.2
+				};
 				chancesSpy = jest.spyOn(Womb, "chances", "get").mockReturnValue(mockChances);
 			});
 

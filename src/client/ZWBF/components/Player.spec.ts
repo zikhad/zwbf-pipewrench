@@ -57,7 +57,7 @@ describe("Player class", () => {
 			(Events as any).onCreatePlayer = { addListener };
 		});
 		it("should register onCreatePlayer event", () => {
-			new ConcretePlayer("TEST_KEY");
+			new ConcretePlayer();
 			const [callback] = addListener.mock.calls[0];
 			callback(mockPlayer);
 
@@ -193,7 +193,7 @@ describe("Player class", () => {
 			(instance as any).data = undefined;
 			expect(instance.data).toBeNull();
 		});
-		it("Should return null by default", () => {
+		it("Should return defined data", () => {
 			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			instance.data = { foo: "mocked" };

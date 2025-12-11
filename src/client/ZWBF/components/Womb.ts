@@ -133,6 +133,8 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			fertility: 0
 		};
 		super.onCreatePlayer(player);
+		/* if(!this.data) this.data = this.defaultData; */
+		/* this.data.chances = Womb.chances; */
 
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
@@ -270,25 +272,31 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		this.menstruationEffects();
 	}
 
+	private getFertilityBonus() {
+		if (this.player?.HasTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
+		if (this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
+		return 0;
+	}
+
 	/**
 	 * Computes fertility value based on traits and state.
 	 * @returns Fertility chance between 0 and 1.
 	 */
 	private getFertility() {
 		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
-		if (!this.data || isInfertile || this.onContraceptive || this.pregnancy) {
+		if (
+			!this.data ||
+			isInfertile ||
+			this.onContraceptive ||
+			this.pregnancy
+		) {
 			return 0;
 		}
 
-		const getBonus = () => {
-			if (this.player?.HasTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
-			if (this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
-			return 0;
-		};
+		print(`phase is: ${this.phase}`)
+		const chance = this.data.chances[this.phase];
 
-		const chance = this.data.chances.get(this.phase)!;
-
-		const bonus = getBonus();
+		const bonus = this.getFertilityBonus();
 
 		return Math.min(1, chance * (1 + bonus));
 	}
@@ -331,21 +339,15 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	/**
 	 * Generates randomized fertility chances for each cycle phase.
 	 */
-	static get chances(): Map<CyclePhase, number> {
-		const phases: { phase: CyclePhase; value: number }[] = [
-			{ phase: CyclePhaseEnum.RECOVERY, value: 0 },
-			{ phase: CyclePhaseEnum.MENSTRUATION, value: ZombRandFloat(0, 0.3) },
-			{ phase: CyclePhaseEnum.FOLLICULAR, value: ZombRandFloat(0, 0.4) },
-			{ phase: CyclePhaseEnum.OVULATION, value: ZombRandFloat(0.85, 1) },
-			{ phase: CyclePhaseEnum.LUTEAL, value: ZombRandFloat(0, 0.3) }
-		];
-
-		const _chances = new Map<CyclePhase, number>();
-		for (const { phase, value } of phases) {
-			_chances.set(phase, value);
-		}
-
-		return _chances;
+	static get chances(): Record<CyclePhase, number> {
+		return {
+			[CyclePhaseEnum.PREGNANT]: 0,
+			[CyclePhaseEnum.RECOVERY]: 0,
+			[CyclePhaseEnum.MENSTRUATION]: ZombRandFloat(0, 0.3),
+			[CyclePhaseEnum.FOLLICULAR]: ZombRandFloat(0, 0.4),
+			[CyclePhaseEnum.OVULATION]: ZombRandFloat(0.85, 1),
+			[CyclePhaseEnum.LUTEAL]: ZombRandFloat(0, 0.3),
+		};
 	}
 
 	set contraceptive(value: boolean) {

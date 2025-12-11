@@ -78,6 +78,7 @@ export abstract class Player<T> {
 				modKey: this.modKey,
 				defaultData: this.defaultData
 			});
+			if(!this.data && this.defaultData) this.data = this.defaultData;
 		}
 
 		this._pregnancy = new ModData({
