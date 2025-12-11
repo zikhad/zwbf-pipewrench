@@ -12,6 +12,11 @@ jest.mock("@client/components/UI/ZWBFTabManager", () => ({
 	ZWBFTabManager: class {
 		constructor() {}
 		addTab() {}
+		static new() {
+			return {
+				addTab: () => { }
+			}
+		}
 	}
 }));
 

@@ -11,6 +11,6 @@ export class ISInventoryPaneContextMenu {
 
 export class ISToolTip {
 	description = "";
-	initialise() {}
+	instantiate() {}
 	setVisible() {}
 }

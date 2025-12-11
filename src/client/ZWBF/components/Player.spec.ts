@@ -17,8 +17,9 @@ jest.mock("@asledgehammer/pipewrench");
 jest.mock("@asledgehammer/pipewrench-events");
 
 class ConcretePlayer extends Player<Record<string, unknown>> {
-	constructor(key?: string) {
+	constructor(key?: string, defaultData?: Record<string, unknown>) {
 		super(key);
+		this.defaultData = defaultData;
 	}
 	public triggerOnCreatePlayer(player: IsoPlayer) {
 		this.onCreatePlayer(player);
@@ -193,12 +194,17 @@ describe("Player class", () => {
 			(instance as any).data = undefined;
 			expect(instance.data).toBeNull();
 		});
-		it("Should return defined data", () => {
+		it("Should have defined data", () => {
 			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			instance.data = { foo: "mocked" };
 			expect(instance.data).toBeDefined();
 		});
+		it("Should have defaultData", () => {
+			const instance = new ConcretePlayer("TESTING_DEFAULTS", { default: "default" });
+			instance.triggerOnCreatePlayer(mockPlayer);
+			expect(instance.data).toBeDefined();
+		})
 	});
 
 	describe("Pregnancy", () => {
