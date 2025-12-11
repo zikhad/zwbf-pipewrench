@@ -54,7 +54,7 @@ export class ZWBFUI {
 
 	private UI?: SimpleUI;
 
-	private readonly tabManager: ZWBFTabManager;
+	// private readonly tabManager: ZWBFTabManager;
 
 	private activePanels = {
 		lactation: true,

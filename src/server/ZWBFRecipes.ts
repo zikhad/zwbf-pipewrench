@@ -1,5 +1,5 @@
 import { getPlayer, ZombRandFloat } from "@asledgehammer/pipewrench";
-import { lactation, womb } from "../client/ZWBF/ZWBF";
+import { lactation, womb } from "@client/ZWBF";
 
 export const ZWBFRecipes: Recipe = {
 	OnTest: {
