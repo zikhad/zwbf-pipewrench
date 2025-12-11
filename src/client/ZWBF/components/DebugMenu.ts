@@ -12,7 +12,9 @@ type DebugMenuProps = {
 };
 
 type AddOptionProps = {
-	menu: KahluaTable;
+	menu: {
+		addOption: (...__args: unknown[]) => { toolTip: ISToolTip }
+	};
 	title: string;
 	description: string;
 	fn: () => void;
@@ -40,7 +42,7 @@ export class DebugMenu {
 		const tooltip = new ISToolTip();
 
 		tooltip.description = description;
-		tooltip.initialise();
+		tooltip.instantiate();
 		tooltip.setVisible(false);
 
 		const option = menu.addOption(title, null, () => fn());
@@ -49,7 +51,10 @@ export class DebugMenu {
 
 	private createDebugContextMenu(
 		playerId: number,
-		context: KahluaTable /*, items: KahluaTable */
+		context: {
+			addOption: (option: string) => KahluaTable,
+			addSubMenu: (option: KahluaTable, submenu: KahluaTable) => void 
+		}
 	) {
 		const player = getSpecificPlayer(playerId);
 		if (!player.isFemale()) return;
