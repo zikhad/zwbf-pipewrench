@@ -10,9 +10,9 @@ Sandbox_EN = {
     Sandbox_ZWBF_Womb_Max_Capacity                            = "Womb Capacity (ml)",
     Sandbox_ZWBF_Womb_Max_Capacity_tooltip                    = "The maximum amount of sperm that Womb can hold",
 
-    Sandbox_ZWBF__Milk_Capacity                               = "Milk Capacity",
-    Sandbox_ZWBF__Milk_Capacity_tooltip                       = "The maximum amount of Milk that breasts can hold in ml",
+    Sandbox_ZWBF_Milk_Capacity                               = "Milk Capacity",
+    Sandbox_ZWBF_Milk_Capacity_tooltip                       = "The maximum amount of Milk that breasts can hold in ml",
 
-    Sandbox_ZWBF__Milk_Expiration                             = "Milk Expiration",
-    Sandbox_ZWBF__Milk_Expiration_tooltip                     = "The number of days for lactation to expire if not used",
+    Sandbox_ZWBF_Milk_Expiration                             = "Milk Expiration",
+    Sandbox_ZWBF_Milk_Expiration_tooltip                     = "The number of days for lactation to expire if not used",
 }
