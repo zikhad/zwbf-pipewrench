@@ -35,18 +35,22 @@ type WombOptions = {
  * and dynamic image rendering for different states.
  */
 export class Womb extends Player<WombData> implements TimedEvents {
-	private readonly _capacity: number;
 
-	private readonly options: WombOptions;
+	private readonly options: WombOptions = {
+		recovery: 7,
+		capacity: 1000
+	};
 
 	private _animation: AnimationStatus;
-
+	
 	private readonly animations: AnimationSettings;
+	
+	public amount = 0;
 
 	public Debug = {
 		sperm: {
 			add: (amount: number) => {
-				this.amount = Math.min(this._capacity, this.amount + amount);
+				this.amount = Math.min(this.options.capacity, this.amount + amount);
 				this.total += amount;
 			},
 			remove: (amount: number) => (this.amount = Math.max(0, this.amount - amount)),
@@ -74,16 +78,81 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		}
 	};
 
+	// === Property Accessors ===
+
+	/**
+	 * Generates randomized fertility chances for each cycle phase.
+	 */
+	static get chances(): Record<CyclePhase, number> {
+		return {
+			[CyclePhaseEnum.PREGNANT]: 0,
+			[CyclePhaseEnum.RECOVERY]: 0,
+			[CyclePhaseEnum.MENSTRUATION]: ZombRandFloat(0, 0.3),
+			[CyclePhaseEnum.FOLLICULAR]: ZombRandFloat(0, 0.4),
+			[CyclePhaseEnum.OVULATION]: ZombRandFloat(0.85, 1),
+			[CyclePhaseEnum.LUTEAL]: ZombRandFloat(0, 0.3),
+		};
+	}
+
+	set contraceptive(value: boolean) {
+		this.data!.onContraceptive = value;
+	}
+
+	set cycleDay(value: number) {
+		this.data!.cycleDay = value;
+	}
+
+	get cycleDay() {
+		return this.data?.cycleDay ?? 0;
+	}
+
+	set total(value: number) {
+		this.data!.total = value;
+	}
+	get total() {
+		return this.data?.total ?? 0;
+	}
+
+	private set fertility(value: number) {
+		this.data!.fertility = value;
+	}
+
+	get fertility() {
+		return this.data?.fertility ?? 0;
+	}
+
+	get onContraceptive() {
+		return this.data?.onContraceptive ?? false;
+	}
+
+	get phase() {
+		return this.getCyclePhase(this.cycleDay);
+	}
+
+	get phaseTranslation() {
+		return {
+			[CyclePhaseEnum.RECOVERY]: "IGUI_ZWBF_UI_Recovery",
+			[CyclePhaseEnum.MENSTRUATION]: "IGUI_ZWBF_UI_Menstruation",
+			[CyclePhaseEnum.FOLLICULAR]: "IGUI_ZWBF_UI_Follicular",
+			[CyclePhaseEnum.OVULATION]: "IGUI_ZWBF_UI_Ovulation",
+			[CyclePhaseEnum.LUTEAL]: "IGUI_ZWBF_UI_Luteal",
+			[CyclePhaseEnum.PREGNANT]: "IGUI_ZWBF_UI_Pregnant"
+		}[this.phase];
+	}
+
+	set animation(value: AnimationStatus) {
+		this._animation = value;
+	}
+
+	get animation() {
+		return this._animation;
+	}
+
 	/**
 	 * Initializes the Womb system with animation presets.
 	 */
 	constructor() {
 		super("ZWBFWomb");
-		this.options = {
-			recovery: 7,
-			capacity: 1000
-		};
-		this._capacity = this.options.capacity;
 		this._animation = {
 			isActive: false,
 			delta: 0,
@@ -118,23 +187,22 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		};
 	}
 
+	defaultData = {
+		amount: 0,
+		total: 0,
+		cycleDay: ZombRand(1, 28),
+		onContraceptive: false,
+		chances: Womb.chances,
+		fertility: 0
+	};
+
 	/**
 	 * Initializes data when the player is created.
 	 * @param player - The IsoPlayer instance.
 	 */
-	onCreatePlayer(player: IsoPlayer) {
-		const defaultDay = ZombRand(1, 28);
-		this.defaultData = {
-			amount: 0,
-			total: 0,
-			cycleDay: defaultDay,
-			onContraceptive: false,
-			chances: Womb.chances,
-			fertility: 0
-		};
+	onCreatePlayer(player: IsoPlayer) {		
 		super.onCreatePlayer(player);
-		/* if(!this.data) this.data = this.defaultData; */
-		/* this.data.chances = Womb.chances; */
+		this.amount = this.data?.amount ?? 0;
 
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
@@ -185,7 +253,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	 * Applies animation updates to internal state.
 	 * @param data - New animation status.
 	 */
-	onAnimationUpdate(data: AnimationStatus) {
+	public onAnimationUpdate(data: AnimationStatus) {
 		this.animation = data;
 		if (!this.isAllowedAnimation()) {
 			this.animation = {
@@ -194,7 +262,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		}
 	}
 
-	intercourse() {
+	private intercourse() {
 		if (this.hasItem("ZWBF.Condom")) {
 			const inventory = this.player?.getInventory();
 			inventory?.Remove("Condom");
@@ -214,7 +282,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		}
 	}
 
-	impregnate() {
+	private impregnate() {
 		const fertility = this.getFertility();
 		if (fertility <= 0) return;
 		if (ZombRandFloat(0, 1) >= 1 - fertility) {
@@ -243,22 +311,26 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.getFertility();
+		if(this.data) this.data.amount = this.amount;
 	}
 
 	onEveryTenMinutes(): void {
 		// 50% of doing nothing also do nothing if empty
-		if (this.amount <= 0 || ZombRand(100) < 50) return;
+		if(this.amount <= 0 || ZombRand(0, 100) < 50) return;
+
 		const amount = ZombRand(10, 50);
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
 	}
 
 	onEveryHour(): void {
-		this.data!.chances = Womb.chances;
 		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, {
-			player: this.player!,
-			data: this.data!,
-			capacity: this._capacity
+			player: this.player,
+			data: {
+				...this.data,
+				chances: Womb.chances
+			} as WombData,
+			capacity: this.options.capacity
 		});
 	}
 
@@ -319,7 +391,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		const pain = groin.getAdditionalPain();
 		const bleedTime = groin.getBleedingTime();
 		groin.setBleedingTime(Math.min(10, bleedTime));
-		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(maxPain)));
+		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(0, maxPain)));
 	}
 	private applyWetness() {
 		const amount = ZombRand(10, 100);
@@ -329,92 +401,14 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
-		if (ZombRand(100) < 50) return;
+		if (ZombRand(0, 100) < 50) return;
 		this.applyBleeding();
-	}
-
-	// === Property Accessors ===
-
-	/**
-	 * Generates randomized fertility chances for each cycle phase.
-	 */
-	static get chances(): Record<CyclePhase, number> {
-		return {
-			[CyclePhaseEnum.PREGNANT]: 0,
-			[CyclePhaseEnum.RECOVERY]: 0,
-			[CyclePhaseEnum.MENSTRUATION]: ZombRandFloat(0, 0.3),
-			[CyclePhaseEnum.FOLLICULAR]: ZombRandFloat(0, 0.4),
-			[CyclePhaseEnum.OVULATION]: ZombRandFloat(0.85, 1),
-			[CyclePhaseEnum.LUTEAL]: ZombRandFloat(0, 0.3),
-		};
-	}
-
-	set contraceptive(value: boolean) {
-		this.data!.onContraceptive = value;
-	}
-
-	set cycleDay(value: number) {
-		this.data!.cycleDay = value;
-	}
-
-	get cycleDay() {
-		return this.data?.cycleDay ?? 0;
-	}
-
-	set amount(value: number) {
-		this.data!.amount = value;
-	}
-
-	get amount() {
-		return this.data?.amount ?? 0;
-	}
-
-	set total(value: number) {
-		this.data!.total = value;
-	}
-	get total() {
-		return this.data?.total ?? 0;
-	}
-
-	private set fertility(value: number) {
-		this.data!.fertility = value;
-	}
-
-	get fertility() {
-		return this.data?.fertility ?? 0;
-	}
-
-	get onContraceptive() {
-		return this.data?.onContraceptive ?? false;
-	}
-
-	get phase() {
-		return this.getCyclePhase(this.cycleDay);
-	}
-
-	get phaseTranslation() {
-		return {
-			[CyclePhaseEnum.RECOVERY]: "IGUI_ZWBF_UI_Recovery",
-			[CyclePhaseEnum.MENSTRUATION]: "IGUI_ZWBF_UI_Menstruation",
-			[CyclePhaseEnum.FOLLICULAR]: "IGUI_ZWBF_UI_Follicular",
-			[CyclePhaseEnum.OVULATION]: "IGUI_ZWBF_UI_Ovulation",
-			[CyclePhaseEnum.LUTEAL]: "IGUI_ZWBF_UI_Luteal",
-			[CyclePhaseEnum.PREGNANT]: "IGUI_ZWBF_UI_Pregnant"
-		}[this.phase];
-	}
-
-	set animation(value: AnimationStatus) {
-		this._animation = value;
-	}
-
-	get animation() {
-		return this._animation;
 	}
 
 	/**
 	 * Builds image path for non-animated state.
 	 */
-	private stillImage(): string {
+	private getStillImage(): string {
 		const pregnancy = this.pregnancy;
 		const getStatus = () => {
 			if (!pregnancy) return "normal";
@@ -423,14 +417,14 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		};
 
 		const getImageIndex = () => {
-			if (pregnancy && pregnancy?.progress > 0.05) {
+			if (pregnancy && pregnancy.progress > 0.05) {
 				return percentageToNumber(
 					(pregnancy.progress > 0.9 ? 1 : pregnancy.progress) * 100,
 					6
 				);
 			}
-			if (this.amount === 0) return 0;
-			const percentage = Math.floor((this.amount / this._capacity) * 100);
+			if (this.amount === 0) return 0;			
+			const percentage = Math.floor((this.amount / this.options.capacity) * 100);
 			const index = percentageToNumber(percentage, 17);
 			return Math.max(1, index);
 		};
@@ -500,6 +494,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		if (!this.data) return "";
 
 		if (this.animation.isActive) return this.sceneImage();
-		return this.stillImage();
+		return this.getStillImage();
 	}
 }

@@ -147,7 +147,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		/** Apply sickness in the begining of Pregnancy */
 		const { progress } = this.pregnancy;
 		if (progress < 0.05 || progress > 0.33) return;
-		this.player!.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(50));
+		this.player!.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(0, 50));
 	}
 
 	private set weightDebuff(progress: number) {
