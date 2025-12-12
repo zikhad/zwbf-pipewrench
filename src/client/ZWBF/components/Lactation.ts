@@ -38,6 +38,14 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		set: (amount: number) => (this.milkAmount = amount),
 		toggle: (status: boolean) => this.toggle(status)
 	};
+	
+	defaultData = {
+		isActive: false,
+		milkAmount: 0,
+		// TODO: Get options from SandboxVars
+		expiration: 7,
+		multiplier: 0
+	};
 
 	constructor() {
 		super("ZWBFLactation");
@@ -51,14 +59,6 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	onCreatePlayer(player: IsoPlayer): void {
 		super.onCreatePlayer(player);
-		this.defaultData = {
-			isActive: false,
-			milkAmount: 0,
-			// TODO: Get options from SandboxVars
-			expiration: 7,
-			multiplier: 0
-		};
-
 		this.moodle = new Moodle({
 			player,
 			name: "Engorgement",
@@ -180,7 +180,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
 
 		return {
-			breasts: `media/ui/lactation/boob/color-${this.skinColorIndex}/${state}_${fullness}.png`,
+			breasts: `media/ui/lactation/boobs/color-${this.skinColorIndex}/${state}_${fullness}.png`,
 			level: `media/ui/lactation/level/milk_level_${level}.png`
 		};
 	}

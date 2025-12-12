@@ -309,7 +309,7 @@ describe("Lactation", () => {
 					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
 				expect(lactation.images.breasts).toBe(
-					`media/ui/lactation/boob/color-0/${expected}`
+					`media/ui/lactation/boobs/color-0/${expected}`
 				);
 			}
 		);
