@@ -18,7 +18,12 @@ globalThis.print = jest.fn();
 	saveLayout: jest.fn(),
 	titleBarHeight: jest.fn(),
 	yAct: 0,
-	isUIVisible: false
+	isUIVisible: false,
+	setPositionPixel: jest.fn(),
+	setPositionPercent: jest.fn(),
+	toggle: jest.fn(),
+	close: jest.fn(),
+	open: jest.fn(),
 });
 
 export const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) => mock<IsoPlayer>(overrides);

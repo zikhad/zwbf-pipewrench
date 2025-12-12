@@ -5,11 +5,19 @@ import { Womb } from "./Womb";
 import { getSpecificPlayer, getText, isDebugEnabled, KahluaTable } from "@asledgehammer/pipewrench";
 import { ISToolTip } from "@asledgehammer/pipewrench/client";
 
+type Option = {
+	title: string;
+	description: string;
+	fn: () => void
+};
+
 type DebugMenuProps = {
 	lactation: Lactation;
 	pregnancy: Pregnancy;
 	womb: Womb;
+	options: Option[];
 };
+
 
 type AddOptionProps = {
 	menu: {
@@ -19,10 +27,20 @@ type AddOptionProps = {
 	description: string;
 	fn: () => void;
 };
-export class DebugMenu {
+
+type ContextMenuProps = {
+	playerId: number;
+	context: {
+		addOption: (...__args: unknown[]) => { toolTip: ISToolTip };
+		addSubMenu: (option: KahluaTable, submenu: KahluaTable) => void;
+	};
+};
+export class ContextMenu {
 	private lactation: Lactation;
 	private pregnancy: Pregnancy;
 	private womb: Womb;
+
+	private readonly options: Option[];
 
 	constructor(props: DebugMenuProps) {
 		const { lactation, pregnancy, womb } = props;
@@ -31,10 +49,15 @@ export class DebugMenu {
 		this.pregnancy = pregnancy;
 		this.womb = womb;
 
-		if (!isDebugEnabled()) return;
-		Events.onFillWorldObjectContextMenu.addListener((playerId, context /*, items */) =>
-			this.createDebugContextMenu(playerId, context /*, items */)
-		);
+		this.options = props.options;
+
+		Events.onFillWorldObjectContextMenu
+			.addListener((playerId, context ) => {
+				this.createContextMenu({playerId, context, options: this.options})
+				if (isDebugEnabled()) {
+					this.createDebugContextMenu({ playerId, context });
+				}
+			});
 	}
 
 	private addOption(props: AddOptionProps) {
@@ -49,26 +72,29 @@ export class DebugMenu {
 		option.toolTip = tooltip;
 	}
 
-	private createDebugContextMenu(
-		playerId: number,
-		context: {
-			addOption: (option: string) => KahluaTable,
-			addSubMenu: (option: KahluaTable, submenu: KahluaTable) => void 
-		}
-	) {
+	private createContextMenu(props: ContextMenuProps & { options: Option[] }) {
+		const { playerId, context, options } = props;
 		const player = getSpecificPlayer(playerId);
 		if (!player.isFemale()) return;
+		for ( const { title, description, fn } of options ) {
+			this.addOption({
+				menu: context,
+				title,
+				description,
+				fn
+			});
+		}
+	}
 
-		const option = context.addOption(getText("ContextMenu_ZWBF_Being_Female"));
+	private createDebugContextMenu(props: ContextMenuProps) {
+		const { playerId, context } = props;
+
+		const option = context.addOption(getText("ContextMenu_ZWBF_Being_Female_Debug_Title"));
 		const submenu = ISContextMenu.getNew(context);
 
 		context.addSubMenu(option, submenu);
 
-		const menuItems: {
-			option: string;
-			fn: () => void;
-			condition?: () => boolean;
-		}[] = [
+		const options = [
 			{
 				option: "Add_Sperm",
 				fn: () => this.womb.Debug.sperm.add(100)
@@ -125,17 +151,20 @@ export class DebugMenu {
 				fn: () => this.pregnancy.Debug.advanceToLabor(),
 				condition: () => this.pregnancy.pregnancy != null
 			}
-		];
-
-		for (const { option, fn, condition } of menuItems) {
-			if (condition && !condition()) continue;
-
-			this.addOption({
-				menu: submenu,
+		]
+			.filter(({condition}) => {
+				return !(condition && !condition());
+			})
+			.map<Option>(({ option, fn }) => ({
 				title: getText(`ContextMenu_${option}_Title`),
 				description: getText(`ContextMenu_${option}_Description`),
 				fn
-			});
-		}
+			}));
+
+		this.createContextMenu({
+			playerId,
+			context: submenu,
+			options
+		});
 	}
 }

@@ -224,7 +224,9 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 		const getAnim = () => {
 			const { queue } = ISTimedActionQueue.getTimedActionQueue(this.player);
-			for (const { animation } of queue) {
+
+			// TODO: improve this
+			for (const { animation } of queue ) {
 				return animation as string;
 			}
 			return null;
@@ -326,10 +328,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	onEveryHour(): void {
 		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, {
 			player: this.player,
-			data: {
-				...this.data,
-				chances: Womb.chances
-			} as WombData,
+			amount: this.amount,
 			capacity: this.options.capacity
 		});
 	}

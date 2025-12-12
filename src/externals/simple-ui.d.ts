@@ -16,6 +16,11 @@ interface UIObject {
 	setTitle: (title: string) => void;
 	titleBarHeight: () => number;
 	setVisible: (state: boolean) => void;
+	setPositionPixel: (x: number, y: number) => void;
+	setPositionPercent: (x: number, y: number) => void;
+	toggle: () => void;
+	open: () => void;
+	close: () => void;
 
 	// Content methods
 	addText: (

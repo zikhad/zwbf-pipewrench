@@ -4,13 +4,13 @@ import { ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
-import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
+// import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
 
 type UIProps = {
 	lactation: Lactation;
 	pregnancy: Pregnancy;
 	womb: Womb;
-	tabManager?: ZWBFTabManager;
+	// tabManager?: ZWBFTabManager;
 };
 export class ZWBFUI {
 	private readonly UIElements = {
@@ -48,13 +48,13 @@ export class ZWBFUI {
 	};
 
 	private player?: IsoPlayer;
-	private lactation?: Lactation;
-	private pregnancy?: Pregnancy;
-	private womb?: Womb;
+	private readonly lactation?: Lactation;
+	private readonly pregnancy?: Pregnancy;
+	private readonly womb?: Womb;
 
 	private UI?: SimpleUI;
 
-	private readonly tabManager: ZWBFTabManager;
+	// private readonly tabManager: ZWBFTabManager;
 
 	private activePanels = {
 		lactation: true,
@@ -69,13 +69,13 @@ export class ZWBFUI {
 		this.lactation = props.lactation;
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
-		this.tabManager = props.tabManager || ZWBFTabManager.new();
-		Events.onCreatePlayer.addListener((_, player) => {
-			this.onCreatePlayer(player);
-			this.onCreateUI();
-		});
-		// Events.onCreateUI.addListener(() => this.onCreateUI());
-		Events.onPostRender.addListener(() => this.onUpdateUI());
+		// this.tabManager = props.tabManager || ZWBFTabManager.new();
+		Events.onCreateUI
+			.addListener(() => this.onCreateUI());
+		Events.onCreatePlayer
+			.addListener((_, player) => this.onCreatePlayer(player));
+		Events.onPostRender
+			.addListener(() => this.onUpdateUI());
 	}
 
 	private label(txt: string): string {
@@ -99,12 +99,8 @@ export class ZWBFUI {
 	
 	onCreatePlayer(player: IsoPlayer) {
 		this.player = player;
-	}
-	onCreateUI() {
+		if (!this.UI) return;
 		if (!this.player?.isFemale()) return;
-		this.UI = NewUI();
-		this.UI.setWidthPixel(200);
-		this.UI.setTitle(getText("IGUI_ZWBF_UI_Panel"));
 
 		// === Womb ===
 		this.UI.addText(
@@ -192,9 +188,17 @@ export class ZWBFUI {
 
 		this.UI.setBorderToAllElements(true);
 		this.UI.saveLayout();
-
-		this.tabManager.addTab("HPanel", this.UI);
 	}
+
+	onCreateUI() {
+		this.UI = NewUI();
+
+		this.UI.setWidthPixel(200);
+		this.UI.setTitle(getText("IGUI_ZWBF_UI_Panel"));
+		this.UI.close();
+		// this.tabManager.addTab("HPanel", this.UI);
+	}
+
 	onUpdateUI() {
 		// Update UI elements here
 		if (
@@ -228,5 +232,10 @@ export class ZWBFUI {
 			this.UI[this.UIElements.womb.fertility.bar].setValue(progress);
 			this.UI[this.UIElements.womb.fertility.value].setText(`${Math.floor(progress * 100)}%`);
 		}
+	}
+
+	toggle() {
+		if (!this.UI) return;
+		this.UI.toggle();
 	}
 }

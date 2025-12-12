@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { DebugMenu } from "./DebugMenu";
+import { ContextMenu } from "./ContextMenu";
 
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
@@ -71,12 +71,12 @@ describe("DebugMenu", () => {
 		});
 		it("should NOT create debug context menu", () => {
 			const { lactation, pregnancy, womb } = createMocks();
-			const instance = new DebugMenu({
+			const instance = new ContextMenu({
 				lactation,
 				pregnancy,
 				womb
 			});
-			expect(instance).toBeInstanceOf(DebugMenu);
+			expect(instance).toBeInstanceOf(ContextMenu);
 			expect(Events.onFillWorldObjectContextMenu.addListener).not.toHaveBeenCalledTimes(1);
 		});
 	});
@@ -91,7 +91,7 @@ describe("DebugMenu", () => {
 				})
 			);
 			const { lactation, pregnancy, womb } = createMocks();
-			const instance = new DebugMenu({
+			const instance = new ContextMenu({
 				lactation,
 				pregnancy,
 				womb
@@ -113,7 +113,7 @@ describe("DebugMenu", () => {
 				);
 			});
 			it("should create a debug context menu", () => {
-				new DebugMenu({
+				new ContextMenu({
 					lactation,
 					pregnancy,
 					womb
@@ -179,7 +179,7 @@ describe("DebugMenu", () => {
 				}
 			])("option $title should trigger correct", ({ title, mockCondition, expected }) => {
 				mockCondition && mockCondition();
-				new DebugMenu({
+				new ContextMenu({
 					lactation,
 					pregnancy,
 					womb
