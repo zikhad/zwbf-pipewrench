@@ -15,6 +15,7 @@ interface UIObject {
 	setHeight: (height: number) => void;
 	setTitle: (title: string) => void;
 	titleBarHeight: () => number;
+	setVisible: (state: boolean) => void;
 
 	// Content methods
 	addText: (

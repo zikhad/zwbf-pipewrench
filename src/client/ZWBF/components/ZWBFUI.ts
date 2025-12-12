@@ -70,9 +70,12 @@ export class ZWBFUI {
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
 		this.tabManager = props.tabManager || ZWBFTabManager.new();
-		Events.onCreateUI.addListener(() => this.onCreateUI());
+		Events.onCreatePlayer.addListener((_, player) => {
+			this.onCreatePlayer(player);
+			this.onCreateUI();
+		});
+		// Events.onCreateUI.addListener(() => this.onCreateUI());
 		Events.onPostRender.addListener(() => this.onUpdateUI());
-		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
 	}
 
 	private label(txt: string): string {
@@ -194,18 +197,23 @@ export class ZWBFUI {
 	}
 	onUpdateUI() {
 		// Update UI elements here
-		if (!this.UI?.isUIVisible) return;
+		if (
+			!this.UI?.isUIVisible ||
+			!this.lactation ||
+			!this.womb ||
+			!this.pregnancy
+		) return;
 
 		// lactation
 		if (this.activePanels.lactation) {
-			const { breasts, level } = this.lactation!.images;
+			const { breasts, level } = this.lactation.images;
 			this.UI[this.UIElements.lactation.image].setPath(breasts);
 			this.UI[this.UIElements.lactation.level].setPath(level);
 		}
 
 		// Womb
-		const { image, phaseTranslation, fertility, amount, total } = this.womb!;
-		const { pregnancy } = this.pregnancy!;
+		const { image, phaseTranslation, fertility, amount, total } = this.womb;
+		const { pregnancy } = this.pregnancy;
 
 		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amount} ml`);
 		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${total} ml`);
