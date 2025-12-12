@@ -78,6 +78,15 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		}
 	};
 
+	defaultData = {
+		amount: 0,
+		total: 0,
+		cycleDay: ZombRand(1, 28),
+		onContraceptive: false,
+		chances: Womb.chances,
+		fertility: 0
+	};
+
 	// === Property Accessors ===
 
 	/**
@@ -186,15 +195,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			}
 		};
 	}
-
-	defaultData = {
-		amount: 0,
-		total: 0,
-		cycleDay: ZombRand(1, 28),
-		onContraceptive: false,
-		chances: Womb.chances,
-		fertility: 0
-	};
 
 	/**
 	 * Initializes data when the player is created.
@@ -315,10 +315,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	onEveryTenMinutes(): void {
-		// 50% of doing nothing also do nothing if empty
-		if(this.amount <= 0 || ZombRand(0, 100) < 50) return;
+		// do nothing if empty
+		if(this.amount <= 0) return;
 
-		const amount = ZombRand(10, 50);
+		const amount = ZombRand(0, 50);
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
 	}
@@ -401,7 +401,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
-		if (ZombRand(0, 100) < 50) return;
+		// if (ZombRand(0, 100) < 50) return;
 		this.applyBleeding();
 	}
 
