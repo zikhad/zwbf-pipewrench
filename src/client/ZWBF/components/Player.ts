@@ -171,6 +171,9 @@ export abstract class Player<T> {
 		if (!this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
 		return this._pregnancy?.data ?? null;
 	}
+	public isPregnant() {
+		return this._pregnancy?.data ? true : false;
+	}
 
 	set pregnancy(value: PregnancyData) {
 		if (!this._pregnancy) return;

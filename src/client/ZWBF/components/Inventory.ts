@@ -15,8 +15,9 @@ import { ZWBTakeContraceptive } from "@actions/ZWBFTakeContraceptive";
 import { ZWBTakeLactaid } from "@actions/ZWBFTakeLactaid";
 import * as Events from "@asledgehammer/pipewrench-events";
 
+type Item = InventoryItem & { name: string };
 type MenuContext = {
-	addOption: (text: string, item: InventoryItem, handler: (item: InventoryItem) => void) => void;
+	addOption: (text: string, item: Item, handler: (item: Item) => void) => void;
 };
 
 type InventoryProps = {
@@ -51,25 +52,27 @@ export class Inventory {
 	private buildInventoryContextMenu(
 		playerId: number,
 		context: MenuContext,
-		items: InventoryItem[]
+		items: Item[]
 	) {
 		const player = getSpecificPlayer(playerId);
 		const itemActions = [
 			{
 				text: getText("ContextMenu_BreastFeed_Baby"),
 				itemType: "Baby",
-				condition: () => this.lactation.milkAmount >= this.lactation.bottleAmount,
+				condition: () => 
+					this.lactation.milkAmount >= this.lactation.bottleAmount,
 				handler: (item: InventoryItem) =>
 					this.handleItemAction(item, player, new ZWBFFeedBaby(this.lactation, item))
+					
 			},
 			{
 				text: getText("ContextMenu_Take_Contraceptive"),
 				itemType: "Contraceptive",
-				condition: () =>
-					!this.pregnancy.pregnancy &&
+				condition: () => 
+					!this.pregnancy.isPregnant() &&
 					!this.womb.onContraceptive &&
 					this.womb.phase != CyclePhaseEnum.RECOVERY,
-				handler: (item: InventoryItem) =>
+				handler: (item: InventoryItem) => 
 					this.handleItemAction(item, player, new ZWBTakeContraceptive(this.womb, item))
 			},
 			{
@@ -77,12 +80,16 @@ export class Inventory {
 				itemType: "Lactaid",
 				condition: () => true,
 				handler: (item: InventoryItem) =>
-					this.handleItemAction(item, player, new ZWBTakeLactaid(this.lactation, item))
+					this.handleItemAction(item, player, new ZWBTakeLactaid(this.lactation, item)),
+					
 			}
 		];
+		
+		const activeItems = itemActions.filter(({condition}) => condition());
+		
 		for (const item of items) {
-			for (const { itemType, condition, handler, text } of itemActions) {
-				if (string.find(item.getType(), itemType) && condition()) {
+			for (const { itemType, handler, text } of activeItems) {
+				if (itemType === item.name) {
 					context.addOption(text, item, handler);
 				}
 			}
