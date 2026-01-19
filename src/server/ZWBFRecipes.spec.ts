@@ -3,7 +3,7 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import * as SpyZWBF from "../client/ZWBF/ZWBF";
 
-import { ZWBFRecipes } from "./ZWBFRecipes";
+import ZWBFRecipes from "./ZWBFRecipes";
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("../client/ZWBF/ZWBF", () => ({
 	lactation: {
