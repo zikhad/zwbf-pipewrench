@@ -1,15 +1,16 @@
 import { getActivatedMods, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFEvents } from "@constants";
+import { WombEventData } from "@types";
 import { percentageToNumber } from "@utils";
 
 export class Effects {
 	constructor() {
 		if (!getActivatedMods().contains("ZomboWinDefeatStrip")) return;
 
-		new Events.EventEmitter<(player: IsoPlayer, amount: number, capacity: number) => void>(
+		new Events.EventEmitter<( data: WombEventData ) => void>(
 			ZWBFEvents.WOMB_HOURLY_UPDATE
-		).addListener((player, amount, capacity) => {
+		).addListener(({ player, amount,  capacity }) => {
 			this.ZWUnblessing(player, amount);
 			this.ZWSuccubus(player, amount, capacity);
 		});

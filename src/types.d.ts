@@ -1,4 +1,4 @@
-import { KahluaTable } from "@asledgehammer/pipewrench";
+import { IsoPlayer, KahluaTable } from "@asledgehammer/pipewrench";
 
 type ModDataProps<T> = {
 	/** The player object from PZ */
@@ -63,3 +63,9 @@ type AnimationStatus = {
 	delta?: number;
 	duration?: number;
 };
+
+type WombEventData = {
+	player: IsoPlayer;
+	amount: number;
+	capacity: number;
+}
