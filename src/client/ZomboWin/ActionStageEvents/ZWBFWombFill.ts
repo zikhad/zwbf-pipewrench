@@ -1,5 +1,5 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEventsEnum } from "@constants";
 import { AnimationStatus } from "@types";
 import { AnimationHandler } from "ZomboWin/ZomboWin";
 
@@ -7,7 +7,7 @@ const { ActionEvents } = AnimationHandler;
 table.insert(ActionEvents.Perform, (action: ISBaseTimedAction) => {
 	const character = action.character;
 	if (character.isFemale()) {
-		triggerEvent(ZWBFEvents.INTERCOURSE);
+		triggerEvent(ZWBFEventsEnum.INTERCOURSE);
 	}
 });
 
@@ -16,7 +16,7 @@ table.insert(ActionEvents.Update, (action: ISBaseTimedAction) => {
 	if (character.isFemale()) {
 		const duration = action.duration;
 		const delta = action.getJobDelta();
-		triggerEvent(ZWBFEvents.ANIMATION_UPDATE, {
+		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			isActive: true,
 			delta,
 			duration
@@ -25,5 +25,5 @@ table.insert(ActionEvents.Update, (action: ISBaseTimedAction) => {
 });
 
 table.insert(ActionEvents.Stop, () => {
-	triggerEvent(ZWBFEvents.ANIMATION_UPDATE, { isActive: false } as AnimationStatus);
+	triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, { isActive: false } as AnimationStatus);
 });

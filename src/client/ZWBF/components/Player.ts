@@ -2,7 +2,7 @@ import { BodyPart, BodyPartType, HaloTextHelper, IsoPlayer } from "@asledgehamme
 import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 
 export interface TimedEvents {
 	/**
@@ -61,7 +61,7 @@ export abstract class Player<T> {
 
 		// Register custom events
 		new Events.EventEmitter<(data: PregnancyData) => void>(
-			ZWBFEvents.PREGNANCY_UPDATE
+			ZWBFEventsEnum.PREGNANCY_UPDATE
 		).addListener(data => this.onPregnancyUpdate(data));
 	}
 

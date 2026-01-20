@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { triggerEvent } from "@asledgehammer/pipewrench";
-import { ZWBFEvents } from "@constants";
+import { ZWBFEventsEnum } from "@constants";
 import { AnimationStatus } from "@types";
 
 jest.mock("@asledgehammer/pipewrench");
@@ -34,7 +34,7 @@ describe("AnimationHandler Event Insertion", () => {
 		const mockAction = { character: mockCharacter };
 
 		ActionEvents.Perform[0](mockAction);
-		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEvents.INTERCOURSE);
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.INTERCOURSE);
 	});
 
 	it("should trigger ANIMATION_UPDATE on Update with payload", () => {
@@ -46,7 +46,7 @@ describe("AnimationHandler Event Insertion", () => {
 		};
 
 		ActionEvents.Update[0](mockAction);
-		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEvents.ANIMATION_UPDATE, {
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			isActive: true,
 			delta: 0.5,
 			duration: 30
@@ -55,7 +55,7 @@ describe("AnimationHandler Event Insertion", () => {
 
 	it("should trigger ANIMATION_UPDATE false on Stop", () => {
 		ActionEvents.Stop[0]();
-		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEvents.ANIMATION_UPDATE, {
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			isActive: false
 		} as AnimationStatus);
 	});

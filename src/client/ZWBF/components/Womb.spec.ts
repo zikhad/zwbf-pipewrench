@@ -5,7 +5,7 @@ import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { CyclePhase, WombData } from "@types";
 import { Womb } from "./Womb";
-import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mockedPlayer } from "@test/mock";
@@ -241,7 +241,7 @@ describe("Womb", () => {
 			jest.spyOn(womb as any, "getFertility").mockReturnValue(1);
 			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(1);
 			(womb as any).impregnate();
-			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEvents.PREGNANCY_START);
+			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_START);
 		});
 	});
 

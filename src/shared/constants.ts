@@ -17,7 +17,7 @@ export enum CyclePhaseEnum {
 	PREGNANT = "Pregnant"
 }
 
-export enum ZWBFEvents {
+export enum ZWBFEventsEnum {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
 	LACTATION_UPDATE = "ZWBFLactationUpdate",
 	ANIMATION_UPDATE = "ZWBFAnimationUpdate",

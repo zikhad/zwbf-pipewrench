@@ -44,7 +44,14 @@ type PregnancyData = {
 	isInLabor?: boolean;
 };
 
-type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
+/** The different menstrual cycle names */
+type CyclePhase =
+	"Recovery"
+	| "Menstruation"
+	| "Follicular"
+	| "Ovulation"
+	| "Luteal"
+	| "Pregnant";
 
 type WombData = {
 	amount: number;
@@ -68,4 +75,4 @@ type WombEventData = {
 	player: IsoPlayer;
 	amount: number;
 	capacity: number;
-}
+};

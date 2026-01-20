@@ -10,7 +10,7 @@ import {
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
-import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
@@ -210,10 +210,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		Events.everyDays.addListener(() => this.onEveryDay());
 
 		new Events.EventEmitter<(data: AnimationStatus) => void>(
-			ZWBFEvents.ANIMATION_UPDATE
+			ZWBFEventsEnum.ANIMATION_UPDATE
 		).addListener(data => this.onAnimationUpdate(data));
 
-		new Events.EventEmitter(ZWBFEvents.INTERCOURSE).addListener(() => this.intercourse());
+		new Events.EventEmitter(ZWBFEventsEnum.INTERCOURSE).addListener(() => this.intercourse());
 	}
 
 	private isAllowedAnimation(
@@ -292,7 +292,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 				text: getText("IGUI_ZWBF_UI_Fertilized"),
 				color: "green"
 			});
-			triggerEvent(ZWBFEvents.PREGNANCY_START);
+			triggerEvent(ZWBFEventsEnum.PREGNANCY_START);
 		}
 	}
 
@@ -326,7 +326,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	onEveryHour(): void {
-		triggerEvent(ZWBFEvents.WOMB_HOURLY_UPDATE, {
+		triggerEvent(ZWBFEventsEnum.WOMB_HOURLY_UPDATE, {
 			player: this.player,
 			amount: this.amount,
 			capacity: this.options.capacity

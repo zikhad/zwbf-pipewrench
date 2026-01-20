@@ -3,7 +3,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
 
@@ -71,7 +71,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
 
-		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
+		LuaEventManager.AddEvent(ZWBFEventsEnum.LACTATION_UPDATE);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
@@ -84,7 +84,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	}
 
 	onEveryMinute() {
-		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
+		triggerEvent(ZWBFEventsEnum.LACTATION_UPDATE, this.data);
 	}
 
 	onEveryTenMinutes() {

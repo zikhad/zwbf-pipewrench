@@ -2,7 +2,7 @@ import type { PregnancyData } from "@types";
 import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
@@ -76,7 +76,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
 
-		new Events.EventEmitter(ZWBFEvents.PREGNANCY_START).addListener(() => this.start());
+		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START).addListener(() => this.start());
 	}
 
 	/**
