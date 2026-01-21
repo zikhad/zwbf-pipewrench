@@ -5,7 +5,7 @@ import { Womb } from "./Womb";
 import { getSpecificPlayer, getText, isDebugEnabled, KahluaTable } from "@asledgehammer/pipewrench";
 import { ISToolTip } from "@asledgehammer/pipewrench/client";
 
-type Option = {
+export type Option = {
 	title: string;
 	description: string;
 	fn: () => void
@@ -40,20 +40,16 @@ export class ContextMenu {
 	private pregnancy: Pregnancy;
 	private womb: Womb;
 
-	private readonly options: Option[];
-
 	constructor(props: DebugMenuProps) {
-		const { lactation, pregnancy, womb } = props;
+		const { lactation, pregnancy, womb, options } = props;
 
 		this.lactation = lactation;
 		this.pregnancy = pregnancy;
 		this.womb = womb;
 
-		this.options = props.options;
-
 		Events.onFillWorldObjectContextMenu
 			.addListener((playerId, context ) => {
-				this.createContextMenu({playerId, context, options: this.options})
+				this.createContextMenu({ playerId, context, options });
 				if (isDebugEnabled()) {
 					this.createDebugContextMenu({ playerId, context });
 				}

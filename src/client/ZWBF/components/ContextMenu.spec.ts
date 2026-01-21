@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { ContextMenu } from "./ContextMenu";
+import { ContextMenu, Option } from "./ContextMenu";
 
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
@@ -23,7 +23,6 @@ describe("DebugMenu", () => {
 			}
 		});
 		const pregnancy = mock<Pregnancy>({
-			// pregnancy: mock<PregnancyData>(),
 			Debug: {
 				start: jest.fn(),
 				stop: jest.fn(),
@@ -45,19 +44,34 @@ describe("DebugMenu", () => {
 				}
 			}
 		});
+
+		const options = mock<Option[]>([
+			{
+				title: "mocked",
+				description: "mocked",
+				fn: jest.fn()
+			}
+		]);
+
+		const context = mock<{
+			addOption: () => { toolTip: string };
+		}>({
+			addOption: () => ({ toolTip: "toolTip" })
+		});
+
 		return {
 			lactation,
 			pregnancy,
-			womb
+			womb,
+			options,
+			context
 		};
 	};
 
 	const mockSubmenu = {
-		addOption: jest.fn().mockReturnValue({ tooltip: jest.fn() })
+		addOption: jest.fn().mockReturnValue({ toolTip: jest.fn() })
 	};
-	beforeEach(() => {
-		jest.clearAllMocks();
-	});
+
 	Object.defineProperty(global, "ISContextMenu", {
 		writable: true,
 		value: {
@@ -65,46 +79,60 @@ describe("DebugMenu", () => {
 		}
 	});
 
+	beforeEach(() => {
+		jest.clearAllMocks();
+	});
+
 	describe("Debug is disabled", () => {
+		const { lactation, pregnancy, womb, options } = createMocks();
+
 		beforeEach(() => {
 			jest.spyOn(SpyPipewrench, "isDebugEnabled").mockReturnValue(false);
 		});
-		it("should NOT create debug context menu", () => {
-			const { lactation, pregnancy, womb } = createMocks();
-			const instance = new ContextMenu({
+
+		it("should Only create One context menu item", () => {
+			new ContextMenu({
 				lactation,
 				pregnancy,
-				womb
+				womb,
+				options
 			});
-			expect(instance).toBeInstanceOf(ContextMenu);
-			expect(Events.onFillWorldObjectContextMenu.addListener).not.toHaveBeenCalledTimes(1);
+			expect(Events.onFillWorldObjectContextMenu.addListener).toHaveBeenCalledTimes(1);
 		});
 	});
 	describe("Debug is enabled", () => {
+		const { lactation, pregnancy, womb, options, context } = createMocks();
+
 		beforeEach(() => {
 			jest.spyOn(SpyPipewrench, "isDebugEnabled").mockReturnValue(true);
 		});
-		it("Should NOT create a debug context menu when player is NOT female", () => {
-			jest.spyOn(SpyPipewrench, "getSpecificPlayer").mockImplementation(() =>
-				mock<IsoPlayer>({
-					isFemale: () => false
-				})
-			);
-			const { lactation, pregnancy, womb } = createMocks();
-			const instance = new ContextMenu({
-				lactation,
-				pregnancy,
-				womb
-			});
-			const [addListener] = (Events.onFillWorldObjectContextMenu.addListener as jest.Mock)
-				.mock.calls[0];
-			addListener(1, mock());
 
-			const spy = jest.spyOn(instance as any, "addOption");
-			expect(spy).not.toHaveBeenCalled();
+		describe("Player is Male", () => {
+			beforeEach(() => {
+				jest.spyOn(SpyPipewrench, "getSpecificPlayer").mockImplementation(() =>
+					mock<IsoPlayer>({
+						isFemale: () => false
+					})
+				);
+			});
+			it("Should NOT create a context menu when player is Male", () => {
+				const instance = new ContextMenu({
+					lactation,
+					pregnancy,
+					womb,
+					options
+				});
+
+				const [addListener] = (Events.onFillWorldObjectContextMenu.addListener as jest.Mock)
+					.mock.calls[0];
+				addListener(1, context);
+
+				const spy = jest.spyOn(instance as any, "addOption");
+				expect(spy).not.toHaveBeenCalled();
+			});
 		});
-		describe("addOption", () => {
-			const { lactation, pregnancy, womb } = createMocks();
+
+		describe("Player is Female", () => {
 			beforeEach(() => {
 				jest.spyOn(SpyPipewrench, "getSpecificPlayer").mockImplementation(() =>
 					mock<IsoPlayer>({
@@ -112,17 +140,7 @@ describe("DebugMenu", () => {
 					})
 				);
 			});
-			it("should create a debug context menu", () => {
-				new ContextMenu({
-					lactation,
-					pregnancy,
-					womb
-				});
-				const [addListener] = (Events.onFillWorldObjectContextMenu.addListener as jest.Mock)
-					.mock.calls[0];
-				addListener(1, mock());
-				expect(Events.onFillWorldObjectContextMenu.addListener).toHaveBeenCalledTimes(1);
-			});
+
 			it.each([
 				{
 					title: "Add_Sperm",
@@ -182,11 +200,12 @@ describe("DebugMenu", () => {
 				new ContextMenu({
 					lactation,
 					pregnancy,
-					womb
+					womb,
+					options
 				});
 				const [addListener] = (Events.onFillWorldObjectContextMenu.addListener as jest.Mock)
 					.mock.calls[0];
-				addListener(1, mock());
+				addListener(1, context);
 				const addOptions = mockSubmenu.addOption.mock.calls;
 				const menuCall =
 					addOptions.find(([call]) => (call as string).includes(title)) || [];

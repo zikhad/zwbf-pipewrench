@@ -11,6 +11,7 @@ export class ISInventoryPaneContextMenu {
 
 export class ISToolTip {
 	description = "";
+	toolTip = "";
 	instantiate() {}
 	setVisible() {}
 }
