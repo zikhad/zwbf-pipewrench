@@ -97,7 +97,7 @@ export class ZWBFUI {
 		}
 	}
 	
-	onCreatePlayer(player: IsoPlayer) {
+	private onCreatePlayer(player: IsoPlayer) {
 		this.player = player;
 		if (!this.UI) return;
 		if (!this.player?.isFemale()) return;
@@ -190,7 +190,7 @@ export class ZWBFUI {
 		this.UI.saveLayout();
 	}
 
-	onCreateUI() {
+	private onCreateUI() {
 		this.UI = NewUI();
 
 		this.UI.setWidthPixel(200);
@@ -199,7 +199,7 @@ export class ZWBFUI {
 		// this.tabManager.addTab("HPanel", this.UI);
 	}
 
-	onUpdateUI() {
+	private onUpdateUI() {
 		// Update UI elements here
 		if (
 			!this.UI?.isUIVisible ||
@@ -234,8 +234,9 @@ export class ZWBFUI {
 		}
 	}
 
-	toggle() {
-		if (!this.UI) return;
-		this.UI.toggle();
+	public toggle() {
+		/* if (!this.UI) return;
+		this.UI.toggle(); */
+		this.UI!.toggle();
 	}
 }

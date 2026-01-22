@@ -8,7 +8,9 @@ import { Womb } from "./Womb";
 import { PregnancyData } from "@types";
 import { Pregnancy } from "./Pregnancy";
 
-jest.mock("@client/components/UI/ZWBFTabManager", () => ({
+jest.mock("@asledgehammer/pipewrench-events");
+
+/* jest.mock("@client/components/UI/ZWBFTabManager", () => ({
 	ZWBFTabManager: class {
 		constructor() {}
 		addTab() {}
@@ -18,7 +20,7 @@ jest.mock("@client/components/UI/ZWBFTabManager", () => ({
 			}
 		}
 	}
-}));
+})); */
 
 describe("ZWBFUI", () => {
 	const addButton = jest.fn();
@@ -70,9 +72,10 @@ describe("ZWBFUI", () => {
 	describe("Event System", () => {
 		const addListener = jest.fn();
 		it.each([
+			/* should be in the same order as the code */
 			{ event: "onCreateUI", handler: "onCreateUI" },
-			{ event: "onPostRender", handler: "onUpdateUI" },
-			{ event: "onCreatePlayer", handler: "onCreatePlayer" }
+			{ event: "onCreatePlayer", handler: "onCreatePlayer" },
+			{ event: "onPostRender", handler: "onUpdateUI" }
 		])("Should register & call $event callback properly", ({ event, handler }) => {
 			(Events as any)[event] = { addListener };
 
@@ -116,8 +119,8 @@ describe("ZWBFUI", () => {
 					HasTrait
 				});
 
-				ui.onCreatePlayer(player);
-				ui.onCreateUI();
+				(ui as any).onCreateUI();
+				(ui as any).onCreatePlayer(player);
 				expect(isFemale).toHaveBeenCalled();
 				female && expect(HasTrait).toHaveBeenCalled();
 			}
@@ -128,8 +131,8 @@ describe("ZWBFUI", () => {
 				isFemale: () => true,
 				HasTrait: () => false
 			});
-			ui.onCreatePlayer(player);
-			ui.onCreateUI();
+			(ui as any).onCreateUI();
+			(ui as any).onCreatePlayer(player);
 			const [, , callback] = addButton.mock.calls[0];
 			expect((ui as any).activePanels.lactation).toBe(true);
 			callback();
@@ -158,18 +161,18 @@ describe("ZWBFUI", () => {
 					HasTrait
 				});
 
-				ui.onCreatePlayer(player);
-				ui.onCreateUI();
+				(ui as any).onCreatePlayer(player);
+				(ui as any).onCreateUI();
 				// clear mock since onCreate can call the HasTrait as well
 				HasTrait.mockClear();
-				ui.onUpdateUI();
+				(ui as any).onUpdateUI();
 
 				(ui as any).UI && ((ui as any).UI.isUIVisible = uiVisible);
 				expect(HasTrait).not.toHaveBeenCalled();
 			}
 		);
 		it.each([{ pregnancy: null }, { pregnancy: { progress: 0.5 } as PregnancyData }])(
-			"Should update UI when pregancy is $pregnancy",
+			"Should update UI when pregnancy is $pregnancy",
 			({ pregnancy }) => {
 				const HasTrait = jest.fn().mockReturnValue(false);
 				const player = mock<IsoPlayer>({
@@ -194,13 +197,30 @@ describe("ZWBFUI", () => {
 					})
 				});
 
-				ui.onCreatePlayer(player);
-				ui.onCreateUI();
+				(ui as any).onCreatePlayer(player);
+				(ui as any).onCreateUI();
 				(ui as any).UI.isUIVisible = true;
 				(ui as any).pregancy = { pregnancy };
-				ui.onUpdateUI();
+				(ui as any).onUpdateUI();
 				expect(HasTrait).toHaveBeenCalled();
 			}
 		);
+	});
+	describe("Toggle UI", () => {
+		it("should toggle the UI", () => {
+			const ui = new ZWBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			const toggleSpy = jest.fn();
+			(ui as any).UI = { toggle: toggleSpy };
+
+			ui.toggle();
+
+			expect(toggleSpy).toHaveBeenCalled();
+
+		});
 	});
 });
