@@ -3,7 +3,8 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import * as SpyZWBF from "../client/ZWBF/ZWBF";
 
-import ZWBFRecipes from "./ZWBFRecipes";
+import "./ZWBFRecipes";
+
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("../client/ZWBF/ZWBF", () => ({
 	lactation: {
@@ -38,7 +39,7 @@ describe("ZWBFRecipes.ts", () => {
 		});
 	});
 	describe("OnTest", () => {
-		describe("Thruthy scenarios", () => {
+		describe("Truthy scenarios", () => {
 			beforeEach(() => {
 				isFemaleSpy.mockReturnValue(true);
 

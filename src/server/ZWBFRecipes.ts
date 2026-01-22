@@ -1,8 +1,6 @@
 import { getPlayer, ZombRandFloat } from "@asledgehammer/pipewrench";
 import { lactation, womb } from "@client/ZWBF";
 
-declare let ZWBFRecipes: Recipe;
-
 ZWBFRecipes = {
 	OnTest: {
 		HandExpress: () => {
@@ -30,5 +28,3 @@ ZWBFRecipes = {
 		}
 	}
 };
-
-export default ZWBFRecipes;
