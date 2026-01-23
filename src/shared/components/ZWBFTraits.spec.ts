@@ -8,11 +8,11 @@ jest.mock("@asledgehammer/pipewrench");
 
 describe("ZWBFTraits", () => {
 	const spyAddTrait = jest.fn();
-	const spySetMutialExclusive = jest.fn();
+	const spySetMutualExclusive = jest.fn();
 	beforeEach(() => {
 		jest.resetAllMocks();
 		TraitFactory.addTrait = spyAddTrait;
-		TraitFactory.setMutualExclusive = spySetMutialExclusive;
+		TraitFactory.setMutualExclusive = spySetMutualExclusive;
 	});
 
 	it("Registers addTraits on game boot", () => {
@@ -32,7 +32,7 @@ describe("ZWBFTraits", () => {
 		const [addTraits] = (Events.onCreateLivingCharacter.addListener as jest.Mock).mock.calls[0];
 		addTraits();
 
-		expect(spySetMutialExclusive).not.toHaveBeenCalled();
+		expect(spySetMutualExclusive).not.toHaveBeenCalled();
 	});
 
 	it("Should call SetMutualExclusive acordingly", () => {
@@ -48,6 +48,6 @@ describe("ZWBFTraits", () => {
 		const [addTraits] = (Events.onCreateLivingCharacter.addListener as jest.Mock).mock.calls[0];
 		addTraits();
 
-		expect(spySetMutialExclusive).toHaveBeenCalledWith("Infertile", "Fertile");
+		expect(spySetMutualExclusive).toHaveBeenCalledWith("Infertile", "Fertile");
 	});
 });
