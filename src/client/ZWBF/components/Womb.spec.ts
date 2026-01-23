@@ -304,14 +304,15 @@ describe("Womb", () => {
 				chancesSpy.mockRestore();
 			});
 
-			it("should update chances when data exists", () => {
+			it("should update chances DAILY when data exists", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 
 				const womb = new Womb();
 				chancesSpy.mockClear();
 
-				womb.onEveryHour();
 				womb.onCreatePlayer(mockedPlayer());
+				(womb as any).menstruationEffects = jest.fn();
+				womb.onEveryDay();
 
 				expect(chancesSpy).toHaveBeenCalledTimes(1);
 

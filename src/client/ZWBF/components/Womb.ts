@@ -337,10 +337,15 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		// Increment cycle day
 		this.cycleDay++;
 
-		if (this.phase != CyclePhaseEnum.MENSTRUATION) return;
-		if (this.player?.HasTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)) return;
+		this.data!.chances = Womb.chances;
+		if (
+			this.phase == CyclePhaseEnum.MENSTRUATION &&
+			!this.player?.HasTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)
+		) {
+			this.menstruationEffects();
+		}
 
-		this.menstruationEffects();
+
 	}
 
 	private getFertilityBonus() {
