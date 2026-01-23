@@ -31,7 +31,7 @@ describe("Effects", () => {
 		});
 	});
 
-	describe("Debug Enabled", () => {
+	describe("ZomboWin Default Enabled", () => {
 		const setInfectionLevel = jest.fn();
 		const getStats = jest.fn().mockImplementation(() => ({
 			setHunger: jest.fn(),
@@ -55,7 +55,11 @@ describe("Effects", () => {
 				(effects as any).ZWUnblessing = jest.fn();
 				(effects as any).ZWSuccubus = jest.fn();
 				const [callback] = addListener.mock.calls[0];
-				callback();
+				callback({
+					player: mock(),
+					amount: mock(),
+					capacity: mock(),
+				});
 				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
 			});
 		});
@@ -86,9 +90,8 @@ describe("Effects", () => {
 							setInfectionLevel
 						}))
 					});
-					const data = mock<WombData>({ amount });
 					const effects = new Effects();
-					(effects as any).ZWUnblessing(player, data);
+					(effects as any).ZWUnblessing(player, amount);
 					expected();
 				}
 			);
@@ -118,9 +121,8 @@ describe("Effects", () => {
 						HasTrait: jest.fn().mockImplementation(() => trait),
 						getStats
 					});
-					const data = mock<WombData>({ amount });
 					const effects = new Effects();
-					(effects as any).ZWSuccubus(player, data, 1000);
+					(effects as any).ZWSuccubus(player, amount);
 					expected();
 				}
 			);
