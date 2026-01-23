@@ -11,6 +11,7 @@ import {
 } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { PregnancyData } from "@types";
+import SpyInstance = jest.SpyInstance;
 
 // Mocks
 jest.mock("@asledgehammer/pipewrench");
@@ -119,7 +120,7 @@ describe("Player class", () => {
 
 	describe("haloText", () => {
 		it.each<{
-			spyOn: () => void;
+			spyOn: () => SpyInstance;
 			color?: "green" | "red";
 			arrow?: "up" | "down";
 		}>([
@@ -157,6 +158,7 @@ describe("Player class", () => {
 					color,
 					arrow
 				});
+				expect(true).toBeTruthy();
 				expect(spy).toHaveBeenCalled();
 			}
 		);

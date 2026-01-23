@@ -69,7 +69,7 @@ export class Inventory {
 				text: getText("ContextMenu_Take_Contraceptive"),
 				itemType: "Contraceptive",
 				condition: () => 
-					!this.pregnancy.isPregnant() &&
+					!this.pregnancy.pregnancy &&
 					!this.womb.onContraceptive &&
 					this.womb.phase != CyclePhaseEnum.RECOVERY,
 				handler: (item: InventoryItem) => 
