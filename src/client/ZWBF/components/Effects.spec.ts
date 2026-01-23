@@ -2,7 +2,6 @@
 import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { WombData } from "@types";
 import { mock } from "jest-mock-extended";
 import { Effects } from "./Effects";
 
