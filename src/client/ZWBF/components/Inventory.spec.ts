@@ -80,7 +80,7 @@ describe("Inventory", () => {
 		});
 
 		const [callback] = addListener.mock.calls[0];
-		callback(0, context, [{ getType: () => item }]);
+		callback(0, context, [{ getType: () => item, name: item }]);
 		const [, , handler] = addOption.mock.calls[0];
 		handler(mock<InventoryItem>(), mock<IsoGameCharacter>(), mock<ISBaseTimedAction>());
 		expect(addOption).toHaveBeenCalledWith(text, expect.any(Object), expect.any(Function));
