@@ -223,13 +223,14 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		if (this.pregnancy?.isInLabor) return true;
 
 		const getAnim = () => {
-			const { queue } = ISTimedActionQueue.getTimedActionQueue(this.player);
+			const { queue }: { queue: { animation: string }[] } = ISTimedActionQueue.getTimedActionQueue(this.player);
 
-			// TODO: improve this
-			for (const { animation } of queue ) {
-				return animation as string;
+			return queue[0]?.animation ?? null;
+			/* if (queue.length > 0) {
+				const { animation } = queue[0];
+				return animation;
 			}
-			return null;
+			return null; */
 		};
 
 		const getAnimInfo = () => {
@@ -246,6 +247,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			}
 			return null;
 		};
+
 		const tags = getAnimInfo()?.tags;
 		if (!tags) return false;
 		return !tags.some(tag => excludedTags.includes(tag));

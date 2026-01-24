@@ -284,7 +284,7 @@ describe("Womb", () => {
 
 	// === Timer Events Tests ===
 	describe("Timer Events", () => {
-		describe("onEveryHour", () => {
+		describe("onEveryDay", () => {
 			let mockChances: Record<CyclePhase, number>;
 			let chancesSpy: jest.SpyInstance;
 
