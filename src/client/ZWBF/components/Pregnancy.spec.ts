@@ -188,6 +188,7 @@ describe("Pregnancy", () => {
 
 				(pregnancy as any).onCreatePlayer({
 					...player,
+					HasTrait: jest.fn().mockReturnValue(false),
 					getTraits: () => ({ add })
 				});
 				const [callback] = addListener.mock.calls[0];
@@ -206,6 +207,7 @@ describe("Pregnancy", () => {
 			const pregnancy = new Pregnancy();
 			(pregnancy as any).onCreatePlayer({
 				...player,
+				HasTrait: jest.fn().mockReturnValue(true),
 				setBlockMovement,
 				getInventory: () => ({ AddItem }),
 				getTraits: () => ({ remove })

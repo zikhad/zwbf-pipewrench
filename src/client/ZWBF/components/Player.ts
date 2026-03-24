@@ -150,6 +150,44 @@ export abstract class Player<T> {
 		this.pregnancy = data;
 	}
 
+	protected hasZWBFTrait(trait: ZWBFTraitsEnum): boolean {
+		return Player.hasZWBFTrait(this.player, trait);
+	}
+
+	protected addZWBFTrait(trait: ZWBFTraitsEnum): void {
+		const player = this.player;
+		if (!player) {
+			return;
+		}
+
+		const traits = player.getTraits();
+
+		if (player.HasTrait(trait)) {
+			return;
+		}
+
+		traits.add(trait);
+	}
+
+	protected removeZWBFTrait(trait: ZWBFTraitsEnum): void {
+		const player = this.player;
+		if (!player) {
+			return;
+		}
+
+		const traits = player.getTraits();
+		if (player.HasTrait(trait)) {
+			traits.remove(trait);
+		}
+	}
+
+	public static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum): boolean {
+		if (!player) {
+			return false;
+		}
+		return player.HasTrait(trait);
+	}
+
 	/**
 	 * Get a skin color index of the player
 	 * @returns Skin color index of the player [0-4]
@@ -168,7 +206,7 @@ export abstract class Player<T> {
 	}
 
 	get pregnancy(): PregnancyData | null {
-		if (!this.player?.HasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
+		if (!this.hasZWBFTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
 		return this._pregnancy?.data ?? null;
 	}
 

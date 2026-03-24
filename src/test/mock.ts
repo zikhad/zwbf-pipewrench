@@ -28,4 +28,8 @@ globalThis.print = jest.fn();
 
 (globalThis as any).ZWBFRecipes = {};
 
-export const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) => mock<IsoPlayer>(overrides);
+export const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) =>
+	mock<IsoPlayer>({
+		HasTrait: jest.fn().mockReturnValue(false),
+		...overrides
+	});

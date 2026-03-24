@@ -342,7 +342,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		this.data!.chances = Womb.chances;
 		if (
 			this.phase == CyclePhaseEnum.MENSTRUATION &&
-			!this.player?.HasTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)
+			!this.hasZWBFTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)
 		) {
 			this.menstruationEffects();
 		}
@@ -351,8 +351,8 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	private getFertilityBonus() {
-		if (this.player?.HasTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
-		if (this.player?.HasTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
+		if (this.hasZWBFTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
+		if (this.hasZWBFTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
 		return 0;
 	}
 
@@ -361,7 +361,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	 * @returns Fertility chance between 0 and 1.
 	 */
 	private getFertility() {
-		const isInfertile = this.player?.HasTrait(ZWBFTraitsEnum.INFERTILE);
+		const isInfertile = this.hasZWBFTrait(ZWBFTraitsEnum.INFERTILE);
 		if (
 			!this.data ||
 			isInfertile ||
@@ -392,7 +392,9 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	private applyBleeding() {
-		const maxPain = this.player?.HasTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS) ? 50 : 25;
+		const maxPain = this.hasZWBFTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS)
+			? 50
+			: 25;
 		const groin = this.getBodyPart(BodyPartType.Groin)!;
 		const pain = groin.getAdditionalPain();
 		const bleedTime = groin.getBleedingTime();

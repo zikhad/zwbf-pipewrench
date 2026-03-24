@@ -67,7 +67,7 @@ describe("Lactation", () => {
 				})
 			);
 			lactation.useMilk(100);
-			expect(SpyHasTrait).toHaveBeenCalledWith("DairyCow");
+			expect(SpyHasTrait).toHaveBeenCalledWith("zwbf:dairycow");
 			expect(lactation.milkAmount).toBe(300);
 		});
 

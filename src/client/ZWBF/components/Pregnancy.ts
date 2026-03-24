@@ -94,7 +94,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	 * start Pregnancy (add Player trait)
 	 */
 	private start() {
-		this.player?.getTraits().add(ZWBFTraitsEnum.PREGNANCY);
+		this.addZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
 	}
 
@@ -102,7 +102,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	 * stop Pregnancy (remove Player trait)
 	 */
 	private stop() {
-		this.player?.getTraits().remove(ZWBFTraitsEnum.PREGNANCY);
+		this.removeZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
 	}
 

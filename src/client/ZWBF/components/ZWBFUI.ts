@@ -4,6 +4,7 @@ import { ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
+import { Player } from "./Player";
 // import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
 
 type UIProps = {
@@ -144,7 +145,7 @@ export class ZWBFUI {
 		this.UI.addText(this.UIElements.womb.cycle.phase.value, "", undefined, "Center");
 		this.UI.nextLine();
 
-		if (!this.player.HasTrait(ZWBFTraitsEnum.INFERTILE)) {
+		if (!Player.hasZWBFTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
 			this.UI.addText(
 				this.UIElements.womb.fertility.title,
 				this.label("IGUI_ZWBF_UI_Fertility"),
@@ -224,7 +225,7 @@ export class ZWBFUI {
 		this.UI[this.UIElements.womb.image].setPath(image);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
 
-		if (!this.player!.HasTrait(ZWBFTraitsEnum.INFERTILE)) {
+		if (!Player.hasZWBFTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
 			const title = getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
 			const progress = pregnancy ? pregnancy.progress : fertility;
 

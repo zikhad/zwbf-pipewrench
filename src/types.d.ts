@@ -10,19 +10,20 @@ type ModDataProps<T> = {
 };
 
 type ZWBFTraits =
-	| "Infertile"
-	| "Fertile"
-	| "Hyperfertile"
-	| "Pregnancy"
-	| "DairyCow"
-	| "StrongMenstrualCramps"
-	| "NoMenstrualCramps";
+	| "zwbf:infertile"
+	| "zwbf:fertile"
+	| "zwbf:hyperfertile"
+	| "zwbf:pregnancy"
+	| "zwbf:dairycow"
+	| "zwbf:strongmenstrualcramps"
+	| "zwbf:nomenstrualcramps";
 
 type TraitType = {
 	id: ZWBFTraits;
 	cost: number;
 	profession?: boolean;
 	exclusives?: ZWBFTraits[];
+	translationKey?: string;
 };
 
 type LactationData = {

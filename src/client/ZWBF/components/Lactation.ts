@@ -150,7 +150,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		this.multiplier = Math.max(0, multiplier || 0);
 		this.expiration = 24 * (expiration || this.expiration);
 
-		if (this.player?.HasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+		if (this.hasZWBFTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.multiplier *= 1.25;
 			this.expiration *= 1.25;
 		}
