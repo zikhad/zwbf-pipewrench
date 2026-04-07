@@ -1,0 +1,8 @@
+module Base
+{
+    timedAction Yonchi_breastpump
+    {
+        metabolics  = SedentaryActivity,
+        actionAnim  = Yonchi_breastpump,
+    }
+}
