@@ -53,7 +53,7 @@ module ZWBF {
 		Icon				= WaterBottle_Full,
 		Tooltip 			= Tooltip_MilkBottle,
 		CantBeFrozen 		= TRUE,
-		EvolvedRecipe 		= HotDrink:2;HotDrinkRed:2;HotDrinkWhite:2;HotDrinkSpiffo:2;HotDrinkTea:2;Beverage:2;Beverage2:2;Oatmeal:2;Soup:5;Stew:5,
+		EvolvedRecipe 		= HotDrink:2;Oatmeal:2;Soup:5;Stew:5,
 		FoodType 			= Milk,
 		DaysFresh			= 4,
 		DaysTotallyRotten 	= 7,
