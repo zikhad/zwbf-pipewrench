@@ -3,6 +3,10 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { PregnancyData } from "../../../../types";
 import { ZWBFTraitsEnum } from "@constants";
 export class Player<T = unknown> {
+	private static resolveTraitRef(trait: ZWBFTraitsEnum): CharacterTraitRef | undefined {
+		return CharacterTrait.get(ResourceLocation.of(trait));
+	}
+
 	public player?: IsoPlayer;
 	public _data?: T;
 
@@ -26,7 +30,9 @@ export class Player<T = unknown> {
 
 		const traits = player.getTraits();
 		if (player.HasTrait(trait)) return;
-		traits.add(trait);
+		const traitRef = Player.resolveTraitRef(trait);
+		if (!traitRef) return;
+		traits.add(traitRef);
 	}
 
 	removeZWBFTrait(trait: ZWBFTraitsEnum) {
@@ -34,7 +40,11 @@ export class Player<T = unknown> {
 		if (!player) return;
 
 		const traits = player.getTraits();
-		if (player.HasTrait(trait)) traits.remove(trait);
+		if (player.HasTrait(trait)) {
+			const traitRef = Player.resolveTraitRef(trait);
+			if (!traitRef) return;
+			traits.remove(traitRef);
+		}
 	}
 
 	static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum) {

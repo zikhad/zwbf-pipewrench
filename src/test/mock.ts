@@ -28,6 +28,24 @@ globalThis.print = jest.fn();
 
 (globalThis as any).ZWBFRecipes = {};
 
+(globalThis as any).CharacterStat = {
+	HUNGER: "HUNGER",
+	FATIGUE: "FATIGUE",
+	ENDURANCE: "ENDURANCE",
+	THIRST: "THIRST"
+};
+
+(globalThis as any).ResourceLocation = {
+	of: jest.fn().mockImplementation((id: string) => id)
+};
+
+(globalThis as any).CharacterTrait = {
+	get: jest.fn().mockImplementation((id: unknown) => ({
+		getName: () => String(id),
+		toString: () => String(id)
+	}))
+};
+
 export const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) =>
 	mock<IsoPlayer>({
 		HasTrait: jest.fn().mockReturnValue(false),
