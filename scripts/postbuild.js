@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 const { copyFolder, getInfo } = require("./utils");
+const { generateTranslations } = require("./utils/translations");
 
 /**
  * returns the src Path for this operation
@@ -84,6 +85,16 @@ const generateBuild42Folder = async () => {
 
 		const src = path.join(basePath, entry);
 		const dest = path.join(build42Path, entry);
+		if (entry === "media") {
+			await fs.copy(src, dest, {
+				overwrite: true,
+				filter: filePath =>
+					!filePath.includes("lua/shared/Translate") &&
+					!filePath.includes("lua\\shared\\Translate")
+			});
+			continue;
+		}
+
 		await fs.copy(src, dest, { overwrite: true });
 	}
 
@@ -103,17 +114,31 @@ const generateBuild42Folder = async () => {
 
 const run = async () => {
 	try {
+		const { name } = getInfo();
+		const basePath = path.join(process.cwd(), "dist", name);
+		const build42Path = path.join(basePath, "42");
+
 		await copyFolder(srcPath("src/media"), distPath(""));
 		console.info("media folder copied successfully.");
-
-		await copyFolder(srcPath("src/translations"), distPath("lua/shared/Translate"));
-		console.info("Translations folder copied successfully.");
 
 		await copyFolder(srcPath("src/root"), distPath("", false));
 		console.info("Root folder copied successfully.");
 
 		await generateBuild42Folder();
 		console.info("Build 42 folder structure ready.");
+
+		const translationResult = await generateTranslations({
+			sourceRoot: srcPath("src/translations-json"),
+			build42TranslateRoot: path.join(build42Path, "media", "lua", "shared", "Translate")
+		});
+
+		if (!translationResult.generated) {
+			throw new Error(
+				"No translation json files found in src/translations-json. Build 42 requires json translations."
+			);
+		}
+
+		console.info(`Translations generated for Build 42 (.json): ${translationResult.fileCount} files.`);
 
 		await fs.remove(distPath(""));
 		console.info("Root media folder removed (Build 42 only artifact).");
