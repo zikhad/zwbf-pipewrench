@@ -30,6 +30,10 @@ export interface TimedEvents {
  * @template T - The type of data stored in ModData for this player.
  */
 export abstract class Player<T> {
+	private static resolveTraitRef(trait: ZWBFTraitsEnum): CharacterTraitRef | undefined {
+		return CharacterTrait.get(ResourceLocation.of(trait));
+	}
+
 	/** Reference to the current player instance */
 	public player?: IsoPlayer;
 
@@ -166,7 +170,12 @@ export abstract class Player<T> {
 			return;
 		}
 
-		traits.add(trait);
+		const traitRef = Player.resolveTraitRef(trait);
+		if (!traitRef) {
+			return;
+		}
+
+		traits.add(traitRef);
 	}
 
 	protected removeZWBFTrait(trait: ZWBFTraitsEnum): void {
@@ -177,7 +186,12 @@ export abstract class Player<T> {
 
 		const traits = player.getTraits();
 		if (player.HasTrait(trait)) {
-			traits.remove(trait);
+			const traitRef = Player.resolveTraitRef(trait);
+			if (!traitRef) {
+				return;
+			}
+
+			traits.remove(traitRef);
 		}
 	}
 

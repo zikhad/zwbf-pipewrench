@@ -134,7 +134,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		// Constume extra water
 		const stats = this.player!.getStats();
 		const water = (0.5 * progress) / 1440;
-		stats.setThirst(Math.min(1, stats.getThirst() + water));
+		stats.set(CharacterStat.THIRST, Math.min(1, stats.get(CharacterStat.THIRST) + water));
 
 		// Constume extra calories
 		const nutrition = this.player!.getNutrition();

@@ -39,8 +39,11 @@ export class Effects {
 		const fullness = amount / capacity;
 		const modifier = percentageToNumber(fullness * 100, 0.3);
 
-		stats.setHunger(Math.max(0, stats.getHunger() - modifier));
-		stats.setFatigue(Math.max(0, stats.getFatigue() - modifier));
-		stats.setEndurance(Math.max(1, stats.getEndurance() + modifier));
+		stats.set(CharacterStat.HUNGER, Math.max(0, stats.get(CharacterStat.HUNGER) - modifier));
+		stats.set(CharacterStat.FATIGUE, Math.max(0, stats.get(CharacterStat.FATIGUE) - modifier));
+		stats.set(
+			CharacterStat.ENDURANCE,
+			Math.max(1, stats.get(CharacterStat.ENDURANCE) + modifier)
+		);
 	}
 }

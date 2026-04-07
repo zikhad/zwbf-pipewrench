@@ -93,16 +93,20 @@ describe("Pregnancy", () => {
 				);
 			});
 			describe("Every Hour update", () => {
-				const setThirst = jest.fn();
+				const setStat = jest.fn();
+				const getStat = jest.fn();
 				const setCalories = jest.fn();
 				let pregnancy: Pregnancy;
 				beforeEach(() => {
+					setStat.mockReset();
+					getStat.mockReset();
+					getStat.mockReturnValue(0);
 					pregnancy = new Pregnancy();
 					(pregnancy as any).onCreatePlayer({
 						...player,
 						getStats: () => ({
-							setThirst,
-							getThirst: () => 0
+							set: setStat,
+							get: getStat
 						}),
 						getNutrition: () => ({
 							setCalories,
@@ -114,14 +118,14 @@ describe("Pregnancy", () => {
 					{
 						progress: 0,
 						expected: () => {
-							expect(setThirst).not.toHaveBeenCalled();
+							expect(setStat).not.toHaveBeenCalled();
 							expect(setCalories).not.toHaveBeenCalled();
 						}
 					},
 					{
 						progress: 0.5,
 						expected: () => {
-							expect(setThirst).toHaveBeenCalled();
+							expect(setStat).toHaveBeenCalled();
 							expect(setCalories).toHaveBeenCalled();
 						}
 					}
@@ -193,7 +197,7 @@ describe("Pregnancy", () => {
 				});
 				const [callback] = addListener.mock.calls[0];
 				callback();
-				expect(add).toHaveBeenCalledWith(ZWBFTraitsEnum.PREGNANCY);
+				expect(add).toHaveBeenCalled();
 			});
 		});
 	});

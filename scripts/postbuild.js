@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 const { copyFolder, getInfo } = require("./utils");
+const { generateTranslations } = require("./utils/translations");
 
 /**
  * returns the src Path for this operation
@@ -21,24 +22,6 @@ const distPath = (dirPath, media = true) => {
 };
 
 /**
- * Reads optional build42 config from build42.config.json
- * @returns {{require?: string[], requireMap?: Record<string, string>}}
- */
-const getBuild42Config = () => {
-	const configPath = path.join(process.cwd(), "build42.config.json");
-	if (!fs.existsSync(configPath)) {
-		return {};
-	}
-
-	try {
-		const raw = fs.readFileSync(configPath, "utf8");
-		return JSON.parse(raw);
-	} catch (_err) {
-		return {};
-	}
-};
-
-/**
  * Parses a .info file (key=value per line)
  * @param {string} content
  * @returns {Record<string, string>}
@@ -56,7 +39,7 @@ const parseInfoFile = content => {
 
 /**
  * Converts info object back to .info format
- * @param {Record<string, string>}
+ * @param {Record<string, string>} info
  * @returns {string}
  */
 const stringifyInfoFile = info =>
@@ -66,115 +49,99 @@ const stringifyInfoFile = info =>
 		.join("\n");
 
 /**
- * Parses a mod.info require line into dependency ids
+ * Build 42 requires use a backslash prefix for each dependency.
  * @param {string | undefined} requireValue
- * @returns {string[]}
+ * @returns {string | undefined}
  */
-const parseRequireDependencies = requireValue => {
+const formatBuild42Require = requireValue => {
 	if (!requireValue) {
-		return [];
+		return undefined;
 	}
 
-	return requireValue
+	const dependencies = requireValue
 		.split(",")
 		.map(dep => dep.trim().replace(/^\\+/, ""))
 		.filter(Boolean);
-};
 
-/**
- * Resolves build 42 dependencies from config overrides/map
- * @param {string | undefined} currentRequire
- * @param {{require?: string[], requireMap?: Record<string, string>}} build42Config
- * @returns {string[]}
- */
-const resolveBuild42Dependencies = (currentRequire, build42Config) => {
-	if (Array.isArray(build42Config.require) && build42Config.require.length > 0) {
-		return build42Config.require;
+	if (dependencies.length === 0) {
+		return undefined;
 	}
 
-	const requireMap = build42Config.requireMap || {};
-	const currentDependencies = parseRequireDependencies(currentRequire);
-	return currentDependencies.map(dep => requireMap[dep] || dep);
+	return `\\${dependencies.join(",\\")}`;
 };
 
-/**
- * Applies Build 42-specific changes
- * @param {Record<string, string>}
- * @returns {Record<string, string>}
- */
-const transformInfoForBuild42 = info => {
-	const build42Config = getBuild42Config();
-	const dependencies = resolveBuild42Dependencies(info.require, build42Config);
-
-	return {
-		...info,
-		require: dependencies.length > 0 ? `\\${dependencies.join(",\\")}` : undefined,
-		version: "42"
-	};
-};
-
-const generateBuild42Files = async () => {
+const generateBuild42Folder = async () => {
 	const { name } = getInfo();
 	const basePath = path.join(process.cwd(), "dist", name);
 	const build42Path = path.join(basePath, "42");
 
 	await fs.ensureDir(build42Path);
 
-	/* ----------------------------
-	   1. Copy legacy artifacts
-	   ---------------------------- */
-	const legacyFiles = ["logo.png", "poster.png"];
-	await Promise.all(
-		legacyFiles.map(async file => {
-			const src = path.join(basePath, file);
-			const dest = path.join(build42Path, file);
-			if (await fs.pathExists(src)) {
-				await fs.copy(src, dest);
-			}
-		})
-	);
+	const baseEntries = await fs.readdir(basePath);
+	for (const entry of baseEntries) {
+		if (entry === "42") {
+			continue;
+		}
 
-	const legacyMedia = path.join(basePath, "media");
-	if (await fs.pathExists(legacyMedia)) {
-		await fs.remove(path.join(build42Path, "media"));
-		await fs.copy(legacyMedia, path.join(build42Path, "media"));
+		const src = path.join(basePath, entry);
+		const dest = path.join(build42Path, entry);
+		if (entry === "media") {
+			await fs.copy(src, dest, {
+				overwrite: true,
+				filter: filePath =>
+					!filePath.includes("lua/shared/Translate") &&
+					!filePath.includes("lua\\shared\\Translate")
+			});
+			continue;
+		}
+
+		await fs.copy(src, dest, { overwrite: true });
 	}
 
-	/* ----------------------------
-	   2. Rewrite mod.info
-	   ---------------------------- */
-	const infoPath = path.join(basePath, "mod.info");
-	if (await fs.pathExists(infoPath)) {
-		const raw = await fs.readFile(infoPath, "utf8");
+	const build42InfoPath = path.join(build42Path, "mod.info");
+	if (await fs.pathExists(build42InfoPath)) {
+		const raw = await fs.readFile(build42InfoPath, "utf8");
 		const parsed = parseInfoFile(raw);
-		const transformed = transformInfoForBuild42(parsed);
-		const output = stringifyInfoFile(transformed);
+		const transformed = {
+			...parsed,
+			require: formatBuild42Require(parsed.require),
+			version: "42"
+		};
 
-		await fs.writeFile(path.join(build42Path, "mod.info"), output);
-	}
-
-	/* ----------------------------
-	   3. Overlay src/42 (override)
-	   ---------------------------- */
-	const src42Path = srcPath("src/42");
-	if (await fs.pathExists(src42Path)) {
-		await fs.copy(src42Path, build42Path, { overwrite: true });
+		await fs.writeFile(build42InfoPath, stringifyInfoFile(transformed));
 	}
 };
 
 const run = async () => {
 	try {
+		const { name } = getInfo();
+		const basePath = path.join(process.cwd(), "dist", name);
+		const build42Path = path.join(basePath, "42");
+
 		await copyFolder(srcPath("src/media"), distPath(""));
 		console.info("media folder copied successfully.");
-
-		await copyFolder(srcPath("src/translations"), distPath("lua/shared/Translate"));
-		console.info("Translations folder copied successfully.");
 
 		await copyFolder(srcPath("src/root"), distPath("", false));
 		console.info("Root folder copied successfully.");
 
-		await generateBuild42Files();
+		await generateBuild42Folder();
 		console.info("Build 42 folder structure ready.");
+
+		const translationResult = await generateTranslations({
+			sourceRoot: srcPath("src/translations-json"),
+			build42TranslateRoot: path.join(build42Path, "media", "lua", "shared", "Translate")
+		});
+
+		if (!translationResult.generated) {
+			throw new Error(
+				"No translation json files found in src/translations-json. Build 42 requires json translations."
+			);
+		}
+
+		console.info(`Translations generated for Build 42 (.json): ${translationResult.fileCount} files.`);
+
+		await fs.remove(distPath(""));
+		console.info("Root media folder removed (Build 42 only artifact).");
 	} catch (err) {
 		console.error("Error copying files:", err);
 		process.exitCode = 1;

@@ -32,15 +32,15 @@ describe("Effects", () => {
 
 	describe("ZomboWin Default Enabled", () => {
 		const setInfectionLevel = jest.fn();
+		const getStat = jest.fn();
+		const setStat = jest.fn();
 		const getStats = jest.fn().mockImplementation(() => ({
-			setHunger: jest.fn(),
-			getHunger: jest.fn(),
-			setFatigue: jest.fn(),
-			getFatigue: jest.fn(),
-			setEndurance: jest.fn(),
-			getEndurance: jest.fn()
+			set: setStat,
+			get: getStat
 		}));
 		beforeEach(() => {
+			getStat.mockReset();
+			setStat.mockReset();
 			jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
 				mock<ArrayList>({
 					contains: jest.fn().mockImplementation(() => true)
@@ -120,6 +120,7 @@ describe("Effects", () => {
 						HasTrait: jest.fn().mockImplementation(() => trait),
 						getStats
 					});
+					getStat.mockReturnValue(0.5);
 					const effects = new Effects();
 					(effects as any).ZWSuccubus(player, amount);
 					expected();
