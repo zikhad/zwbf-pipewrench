@@ -1,0 +1,60 @@
+module ZWBFRecipes
+{
+    import
+    {
+        Base,
+        ZWBF
+    }
+
+    /************************ Vaginal Douche ************************/
+    craftRecipe ClearSperm
+    {
+        timedAction = Making,
+        category = Health,
+        time = 200,
+        Tags = InHandCraft,
+        OnTest = ZWBFRecipes.OnTest.ClearSperm,
+        OnCreate = ZWBFRecipes.OnCreate.ClearSperm,
+        inputs
+        {
+            item 1 [ZWBF.VaginalDouche] flags[IsFull] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+    
+    /************************ Condom ************************/
+    craftRecipe OpenCondomBox
+    {
+        timedAction = UnPackBox,
+        category = Health,
+        time = 20,
+        Tags = InHandCraft;CanBeDoneInDark,
+        recipeGroup = OpenBox,
+        inputs
+        {
+            item 1 [ZWBF.CondomBox],
+        }
+        outputs
+        {
+            item 10 ZWBF.Condom,
+        }
+    }
+
+    craftRecipe PlaceCondomsInBox
+    {
+        timedAction = PackingBox,
+        category = Health,
+        time = 20,
+        Tags = InHandCraft;CanBeDoneInDark,
+        inputs
+        {
+            item 10 [ZWBF.Condom],
+        }
+        outputs
+        {
+            item 1 ZWBF.CondomBox,
+        }
+    }
+}
