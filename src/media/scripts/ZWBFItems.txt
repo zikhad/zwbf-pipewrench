@@ -1,7 +1,6 @@
 module ZWBF {
 	imports {
-		Base,
-		Babies
+		Base
 	}
 
 	item Contraceptive

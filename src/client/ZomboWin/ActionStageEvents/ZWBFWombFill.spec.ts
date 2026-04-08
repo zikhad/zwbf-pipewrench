@@ -1,9 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { triggerEvent } from "@asledgehammer/pipewrench";
+import { triggerEvent, ArrayList } from "@asledgehammer/pipewrench";
 import { ZWBFEventsEnum } from "@constants";
 import { AnimationStatus } from "@types";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
+import { mock } from "jest-mock-extended";
 
-jest.mock("@asledgehammer/pipewrench");
+jest.mock("@asledgehammer/pipewrench", () => ({
+	...jest.requireActual("@asledgehammer/pipewrench"),
+	require: jest.fn(),
+	getActivatedMods: jest.fn(),
+	triggerEvent: jest.fn()
+}));
 jest.mock("ZomboWin/ZomboWin");
 
 describe("AnimationHandler Event Insertion", () => {
@@ -19,6 +26,20 @@ describe("AnimationHandler Event Insertion", () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+
+		(globalThis as any).table = { 
+			insert: jest.fn((array, item) => array.push(item))
+		};
+
+		const { require: mockRequire, getActivatedMods: mockGetActivatedMods } = require("@asledgehammer/pipewrench");
+		mockGetActivatedMods.mockImplementation(() =>
+			mock<ArrayList>({
+				contains: jest.fn().mockReturnValue(true)
+			})
+		);
+		mockRequire.mockReturnValue({
+			AnimationHandler: { ActionEvents }
+		});
 
 		// Provide ActionEvents for the module to use
 		jest.doMock("ZomboWin/ZomboWin", () => ({
