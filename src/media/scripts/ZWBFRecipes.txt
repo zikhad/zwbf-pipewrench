@@ -6,149 +6,21 @@ module ZWBFRecipes
         ZWBF
     }
 
-    /************************ Milk ************************/
-    craftRecipe Hand Expression in Bottle
-    {
-        timedAction = Yonchi_breastpump,
-        category = Cooking,
-        time = 800,
-        xpAward = Cooking:3,
-        Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.HandExpress,
-        OnCreate = ZWBFRecipes.OnCreate.HandExpress,
-        inputs
-        {
-            item 1 [Base.WaterBottle] flags[IsEmpty],
-        }
-        outputs
-        {
-            item 1 ZWBF.MilkBottle,
-        }
-    }
-
-    craftRecipe Hand Expression in Biberon
-    {
-        timedAction = Yonchi_breastpump,
-        category = Cooking,
-        time = 800,
-        xpAward = Cooking:3,
-        Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.HandExpress,
-        OnCreate = ZWBFRecipes.OnCreate.HandExpress,
-        inputs
-        {
-            item 1 [Babies.Biberon] mode:keep,
-        }
-        outputs
-        {
-        }
-    }
-
-    craftRecipe Fill Biberon
-    {
-        timedAction = Yonchi_breastpump,
-        category = Cooking,
-        time = 500,
-        xpAward = Cooking:3,
-        Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.BreastPump,
-        OnCreate = ZWBFRecipes.OnCreate.BreastPump,
-        inputs
-        {
-            item 1 [Babies.Biberon] mode:keep,
-            item 1 [ZWBF.BreastPump] mode:keep,
-        }
-        outputs
-        {
-        }
-    }
-
-    craftRecipe Fill Milk Bottle
-    {
-        timedAction = Yonchi_breastpump,
-        category = Cooking,
-        time = 500,
-        xpAward = Cooking:3,
-        Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.BreastPump,
-        OnCreate = ZWBFRecipes.OnCreate.BreastPump,
-        inputs
-        {
-            item 1 [Base.WaterBottle] flags[IsEmpty],
-            item 1 [ZWBF.BreastPump] mode:keep,
-        }
-        outputs
-        {
-            item 1 ZWBF.MilkBottle,
-        }
-    }
-
     /************************ Vaginal Douche ************************/
-    craftRecipe Fill Vaginal Douche
+    craftRecipe ClearSperm
     {
         timedAction = Making,
         category = Health,
-        time = 100,
-        Tags = InHandCraft,
-        inputs
-        {
-            item 1 [ZWBF.VaginalDouche_empty],
-            -fluid 1.0 [Water],
-        }
-        outputs
-        {
-            item 1 ZWBF.VaginalDouche_full,
-        }
-    }
-
-    craftRecipe Clear Sperm
-    {
-        timedAction = Making,
-        category = Health,
-        time = 500,
+        time = 200,
         Tags = InHandCraft,
         OnTest = ZWBFRecipes.OnTest.ClearSperm,
         OnCreate = ZWBFRecipes.OnCreate.ClearSperm,
         inputs
         {
-            item 1 [ZWBF.VaginalDouche_full],
+            item 1 [ZWBF.VaginalDouche] flags[IsFull] mode:keep,
         }
         outputs
         {
-            item 1 ZWBF.VaginalDouche_empty,
-        }
-    }
-
-    /************************ Condoms ************************/
-    craftRecipe Open Condom Box
-    {
-        timedAction = Making,
-        category = Health,
-        time = 20,
-        Tags = InHandCraft;CanBeDoneInDark,
-        inputs
-        {
-            item 1 [ZWBF.CondomBox],
-        }
-        outputs
-        {
-            item 10 ZWBF.Condom,
-        }
-    }
-
-    craftRecipe Place Condoms in Box
-    {
-        timedAction = Making,
-        category = Health,
-        time = 20,
-        Tags = InHandCraft;CanBeDoneInDark,
-        inputs
-        {
-            item 10 [ZWBF.Condom],
-        }
-        outputs
-        {
-            item 1 ZWBF.CondomBox,
         }
     }
 }
