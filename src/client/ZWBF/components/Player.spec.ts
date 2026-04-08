@@ -11,6 +11,7 @@ import {
 } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { PregnancyData } from "@types";
+import { mockedPlayer } from "@test/mock";
 import SpyInstance = jest.SpyInstance;
 
 // Mocks
@@ -31,7 +32,7 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 }
 
 describe("Player class", () => {
-	const mockPlayer = mock<IsoPlayer>({
+	const mockPlayer = mockedPlayer({
 		getModData: () => ({ TEST_KEY: "someting" })
 	});
 	const mockBodyDamage = mock<BodyDamage>();
@@ -40,7 +41,7 @@ describe("Player class", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 
-		mockPlayer.HasTrait.mockReturnValue(true);
+		(mockPlayer.getCharacterTraits().get as any).mockReturnValue(true);
 		mockPlayer.getBodyDamage.mockReturnValue(mockBodyDamage);
 		mockBodyDamage.getBodyPart.mockReturnValue(mockBodyPart);
 	});
@@ -214,7 +215,7 @@ describe("Player class", () => {
 			{ pregnancy: true, data: { progress: 0.5, current: 1, isInLabor: false } },
 			{ pregnancy: false, data: null }
 		])("Should return $data when pregnancy is $pregnancy", ({ pregnancy, data }) => {
-			mockPlayer.HasTrait.mockReturnValue(pregnancy);
+			(mockPlayer.getCharacterTraits().get as any).mockReturnValue(pregnancy);
 			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			data && (instance.pregnancy = data);
@@ -222,14 +223,14 @@ describe("Player class", () => {
 			expect(instance.pregnancy).toBe(data);
 		});
 		it("Pregnancy should return null if player is not pregnant", () => {
-			mockPlayer.HasTrait.mockReturnValue(false);
+			(mockPlayer.getCharacterTraits().get as any).mockReturnValue(false);
 			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			instance.pregnancy = mock();
 			expect(instance.pregnancy).toBeNull();
 		});
 		it("Pregnancy should return null if pregnancy data is not present", () => {
-			mockPlayer.HasTrait.mockReturnValue(true);
+			(mockPlayer.getCharacterTraits().get as any).mockReturnValue(true);
 			const instance = new ConcretePlayer("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
 			(instance as any)._pregnancy = undefined;

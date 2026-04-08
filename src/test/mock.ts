@@ -49,5 +49,14 @@ globalThis.print = jest.fn();
 export const mockedPlayer = (overrides: Partial<IsoPlayer> = {}) =>
 	mock<IsoPlayer>({
 		HasTrait: jest.fn().mockReturnValue(false),
+		getCharacterTraits: jest.fn().mockReturnValue({
+			get: jest.fn().mockReturnValue(false),
+			getKnownTraits: jest.fn().mockReturnValue({
+				size: jest.fn().mockReturnValue(0),
+				get: jest.fn()
+			}),
+			add: jest.fn(),
+			remove: jest.fn()
+		}),
 		...overrides
 	});

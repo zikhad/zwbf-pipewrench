@@ -7,6 +7,7 @@ import { Lactation } from "./Lactation";
 import { Womb } from "./Womb";
 import { PregnancyData } from "@types";
 import { Pregnancy } from "./Pregnancy";
+import { mockedPlayer } from "@test/mock";
 
 jest.mock("@asledgehammer/pipewrench-events");
 
@@ -113,24 +114,23 @@ describe("ZWBFUI", () => {
 			"should createUI properly when player is female: $female and INFERTILE trait: $trait",
 			({ trait, female }) => {
 				const isFemale = jest.fn().mockReturnValue(female);
-				const HasTrait = jest.fn().mockReturnValue(trait);
-				const player = mock<IsoPlayer>({
-					isFemale,
-					HasTrait
+				const player = mockedPlayer({
+					isFemale
 				});
+				(player.getCharacterTraits().get as any).mockReturnValue(trait);
 
 				(ui as any).onCreateUI();
 				(ui as any).onCreatePlayer(player);
 				expect(isFemale).toHaveBeenCalled();
-				female && expect(HasTrait).toHaveBeenCalled();
+				female && expect(player.getCharacterTraits().get).toHaveBeenCalled();
 			}
 		);
 
 		it("Should call toggleLactationPanel properly", () => {
-			const player = mock<IsoPlayer>({
-				isFemale: () => true,
-				HasTrait: () => false
+			const player = mockedPlayer({
+				isFemale: () => true
 			});
+			(player.getCharacterTraits().get as any).mockReturnValue(false);
 			(ui as any).onCreateUI();
 			(ui as any).onCreatePlayer(player);
 			const [, , callback] = addButton.mock.calls[0];
@@ -155,30 +155,26 @@ describe("ZWBFUI", () => {
 					womb: mock()
 				});
 				const isFemale = jest.fn().mockReturnValue(female);
-				const HasTrait = jest.fn().mockReturnValue(false);
-				const player = mock<IsoPlayer>({
-					isFemale,
-					HasTrait
-				});
+				const player = mockedPlayer({ isFemale });
+				(player.getCharacterTraits().get as any).mockReturnValue(false);
 
 				(ui as any).onCreatePlayer(player);
 				(ui as any).onCreateUI();
-				// clear mock since onCreate can call the HasTrait as well
-				HasTrait.mockClear();
+				// clear mock since onCreate can call the get as well
+				(player.getCharacterTraits().get as any).mockClear();
 				(ui as any).onUpdateUI();
 
 				(ui as any).UI && ((ui as any).UI.isUIVisible = uiVisible);
-				expect(HasTrait).not.toHaveBeenCalled();
+				expect(player.getCharacterTraits().get).not.toHaveBeenCalled();
 			}
 		);
 		it.each([{ pregnancy: null }, { pregnancy: { progress: 0.5 } as PregnancyData }])(
 			"Should update UI when pregnancy is $pregnancy",
 			({ pregnancy }) => {
-				const HasTrait = jest.fn().mockReturnValue(false);
-				const player = mock<IsoPlayer>({
-					HasTrait,
+				const player = mockedPlayer({
 					isFemale: () => true
 				});
+				(player.getCharacterTraits().get as any).mockReturnValue(false);
 
 				const ui = new ZWBFUI({
 					lactation: mock<Lactation>({
@@ -202,7 +198,7 @@ describe("ZWBFUI", () => {
 				(ui as any).UI.isUIVisible = true;
 				(ui as any).pregancy = { pregnancy };
 				(ui as any).onUpdateUI();
-				expect(HasTrait).toHaveBeenCalled();
+				expect(player.getCharacterTraits().get).toHaveBeenCalled();
 			}
 		);
 	});
