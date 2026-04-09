@@ -5,18 +5,6 @@ import { Recipe } from "server/types";
 
 declare let ZWBFRecipes: Recipe;
 
-type FluidContainer = {
-	removeFluid(): void;
-	addFluid(type: any, amount: number): void;
-	getCapacity(): number;
-}
-type InventoryItem = {
-	getFluidContainer: () => FluidContainer | null;
-}
-type Inventory = {
-	getFirstAvailableFluidContainer: (type: string) => InventoryItem;
-}
-
 /**
  * This function will fill the first available fluid container in the character's inventory with human milk.
  * It checks if the character has an inventory and if there is a fluid container available before adding the milk.
@@ -24,9 +12,8 @@ type Inventory = {
  * @param amount The amount of human milk to add to the container.
  */
 const fillContainerWithHumanMilk = (character: IsoGameCharacter, amount: number) => {
-	// TODO: agument type definitions of IsoGameCharacter.getInventory() to include getFirstAvailableFluidContainer
-	const inventoryItems = (character.getInventory() as unknown as Inventory).getFirstAvailableFluidContainer(Fluid.HUMAN_MILK) 
-	if (!inventoryItems) return;
+	const inventoryItems = character.getInventory().getFirstAvailableFluidContainer(Fluid.HUMAN_MILK);
+	if (!inventoryItems || !inventoryItems.getFluidContainer) return;
 	const container = inventoryItems.getFluidContainer();
 	if (!container) return;
 	container.addFluid(Fluid.HUMAN_MILK, amount);

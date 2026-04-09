@@ -58,9 +58,25 @@ declare global {
 	var ResourceLocation: {
 		of: (this: void, id: string) => unknown;
 	};
+
+	/** Fluid container interface */
+	interface FluidContainer {
+		removeFluid(): void;
+		addFluid(type: any, amount: number): void;
+		getCapacity(): number;
+	}
 }
 
 declare module "@asledgehammer/pipewrench" {
+	export namespace zombie.inventory {
+		interface InventoryItem {
+			getFluidContainer?(): FluidContainer | null;
+		}
+
+		interface ItemContainer {
+			getFirstAvailableFluidContainer(type: string): InventoryItem | null;
+		}
+	}
 	export namespace zombie.characters {
 		interface IsoGameCharacter$CharacterTraits {
 			get(trait: CharacterTraitRef): boolean;
