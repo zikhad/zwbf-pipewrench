@@ -64,6 +64,9 @@ declare global {
 		removeFluid(): void;
 		addFluid(type: any, amount: number): void;
 		getCapacity(): number;
+		isFull(): boolean;
+		isEmpty(): boolean;
+		getFreeCapacity(): number;
 	}
 }
 
