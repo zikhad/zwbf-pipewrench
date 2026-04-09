@@ -57,4 +57,43 @@ module ZWBFRecipes
             item 1 ZWBF.CondomBox,
         }
     }
+
+    /************************ Milk ************************/
+    craftRecipe HandExpressionInBottle
+    {
+        timedAction = Yonchi_breastpump,
+        category = Cooking,
+        time = 800,
+        xpAward = Cooking:3,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.HandExpress,
+        OnCreate = ZWBFRecipes.OnCreate.HandExpress,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle] mode:keep flags[Prop1;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
+
+
+    craftRecipe FillMilkBottle
+    {
+        timedAction = Yonchi_breastpump,
+        category = Cooking,
+        time = 500,
+        xpAward = Cooking:3,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.BreastPump,
+        OnCreate = ZWBFRecipes.OnCreate.BreastPump,
+        inputs
+        {
+            item 1 [ZWBF.BreastPump] flags[Prop1] mode:keep,
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle] mode:keep flags[Prop2;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
 }

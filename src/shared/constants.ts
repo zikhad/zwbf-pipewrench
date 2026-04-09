@@ -25,3 +25,7 @@ export enum ZWBFEventsEnum {
 	PREGNANCY_START = "ZWBFPregnancyStart",
 	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour"
 }
+
+export const Fluid = {
+	HUMAN_MILK: "HumanMilk"
+}
