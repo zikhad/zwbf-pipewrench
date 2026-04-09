@@ -21,8 +21,8 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	private readonly CONSTANTS = {
 		MAX_LEVEL: 5,
 		AMOUNTS: {
-			MIN: 20,
-			MAX: 100
+			MIN: 0.02,
+			MAX: 0.1
 		}
 	};
 
@@ -51,10 +51,10 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		super("ZWBFLactation");
 		this.options = {
 			expiration: 7,
-			capacity: 1000
+			capacity: 1,
 		};
 		this._capacity = this.options.capacity;
-		this._bottleAmount = 200;
+		this._bottleAmount = 0.2;
 	}
 
 	onCreatePlayer(player: IsoPlayer): void {
@@ -95,8 +95,8 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 		// Apply engorgement pain
 		const currentPain = torso.getAdditionalPain();
-		if (currentPain < 25) {
-			torso.setAdditionalPain(Math.min(25, currentPain + modifier));
+		if (currentPain < 15) {
+			torso.setAdditionalPain(Math.min(15, currentPain + modifier));
 		}
 
 		// Apply wetness
