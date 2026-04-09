@@ -43,8 +43,8 @@ describe("Inventory", () => {
 			item: "Baby",
 			text: "ContextMenu_BreastFeed_Baby",
 			lactation: mock<Lactation>({
-				milkAmount: 400,
-				bottleAmount: 200
+				milkAmount: 0.4,
+				bottleAmount: 0.2
 			})
 		},
 		{

@@ -1,10 +1,10 @@
 import { mock } from "jest-mock-extended";
-import { IsoGameCharacter } from "@asledgehammer/pipewrench";
+import { IsoGameCharacter, InventoryItem } from "@asledgehammer/pipewrench";
 import * as SpyZWBF from "../client/ZWBF/ZWBF";
 
 (globalThis as any).Fluid = { HumanMilk: "HumanMilk" };
 
-import "./ZWBFRecipes";
+import { ZWBFRecipesImpl as ZWBFRecipes } from "./ZWBFRecipes";
 
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("../client/ZWBF/ZWBF", () => ({
@@ -32,17 +32,31 @@ describe("ZWBFRecipes.ts", () => {
 		jest.resetAllMocks();
 		mockCharacter = mock<IsoGameCharacter>({ isFemale: isFemaleSpy });
 		Object.defineProperty(SpyZWBF.lactation, "bottleAmount", {
-			get: jest.fn(() => 200),
+			get: jest.fn(() => 0.2),
 			configurable: true
 		});
 	});
+
+	const createMockItemWithContainer = (isFull: boolean = false) => {
+		return mock<InventoryItem>({
+			getFluidContainer: jest.fn(() => ({
+				removeFluid: jest.fn(),
+				addFluid: jest.fn(),
+				getFreeCapacity: jest.fn(() => isFull ? 0 : 1.0),
+				getCapacity: jest.fn(() => 1.0),
+				isFull: jest.fn(() => isFull),
+				isEmpty: jest.fn(() => false)
+			}))
+		});
+	};
+
 	describe("OnTest", () => {
 		describe("Truthy scenarios", () => {
 			beforeEach(() => {
 				isFemaleSpy.mockReturnValue(true);
 
 				Object.defineProperty(SpyZWBF.lactation, "milkAmount", {
-					get: jest.fn(() => 400),
+					get: jest.fn(() => 0.4),
 					configurable: true
 				});
 
@@ -53,7 +67,8 @@ describe("ZWBFRecipes.ts", () => {
 			});
 
 			it.each(scenarios)("Should return true for $name", ({ name }) => {
-				const result = ZWBFRecipes.OnTest[name](null as any, mockCharacter);
+				const mockItem = createMockItemWithContainer(false);
+				const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 				expect(result).toBeTruthy();
 			});
 		});
@@ -63,7 +78,8 @@ describe("ZWBFRecipes.ts", () => {
 					isFemaleSpy.mockReturnValue(false);
 				});
 				it.each(scenarios)("Should return false for $name", ({ name }) => {
-					const result = ZWBFRecipes.OnTest[name](null as any, mockCharacter);
+					const mockItem = createMockItemWithContainer(false);
+					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
 			});
@@ -72,7 +88,7 @@ describe("ZWBFRecipes.ts", () => {
 					isFemaleSpy.mockReturnValue(true);
 
 					Object.defineProperty(SpyZWBF.lactation, "milkAmount", {
-						get: jest.fn(() => 100),
+						get: jest.fn(() => 0.1),
 						configurable: true
 					});
 
@@ -82,7 +98,8 @@ describe("ZWBFRecipes.ts", () => {
 					});
 				});
 				it.each(scenarios)("Should return false for $name", ({ name }) => {
-					const result = ZWBFRecipes.OnTest[name](null as any, mockCharacter);
+					const mockItem = createMockItemWithContainer(false);
+					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
 			});
@@ -92,7 +109,30 @@ describe("ZWBFRecipes.ts", () => {
 		describe("Lactation recipes", () => {
 			const filteredScenarios = scenarios.filter(({ type }) => type == "lactation");
 			it.each(filteredScenarios)("should call useMilk for $name", ({ name }) => {
-				ZWBFRecipes.OnCreate[name](null, null, mockCharacter);
+				const removeFluid = jest.fn();
+				const addFluid = jest.fn();
+				const getFreeCapacity = jest.fn(() => 1.0);
+				const isFull = jest.fn(() => false);
+				const isEmpty = jest.fn(() => false);
+				const getCapacity = jest.fn(() => 1.0);
+
+				const mockContainerItem = mock<InventoryItem>({
+					getFluidContainer: jest.fn(() => ({
+						removeFluid,
+						addFluid,
+						getFreeCapacity,
+						getCapacity,
+						isFull,
+						isEmpty
+					}))
+				});
+
+				const mockItems = {
+					getInputItems: jest.fn(() => ({
+						get: jest.fn(() => mockContainerItem)
+					}))
+				};
+				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
 				expect(SpyZWBF.lactation.useMilk).toHaveBeenCalled();
 			});
 		});
@@ -102,20 +142,32 @@ describe("ZWBFRecipes.ts", () => {
 			it.each(filteredScenarios)("should fill created result with HumanMilk for $name", ({ name }) => {
 				const removeFluid = jest.fn();
 				const addFluid = jest.fn();
+				const getFreeCapacity = jest.fn(() => 1.0);
+				const isFull = jest.fn(() => false);
+				const isEmpty = jest.fn(() => false);
 				const getCapacity = jest.fn(() => 1.0);
-				const mockResult = {
+				
+				const mockContainerItem = mock<InventoryItem>({
 					getFluidContainer: jest.fn(() => ({
 						removeFluid,
 						addFluid,
-						getCapacity
+						getFreeCapacity,
+						getCapacity,
+						isFull,
+						isEmpty
+					}))
+				});
+
+				const mockItems = {
+					getInputItems: jest.fn((index: number) => ({
+						get: jest.fn(() => mockContainerItem)
 					}))
 				};
 
-				ZWBFRecipes.OnCreate[name](null, mockResult as any, mockCharacter);
-				expect(removeFluid).toHaveBeenCalled();
-				expect(addFluid).toHaveBeenCalledWith("HumanMilk", 1.0);
+				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
+				expect(addFluid).toHaveBeenCalledWith("HumanMilk", 0.2);
 			});
-		});
+		})
 
 		describe("Womb recipes", () => {
 			const amountSetter = jest.fn();
@@ -128,7 +180,30 @@ describe("ZWBFRecipes.ts", () => {
 
 			const filteredScenarios = scenarios.filter(({ type }) => type == "womb");
 			it.each(filteredScenarios)("should call womb functions on $name", ({ name }) => {
-				ZWBFRecipes.OnCreate[name](null, null, mockCharacter);
+				const removeFluid = jest.fn();
+				const addFluid = jest.fn();
+				const getFreeCapacity = jest.fn(() => 1.0);
+				const isFull = jest.fn(() => false);
+				const isEmpty = jest.fn(() => false);
+				const getCapacity = jest.fn(() => 1.0);
+				
+				const mockContainerItem = mock<InventoryItem>({
+					getFluidContainer: jest.fn(() => ({
+						removeFluid,
+						addFluid,
+						getFreeCapacity,
+						getCapacity,
+						isFull,
+						isEmpty
+					}))
+				});
+				
+				const mockItems = {
+					getInputItems: jest.fn(() => ({
+						get: jest.fn(() => mockContainerItem)
+					}))
+				};
+				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
 				expect(amountSetter).toHaveBeenCalled();
 			});
 		});

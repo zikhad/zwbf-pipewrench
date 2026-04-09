@@ -15,7 +15,7 @@ jest.mock("@asledgehammer/pipewrench/client");
 describe("DebugMenu", () => {
 	const createMocks = () => {
 		const lactation = mock<Lactation>({
-			bottleAmount: 200,
+			bottleAmount: 0.2,
 			Debug: {
 				toggle: jest.fn(),
 				add: jest.fn(),
@@ -169,7 +169,7 @@ describe("DebugMenu", () => {
 				},
 				{
 					title: "Milk_Add_Milk",
-					expected: () => expect(lactation.Debug.add).toHaveBeenCalledWith(200)
+					expected: () => expect(lactation.Debug.add).toHaveBeenCalledWith(0.2)
 				},
 				{
 					title: "Milk_Clear_Milk",
