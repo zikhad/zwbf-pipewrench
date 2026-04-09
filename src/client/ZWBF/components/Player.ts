@@ -3,6 +3,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
 import { ModData } from "./ModData";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
 export interface TimedEvents {
 	/**
@@ -23,16 +24,7 @@ export interface TimedEvents {
 	onEveryDay?: () => void;
 }
 
-/**
- * Abstract base class to manage per-player mod state, pregnancy updates,
- * and ModData lifecycle for Project Zomboid players.
- *
- * @template T - The type of data stored in ModData for this player.
- */
 export abstract class Player<T> {
-	private static resolveTraitRef(trait: ZWBFTraitsEnum): CharacterTraitRef | undefined {
-		return CharacterTrait.get(ResourceLocation.of(trait));
-	}
 
 	/** Reference to the current player instance */
 	public player?: IsoPlayer;
@@ -155,51 +147,22 @@ export abstract class Player<T> {
 	}
 
 	protected hasZWBFTrait(trait: ZWBFTraitsEnum): boolean {
-		return Player.hasZWBFTrait(this.player, trait);
+		return this.player ? CharacterTraitApi.hasTrait(this.player, trait) : false;
 	}
 
 	protected addZWBFTrait(trait: ZWBFTraitsEnum): void {
-		const player = this.player;
-		if (!player) {
-			return;
-		}
-
-		const traits = player.getTraits();
-
-		if (player.HasTrait(trait)) {
-			return;
-		}
-
-		const traitRef = Player.resolveTraitRef(trait);
-		if (!traitRef) {
-			return;
-		}
-
-		traits.add(traitRef);
+		if (!this.player) return;
+		CharacterTraitApi.addTrait(this.player, trait);
 	}
 
 	protected removeZWBFTrait(trait: ZWBFTraitsEnum): void {
-		const player = this.player;
-		if (!player) {
-			return;
-		}
-
-		const traits = player.getTraits();
-		if (player.HasTrait(trait)) {
-			const traitRef = Player.resolveTraitRef(trait);
-			if (!traitRef) {
-				return;
-			}
-
-			traits.remove(traitRef);
-		}
+		if (!this.player) return;
+		CharacterTraitApi.removeTrait(this.player, trait);
 	}
 
 	public static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum): boolean {
-		if (!player) {
-			return false;
-		}
-		return player.HasTrait(trait);
+		if (!player) return false;
+		return CharacterTraitApi.hasTrait(player, trait);
 	}
 
 	/**

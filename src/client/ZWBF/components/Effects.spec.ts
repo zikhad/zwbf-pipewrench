@@ -4,6 +4,7 @@ import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
 import { Effects } from "./Effects";
+import { mockedPlayer } from "@test/mock";
 
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("@asledgehammer/pipewrench-events");
@@ -83,12 +84,12 @@ describe("Effects", () => {
 			])(
 				"should call (or not) when player has trait is $trait and amount is $amount",
 				({ trait, amount, expected }) => {
-					const player = mock<IsoPlayer>({
-						HasTrait: jest.fn().mockImplementation(() => trait),
+					const player = mockedPlayer({
 						getBodyDamage: jest.fn().mockImplementation(() => ({
 							setInfectionLevel
 						}))
 					});
+					(player.getCharacterTraits().get as any).mockReturnValue(trait);
 					const effects = new Effects();
 					(effects as any).ZWUnblessing(player, amount);
 					expected();
@@ -116,10 +117,10 @@ describe("Effects", () => {
 			])(
 				"Should call (or not) when player has trait is $trait and amount is $amount",
 				({ trait, amount, expected }) => {
-					const player = mock<IsoPlayer>({
-						HasTrait: jest.fn().mockImplementation(() => trait),
+					const player = mockedPlayer({
 						getStats
 					});
+					(player.getCharacterTraits().get as any).mockReturnValue(trait);
 					getStat.mockReturnValue(0.5);
 					const effects = new Effects();
 					(effects as any).ZWSuccubus(player, amount);

@@ -3,6 +3,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFEventsEnum } from "@constants";
 import { WombEventData } from "@types";
 import { percentageToNumber } from "@utils";
+import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
 export class Effects {
 	constructor() {
@@ -20,7 +21,7 @@ export class Effects {
 	 * Sexperiment trait, make infection 0 8 when sperm is present in the womb
 	 */
 	private ZWUnblessing(player: IsoPlayer, amount: number) {
-		if (!player.HasTrait("unblessing") || amount <= 0) return;
+		if (!CharacterTraitApi.hasTrait(player, "unblessing") || amount <= 0) return;
 		player.getBodyDamage().setInfectionLevel(0);
 	}
 
@@ -34,7 +35,7 @@ export class Effects {
 	 * The more full, more the buff (max 0.3)
 	 */
 	private ZWSuccubus(player: IsoPlayer, amount: number, capacity: number) {
-		if (!player.HasTrait("succubus") || amount <= 0) return;
+		if (!CharacterTraitApi.hasTrait(player, "succubus") || amount <= 0) return;
 		const stats = player.getStats();
 		const fullness = amount / capacity;
 		const modifier = percentageToNumber(fullness * 100, 0.3);

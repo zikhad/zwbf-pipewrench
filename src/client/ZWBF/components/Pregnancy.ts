@@ -1,11 +1,12 @@
 import type { PregnancyData } from "@types";
-import { IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
+import { getActivatedMods, IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
+
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	// TODO: how to make sandbox vars work here?
 	private options = {
@@ -156,6 +157,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	public birth() {
 		if (!this.player) return;
+		if (!getActivatedMods().contains("Babies")) return; // TODO: What happens if Babies the mod is deactivated?
 		const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
 		this.player.getInventory().AddItem(`Babies.${baby}`);
 		this.player.setBlockMovement(false);

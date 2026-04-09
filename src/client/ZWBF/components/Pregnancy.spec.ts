@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
 import { Pregnancy } from "./Pregnancy";
 import { ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import { PregnancyData } from "@types";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
 
 jest.mock("@actions/ZWBFBirth");
 jest.mock("./Moodles");
 jest.mock("./Player");
+jest.mock("@asledgehammer/pipewrench");
 
 describe("Pregnancy", () => {
 	const player = mock<IsoPlayer>({
@@ -208,6 +210,11 @@ describe("Pregnancy", () => {
 			const remove = jest.fn();
 			const AddItem = jest.fn();
 			const setBlockMovement = jest.fn();
+			jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
+				mock<ArrayList>({
+					contains: jest.fn().mockReturnValue(true)
+				})
+			);
 			const pregnancy = new Pregnancy();
 			(pregnancy as any).onCreatePlayer({
 				...player,
