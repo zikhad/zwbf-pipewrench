@@ -59,7 +59,7 @@ module ZWBFRecipes
     }
 
     /************************ Milk ************************/
-    craftRecipe HandExpressionInBottle
+    craftRecipe HandExpression
     {
         timedAction = Yonchi_breastpump,
         category = Cooking,
@@ -78,7 +78,7 @@ module ZWBFRecipes
     }
 
 
-    craftRecipe FillMilkBottle
+    craftRecipe PumpMilk
     {
         timedAction = Yonchi_breastpump,
         category = Cooking,
