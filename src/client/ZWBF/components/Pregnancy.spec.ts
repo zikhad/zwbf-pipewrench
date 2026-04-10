@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
+import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
 import { Pregnancy } from "./Pregnancy";
@@ -94,6 +95,30 @@ describe("Pregnancy", () => {
 					}
 				);
 			});
+
+			it("Should queue birth action only on the labor transition", () => {
+				const add = jest.spyOn(ISTimedActionQueue, "add");
+				const mockPlayer = mock<IsoPlayer>({ setBlockMovement: jest.fn() });
+				const pregnancy = new Pregnancy();
+				(pregnancy as any).player = mockPlayer;
+				Object.defineProperty(pregnancy, "pregnancy", {
+					value: {
+						current: 14 * 24 * 60 - 1,
+						progress: (14 * 24 * 60 - 1) / (14 * 24 * 60),
+						isInLabor: false
+					},
+					writable: true,
+					configurable: true
+				});
+
+				(pregnancy as any).onEveryMinute();
+				expect(add).toHaveBeenCalledTimes(1);
+
+				add.mockClear();
+				(pregnancy as any).onEveryMinute();
+				expect(add).not.toHaveBeenCalled();
+			});
+
 			describe("Every Hour update", () => {
 				const setStat = jest.fn();
 				const getStat = jest.fn();

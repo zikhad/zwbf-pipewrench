@@ -110,14 +110,16 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	onEveryMinute(): void {
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
-		const { current = 0 } = this.pregnancy;
+		const current = this.pregnancy.current ?? 0;
+		const previousInLabor = this.pregnancy.isInLabor ?? false;
 		const updated = Math.min(duration, current + 1);
+		const isInLabor = updated == duration;
 		this.pregnancy = {
 			current: updated,
 			progress: updated / duration,
-			isInLabor: updated == duration
+			isInLabor
 		};
-		if (this.pregnancy.isInLabor) {
+		if (isInLabor && !previousInLabor) {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
