@@ -6,6 +6,23 @@ module ZWBFRecipes
         ZWBF
     }
 
+    /************************ Pills ************************/
+    craftRecipe TakeContraceptive {
+        timedAction = TakePills,
+        category = Health,
+        time = 20,
+        Tags = InHandCraft,
+        OnTest = ZWBFRecipes.OnTest.TakeContraceptive,
+        OnCreate = ZWBFRecipes.OnCreate.TakeContraceptive,
+        inputs
+        {
+            item 1.0 [ZWBF.Contraceptive],
+        }
+        outputs
+        {
+        }
+    }
+
     /************************ Vaginal Douche ************************/
     craftRecipe ClearSperm
     {

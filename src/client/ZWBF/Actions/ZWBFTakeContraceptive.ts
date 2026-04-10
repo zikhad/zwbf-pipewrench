@@ -6,7 +6,7 @@ export class ZWBTakeContraceptive extends ZWBFTakePills {
 	private womb: Womb;
 	constructor(womb: Womb, pills: InventoryItem) {
 		super({
-			name: "ZWBFActionTakeLactaid",
+			name: "ZWBFActionTakeContraceptive",
 			character: womb.player!,
 			contextMenu: "ContextMenu_Take_Contraceptive",
 			pills
@@ -14,7 +14,8 @@ export class ZWBTakeContraceptive extends ZWBFTakePills {
 		this.womb = womb;
 	}
 	perform() {
-		this.womb.contraceptive = true;
 		super.perform();
+		this.womb.contraceptive = true;
+		print("[ZWBF] - Contraceptive taken.");
 	}
 }

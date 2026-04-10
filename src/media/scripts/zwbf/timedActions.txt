@@ -5,4 +5,11 @@ module Base
         metabolics  = SedentaryActivity,
         actionAnim  = Yonchi_breastpump,
     }
+    
+    timedAction TakePills
+    {
+        metabolics = SedentaryActivity,
+        actionAnim = TakePills,
+        prop1 = Base.Pills,
+    }
 }

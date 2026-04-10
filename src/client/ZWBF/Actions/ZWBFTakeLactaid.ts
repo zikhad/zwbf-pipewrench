@@ -14,8 +14,9 @@ export class ZWBTakeLactaid extends ZWBFTakePills {
 		this.lactation = lactation;
 	}
 	perform() {
+		super.perform();
+		print("[ZWBF] - Lactaid taken.");
 		const multiplier = this.lactation.multiplier + ZombRandFloat(0, 0.3);
 		this.lactation.useMilk(0, multiplier);
-		super.perform();
 	}
 }

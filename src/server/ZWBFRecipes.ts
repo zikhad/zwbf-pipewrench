@@ -8,6 +8,12 @@ declare let ZWBFRecipes: Recipe;
 
 ZWBFRecipes = {
 	OnTest: {
+		TakeContraceptive: (item, character) => {
+			if (!character.isFemale()) return false;
+			if (womb.contraceptive) return false;
+			if (womb.pregnancy) return false;
+			return true;
+		},
 		HandExpress: (item, character) => {
 			if (!character.isFemale()) return false;
 			if (new FluidContainerApi(item).isFull()) return false;
@@ -24,6 +30,9 @@ ZWBFRecipes = {
 		}
 	},
 	OnCreate: {
+		TakeContraceptive: (_items, _character) => {
+			womb.contraceptive = true;
+		},
 		HandExpress: (items, _character) => {
 			const container = items.getInputItems(0).get(0) as InventoryItem;
 			const amount = new FluidContainerApi(container).fill(Fluids.HUMAN_MILK, lactation.bottleAmount);
