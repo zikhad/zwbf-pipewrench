@@ -1,9 +1,8 @@
 import { getActivatedMods, ISBaseTimedAction, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
-import { ZWBFEventsEnum } from "@constants";
+import { MODS, ZWBFEventsEnum } from "@constants";
 import type { AnimationStatus } from "@types";
-// import { AnimationHandler } from "ZomboWin/ZomboWin";
 
-if (getActivatedMods().contains("ZomboWin")) {
+if (getActivatedMods().contains(MODS.ZOMBOWIN)) {
 
 	const { ActionEvents } = pipewrenchRequire("ZomboWin/ZomboWin").AnimationHandler;
 	table.insert(ActionEvents.Perform, (action: ISBaseTimedAction) => {

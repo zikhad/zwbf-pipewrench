@@ -1,13 +1,13 @@
 import { getActivatedMods, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFEventsEnum } from "@constants";
+import { MODS, ZWBFEventsEnum } from "@constants";
 import { WombEventData } from "@types";
 import { percentageToNumber } from "@utils";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
 export class Effects {
 	constructor() {
-		if (!getActivatedMods().contains("ZomboWinDefeatStrip")) return;
+		if (!getActivatedMods().contains(MODS.ZOMBOWIN_DEFEAT)) return;
 
 		new Events.EventEmitter<( data: WombEventData ) => void>(
 			ZWBFEventsEnum.WOMB_HOURLY_UPDATE

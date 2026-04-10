@@ -30,4 +30,11 @@ export enum ZWBFEventsEnum {
 
 export const Fluids: Record<string, Fluid> = {
 	HUMAN_MILK: "HumanMilk"
+};
+
+export enum MODS {
+	BABIES = "Babies",
+	ZOMBOWIN = "ZomboWin",
+	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
+	MOODLE_FRAMEWORK = "MoodleFramework"
 }

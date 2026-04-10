@@ -5,6 +5,7 @@ import {
 	IsoPlayer,
 	require as pipeWrenchRequire
 } from "@asledgehammer/pipewrench";
+import { MODS } from "@constants";
 
 type MoodleProps = {
 	player: IsoPlayer;
@@ -28,7 +29,7 @@ export class Moodle {
 		this.type = type;
 		this.texture = texture;
 		this.tresholds = tresholds;
-		if (getActivatedMods().contains("MoodleFramework")) {
+		if (getActivatedMods().contains(MODS.MOODLE_FRAMEWORK)) {
 			this.isMF = true;
 			pipeWrenchRequire("MF_ISMoodle");
 			MF.createMoodle(this.name);
