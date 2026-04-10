@@ -6,7 +6,7 @@ import { FluidContainerApi } from "@shared/components/FluidContainerApi";
 
 declare let ZWBFRecipes: Recipe;
 
-export const ZWBFRecipesImpl: Recipe = {
+ZWBFRecipes = {
 	OnTest: {
 		HandExpress: (item, character) => {
 			if (!character.isFemale()) return false;
@@ -42,4 +42,6 @@ export const ZWBFRecipesImpl: Recipe = {
 	}
 };
 
-ZWBFRecipes = ZWBFRecipesImpl;
+export { ZWBFRecipes };
+
+// ZWBFRecipes = ZWBFRecipesImpl;
