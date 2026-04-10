@@ -14,7 +14,7 @@ export class ZWBTakeContraceptive extends ZWBFTakePills {
 		this.womb = womb;
 	}
 	perform() {
-		super.perform();
 		this.womb.contraceptive = true;
+		super.perform();
 	}
 }

@@ -314,6 +314,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	onEveryMinute(): void {
+		print("[ZWBF] Minute update - checking fertility");
 		this.fertility = this.getFertility();
 		if(this.data) this.data.amount = this.amount;
 	}

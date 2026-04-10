@@ -139,7 +139,8 @@ export class ContextMenu {
 			},
 			{
 				option: "Advance_Pregnancy",
-				fn: () => this.pregnancy.Debug.advance(60),
+				// advance 1 day
+				fn: () => this.pregnancy.Debug.advance(60 * 24),
 				condition: () => this.pregnancy.pregnancy != null
 			},
 			{

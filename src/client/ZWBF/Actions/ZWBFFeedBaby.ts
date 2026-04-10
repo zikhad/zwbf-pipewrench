@@ -76,5 +76,6 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 		this.baby.setJobDelta(0);
 		this.lactation.useMilk(this.lactation.bottleAmount, ZombRandFloat(0.1, 0.3));
 		this.feedBaby();
+		this.stop();
 	}
 }
