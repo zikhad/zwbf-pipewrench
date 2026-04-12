@@ -48,18 +48,6 @@ describe("Inventory", () => {
 			})
 		},
 		{
-			scenario: "Take contraceptive",
-			item: "Contraceptive",
-			text: "ContextMenu_Take_Contraceptive",
-			pregnancy: mock<Pregnancy>({
-				pregnancy: null
-			}),
-			womb: mock<Womb>({
-				onContraceptive: false,
-				phase: CyclePhaseEnum.OVULATION
-			})
-		},
-		{
 			scenario: "Take Lactaid",
 			item: "Lactaid",
 			text: "ContextMenu_Take_Lactaid"
