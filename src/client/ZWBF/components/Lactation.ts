@@ -125,7 +125,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	/**
 	 * Toggles lactation on or off and resets data if needed
 	 */
-	private toggle(status: boolean) {
+	public toggle(status: boolean) {
 		this.data!.isActive = status;
 		if (!status) {
 			this.data = {
