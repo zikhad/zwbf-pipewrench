@@ -15,8 +15,8 @@ Menstrual cycle, Pregnancy, Lactation and more
 ---
 # TODO
 - [x] Fix animation looping
-- [ ] Fix contraceptive effects (seems not to be working)
-- [ ] Check and potentially fix Lactaid
+- [x] Fix contraceptive effects (seems not to be working)
+- [x] Check and potentially fix Lactaid
 - [ ] Create Sperm fluid
 - [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
 
