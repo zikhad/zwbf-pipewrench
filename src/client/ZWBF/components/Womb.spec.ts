@@ -84,7 +84,7 @@ describe("Womb", () => {
 				expect(womb.total).toBe(0);
 				expect(womb.cycleDay).toBe(0);
 				expect(womb.fertility).toBe(0);
-				expect(womb.onContraceptive).toBe(false);
+				expect(womb.contraceptive).toBe(false);
 				expect(womb.phase).toBe("Recovery");
 				expect(womb.image).toBe("");
 			});
@@ -103,7 +103,7 @@ describe("Womb", () => {
 				expect(womb.total).toBe(400);
 				expect(womb.cycleDay).toBe(1);
 				expect(womb.fertility).toBe(0);
-				expect(womb.onContraceptive).toBe(true);
+				expect(womb.contraceptive).toBe(true);
 				expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
 			});
 		});
@@ -238,7 +238,7 @@ describe("Womb", () => {
 	describe("Impregnate", () => {
 		test("should start pregnancy when the random is greater than fertility", () => {
 			const womb = new Womb();
-			jest.spyOn(womb as any, "getFertility").mockReturnValue(1);
+			jest.spyOn(womb as any, "computeFertility").mockReturnValue(1);
 			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(1);
 			(womb as any).impregnate();
 			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_START);
@@ -624,9 +624,9 @@ describe("Womb", () => {
 		it("should be able to set contraceptive externally", () => {
 			const womb = new Womb();
 			womb.onCreatePlayer(mockedPlayer());
-			expect(womb.onContraceptive).toBe(false);
+			expect(womb.contraceptive).toBe(false);
 			womb.contraceptive = true;
-			expect(womb.onContraceptive).toBe(true);
+			expect(womb.contraceptive).toBe(true);
 		});
 		it("Should be able to retrieve phaseTranslation", () => {
 			const womb = new Womb();

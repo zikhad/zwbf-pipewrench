@@ -58,7 +58,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			setTotal: (amount: number) => (this.total = Math.max(0, amount))
 		},
 		cycle: {
-			addDay: (amount = 1) => (this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29)),
+			addDay: (amount = 1) => {
+				this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29);
+				this.contraceptive = false;
+			},
 			nextPhase: () => {
 				if (this.pregnancy) return;
 				if (this.cycleDay < 1) {
@@ -74,6 +77,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 				} else {
 					this.cycleDay = 1;
 				}
+				this.contraceptive = false;
 			}
 		}
 	};
@@ -106,6 +110,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	set contraceptive(value: boolean) {
 		this.data!.onContraceptive = value;
 	}
+	
+	get contraceptive() {
+		return this.data?.onContraceptive ?? false;
+	}
 
 	set cycleDay(value: number) {
 		this.data!.cycleDay = value;
@@ -128,10 +136,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	get fertility() {
 		return this.data?.fertility ?? 0;
-	}
-
-	get onContraceptive() {
-		return this.data?.onContraceptive ?? false;
 	}
 
 	get phase() {
@@ -287,9 +291,8 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	private impregnate() {
-		const fertility = this.getFertility();
-		if (fertility <= 0) return;
-		if (ZombRandFloat(0, 1) >= 1 - fertility) {
+		if (this.fertility <= 0) return;
+		if (ZombRandFloat(0, 1) >= 1 - this.fertility) {
 			this.haloText({
 				text: getText("IGUI_ZWBF_UI_Fertilized"),
 				color: "green"
@@ -314,7 +317,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	onEveryMinute(): void {
-		this.fertility = this.getFertility();
+		this.fertility = this.computeFertility();
 		print("[ZWBF] Minute update - checking fertility - fertility: ", this.fertility);
 		if(this.data) this.data.amount = this.amount;
 	}
@@ -340,6 +343,9 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		// Increment cycle day
 		this.cycleDay++;
 
+		// Remove contraceptive effect
+		this.contraceptive = false;
+
 		this.data!.chances = Womb.chances;
 		if (
 			this.phase == CyclePhaseEnum.MENSTRUATION &&
@@ -347,11 +353,9 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		) {
 			this.menstruationEffects();
 		}
-
-
 	}
 
-	private getFertilityBonus() {
+	private computeFertilityBonus() {
 		if (this.hasZWBFTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
 		if (this.hasZWBFTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
 		return 0;
@@ -361,20 +365,19 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	 * Computes fertility value based on traits and state.
 	 * @returns Fertility chance between 0 and 1.
 	 */
-	private getFertility() {
-		const isInfertile = this.hasZWBFTrait(ZWBFTraitsEnum.INFERTILE);
+	private computeFertility() {
+		const isInfetile = this.hasZWBFTrait(ZWBFTraitsEnum.INFERTILE);
 		if (
 			!this.data ||
-			isInfertile ||
-			this.onContraceptive ||
+			isInfetile ||
+			this.contraceptive ||
 			this.pregnancy
 		) {
 			return 0;
 		}
 
 		const chance = this.data.chances[this.phase];
-
-		const bonus = this.getFertilityBonus();
+		const bonus = this.computeFertilityBonus();
 
 		return Math.min(1, chance * (1 + bonus));
 	}
@@ -392,6 +395,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		return CyclePhaseEnum.LUTEAL;
 	}
 
+	/** Applies bleeding effects */
 	private applyBleeding() {
 		const maxPain = this.hasZWBFTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS)
 			? 50
@@ -402,6 +406,8 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		groin.setBleedingTime(Math.min(10, bleedTime));
 		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(0, maxPain)));
 	}
+	
+	/** Applies wetness effects */
 	private applyWetness() {
 		const amount = ZombRand(10, 100);
 		const groin = this.getBodyPart(BodyPartType.Groin)!;
@@ -410,7 +416,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
-		// if (ZombRand(0, 100) < 50) return;
 		this.applyBleeding();
 	}
 
