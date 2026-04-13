@@ -18,22 +18,7 @@ jest.mock("../client/ZWBF/ZWBF", () => ({
 
 describe("ZWBFRecipes.ts", () => {
 	const isFemaleSpy = jest.fn();
-	let mockCharacter: IsoGameCharacter;
-
-	const scenarios = [
-		{ name: "HandExpress", type: "lactation" },
-		{ name: "BreastPump", type: "lactation" },
-		{ name: "ClearSperm", type: "womb" }
-	];
-
-	beforeEach(() => {
-		jest.resetAllMocks();
-		mockCharacter = mock<IsoGameCharacter>({ isFemale: isFemaleSpy });
-		Object.defineProperty(SpyZWBF.lactation, "bottleAmount", {
-			get: jest.fn(() => 0.2),
-			configurable: true
-		});
-	});
+	const mockCharacter = mock<IsoGameCharacter>({ isFemale: isFemaleSpy });
 
 	const createMockItemWithContainer = (isFull: boolean = false) => {
 		return mock<InventoryItem>({
@@ -47,6 +32,36 @@ describe("ZWBFRecipes.ts", () => {
 			}))
 		});
 	};
+	
+	const scenarios = [
+		/* Pills */
+		{ name: "TakeContraceptive", type: "pill" },
+		{ name: "TakeLactaid", type: "pill" },
+		/* Milk */
+		{ name: "HandExpress", type: "lactation" },
+		{ name: "BreastPump", type: "lactation" },
+		/* Womb */
+		{ name: "ClearSperm", type: "womb" }
+	];
+
+	beforeEach(() => {
+		jest.resetAllMocks();
+		Object.defineProperty(SpyZWBF.lactation, "bottleAmount", {
+			get: jest.fn(() => 0.2),
+			configurable: true
+		});
+		Object.defineProperties(SpyZWBF.womb, {
+			pregnancy: {
+				get: jest.fn(() => false),
+				configurable: true
+			},
+			contraceptive: {
+				get: jest.fn(() => false),
+				set: jest.fn(),
+				configurable: true
+			}
+		});
+	});
 
 	describe("OnTest", () => {
 		describe("Truthy scenarios", () => {
@@ -95,7 +110,8 @@ describe("ZWBFRecipes.ts", () => {
 						configurable: true
 					});
 				});
-				it.each(scenarios)("Should return false for $name", ({ name }) => {
+				const filteredScenarios = scenarios.filter(({ type }) => type !== "pill");
+				it.each(filteredScenarios)("Should return false for $name", ({ name }) => {
 					const mockItem = createMockItemWithContainer(false);
 					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
@@ -130,9 +146,67 @@ describe("ZWBFRecipes.ts", () => {
 					expect(result).toBeTruthy();
 				});
 			});
+			describe("Player cannot take pills", () => {
+				it("Player is on contraceptive already", () => {
+					isFemaleSpy.mockReturnValue(true);
+					Object.defineProperty(SpyZWBF.womb, "contraceptive", {
+						get: jest.fn(() => true),
+						configurable: true
+					});
+					const result = ZWBFRecipes.OnTest.TakeContraceptive(mock(), mockCharacter);
+					expect(result).toBeFalsy();
+				});
+				it("Player is pregnant already", () => {
+					isFemaleSpy.mockReturnValue(true);
+					Object.defineProperty(SpyZWBF.womb, "pregnancy", {
+						get: jest.fn(() => true),
+						configurable: true
+					});
+					const result = ZWBFRecipes.OnTest.TakeContraceptive(mock(), mockCharacter);
+					expect(result).toBeFalsy();
+				});
+				it("Player is lactating already", () => {
+					isFemaleSpy.mockReturnValue(true);
+					Object.defineProperty(SpyZWBF.lactation, "isLactating", {
+						get: jest.fn(() => true),
+						configurable: true
+					});
+					const result = ZWBFRecipes.OnTest.TakeLactaid(mock(), mockCharacter);
+					expect(result).toBeFalsy();	
+				});
+			});
 		});
 	});
 	describe("OnCreate", () => {
+		describe("Pill recipes", () => {
+			const spySetContraceptive = jest.fn();
+			const spyToggleLactation = jest.fn();
+			beforeEach(() => {
+				isFemaleSpy.mockReturnValue(true);
+				Object.defineProperties(SpyZWBF.womb, {
+					contraceptive: {
+						get: jest.fn(() => false),
+						set: spySetContraceptive,
+						configurable: true
+					}
+				});
+				Object.defineProperties(SpyZWBF.lactation, {
+					isLactating: {
+						get: jest.fn(() => false),
+						configurable: true
+					}
+				});
+				SpyZWBF.lactation.toggle = spyToggleLactation;
+			});
+			it("Should set contraceptive to true when taking contraceptive pill", () => {
+				ZWBFRecipes.OnCreate.TakeContraceptive(mock(), mockCharacter);
+				expect(spySetContraceptive).toHaveBeenCalledWith(true);
+			});
+			it("Should toggle lactation on when taking lactaid pill", () => {
+				ZWBFRecipes.OnCreate.TakeLactaid(mock(), mockCharacter);
+				expect(spyToggleLactation).toHaveBeenCalledWith(true);
+			});
+		});
 		describe("Lactation recipes", () => {
 			const filteredScenarios = scenarios.filter(({ type }) => type == "lactation");
 			it.each(filteredScenarios)("should call useMilk for $name", ({ name }) => {

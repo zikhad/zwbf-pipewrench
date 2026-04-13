@@ -60,6 +60,7 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 		return (this.character as IsoGameCharacter).getInventory().contains(this.baby);
 	}
 	start() {
+		super.start();
 		this.baby.setJobType(getText("ContextMenu_BreastFeed_Baby"));
 		this.baby.setJobDelta(0.0);
 		this.setActionAnim("FeedBaby", null);
@@ -76,6 +77,5 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 		this.baby.setJobDelta(0);
 		this.lactation.useMilk(this.lactation.bottleAmount, ZombRandFloat(0.1, 0.3));
 		this.feedBaby();
-		this.stop();
 	}
 }

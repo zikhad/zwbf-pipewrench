@@ -319,6 +319,13 @@ describe("Womb", () => {
 				expect(womb.data?.chances).toEqual(mockChances);
 			});
 		});
+		describe("onEveryHour", () => {
+			it("should update hourly data", () => {
+				const womb = new Womb();
+				womb.onEveryHour();
+				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.WOMB_HOURLY_UPDATE, expect.anything());
+			});
+		});
 	});
 
 	// === Fertility Tests ===
