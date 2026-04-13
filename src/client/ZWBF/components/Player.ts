@@ -119,10 +119,10 @@ export abstract class Player<T> {
 		const { text, style } = props;
 		switch (style) {
 			case "good":
-				(HaloTextHelper as any).addGoodText(this.player, text);
+				HaloTextHelper.addGoodText(this.player, text);
 				break;
 			case "bad":
-				(HaloTextHelper as any).addBadText(this.player, text);
+				HaloTextHelper.addBadText(this.player, text);
 				break;
 			default:
 				HaloTextHelper.addText(this.player, text);

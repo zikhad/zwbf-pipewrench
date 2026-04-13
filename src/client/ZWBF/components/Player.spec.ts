@@ -157,44 +157,21 @@ describe("Player class", () => {
 	describe("haloText", () => {
 		it.each<{
 			spyOn: () => jest.SpyInstance;
-			color?: "green" | "red";
-			arrow?: "up" | "down";
+			style?: "good" | "bad";
 		}>([
-			{
-				color: "green",
-				arrow: "up",
-				spyOn: () => jest.spyOn(HaloTextHelper, "addTextWithArrow")
-			},
-			{
-				color: "green",
-				arrow: "down",
-				spyOn: () => jest.spyOn(HaloTextHelper, "addTextWithArrow")
-			},
-			{
-				color: "red",
-				arrow: "up",
-				spyOn: () => jest.spyOn(HaloTextHelper, "addTextWithArrow")
-			},
-			{
-				color: "red",
-				arrow: "down",
-				spyOn: () => jest.spyOn(HaloTextHelper, "addTextWithArrow")
-			},
-			{ color: "green", spyOn: () => jest.spyOn(HaloTextHelper, "addText") },
-			{ color: "red", spyOn: () => jest.spyOn(HaloTextHelper, "addText") },
+			{ style: "good", spyOn: () => jest.spyOn(HaloTextHelper, "addGoodText") },
+			{ style: "bad", spyOn: () => jest.spyOn(HaloTextHelper, "addBadText") },
 			{ spyOn: () => jest.spyOn(HaloTextHelper, "addText") }
 		])(
-			"haloText should call HaloTextHelper with color $color and arrow $arrow",
-			({ color, arrow, spyOn }) => {
+			"haloText should call HaloTextHelper with style $style",
+			({ style, spyOn }) => {
 				const spy = spyOn();
 				const instance = new ConcretePlayer();
 				instance.triggerOnCreatePlayer(mockPlayer);
 				instance.haloText({
 					text: "mock",
-					color,
-					arrow
+					style
 				});
-				expect(true).toBeTruthy();
 				expect(spy).toHaveBeenCalled();
 			}
 		);

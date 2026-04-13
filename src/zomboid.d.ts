@@ -71,6 +71,11 @@ declare global {
 }
 
 declare module "@asledgehammer/pipewrench" {
+	export namespace HaloTextHelper {
+		function addGoodText(player: IsoPlayer, text: string): void;
+		function addBadText(player: IsoPlayer, text: string): void;
+	}
+
 	export namespace zombie.inventory {
 		interface InventoryItem {
 			getFluidContainer?(): FluidContainer | null;

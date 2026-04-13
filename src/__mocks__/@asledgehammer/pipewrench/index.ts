@@ -69,6 +69,8 @@ export class GameTime {
 export class HaloTextHelper {
 	static addTextWithArrow() {}
 	static addText() {}
+	static addGoodText() {}
+	static addBadText() {}
 	static getColorGreen() {
 		return "green";
 	}
