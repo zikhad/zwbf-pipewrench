@@ -1,6 +1,6 @@
 import { ArrayList, InventoryItem, IsoGameCharacter } from "@asledgehammer/pipewrench";
 
-export type Fluid = "HumanMilk" | string;
+export type Fluid = "HumanMilk" | "Semen" | string;
 
 interface FluidContainer {
 	removeFluid(): void;

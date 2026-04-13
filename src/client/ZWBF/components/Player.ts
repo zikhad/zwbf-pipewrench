@@ -108,32 +108,24 @@ export abstract class Player<T> {
 	}
 
 	/**
-	 * Helper function to create `HaloText` in player
-	 * @param props Properties to `HaloText`
+	 * Displays halo text above the player with optional styling.
+	 *
+	 * @param props - Properties for the halo text.
+	 * @param props.text - The text to display.
+	 * @param {"good" | "bad"} [props.style] - Optional style for the text, affecting color and icon.
 	 */
-	public haloText(props: { text: string; color?: "green" | "red"; arrow?: "up" | "down" }) {
+	public haloText(props: { text: string; style?: "good" | "bad"; }) {
 		if (!this.player) return;
-
-		const { text, color, arrow } = props;
-
-		const getColor = (color?: "green" | "red") => {
-			switch (color) {
-				case "green":
-					return HaloTextHelper.getColorGreen();
-				case "red":
-					return HaloTextHelper.getColorRed();
-				default:
-					return HaloTextHelper.getColorWhite();
-			}
-		};
-		const txtColor = getColor(color);
-		switch (arrow) {
-			case "up":
-			case "down":
-				HaloTextHelper.addTextWithArrow(this.player, text, arrow === "up", txtColor);
+		const { text, style } = props;
+		switch (style) {
+			case "good":
+				(HaloTextHelper as any).addGoodText(this.player, text);
+				break;
+			case "bad":
+				(HaloTextHelper as any).addBadText(this.player, text);
 				break;
 			default:
-				HaloTextHelper.addText(this.player, text, txtColor);
+				HaloTextHelper.addText(this.player, text);
 		}
 	}
 

@@ -29,7 +29,8 @@ export enum ZWBFEventsEnum {
 }
 
 export const Fluids: Record<string, Fluid> = {
-	HUMAN_MILK: "HumanMilk"
+	HUMAN_MILK: "HumanMilk",
+	SEMEN: "Semen"
 };
 
 export enum MODS {

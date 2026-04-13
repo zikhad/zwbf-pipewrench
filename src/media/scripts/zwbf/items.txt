@@ -16,19 +16,21 @@ module ZWBF {
 	item CondomUsed
 	{
 		DisplayCategory		= FirstAid,
-		ItemType			= base:food,
+		ItemType			= base:normal,
 		Weight				= 0.01,
 		DisplayName			= Used Condom,
 		Icon				= condom_used,
 		StaticModel			= PillBottle,
-		FoodType			= NoExplicit,
-		CustomContextMenu 	= Drink,
-		CustomEatSound 		= DrinkingFromBottlePlastic,
-		HungerChange		= -5,
-		Calories			= 25,
-		Carbohydrates		= 7,
-		Lipids				= 5,
-		Proteins			= 5,
+		CustomEatSound 		= EatingMushy,
+		component FluidContainer
+		{
+			ContainerName = CondomUsed,
+			Capacity = 0.02,
+			Fluids
+			{
+				fluid = Semen:0.02,
+			}
+		}
 	}
 
 	item CondomBox

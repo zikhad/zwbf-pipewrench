@@ -91,6 +91,23 @@ module ZWBFRecipes
         }
     }
 
+    craftRecipe PushCum
+    {
+        timedAction = Making, /* TODO: Change to a custom animation */
+        category = Health,
+        time = 200,
+        Tags = InHandCraft;CanBeDoneInDark,
+        OnTest = ZWBFRecipes.OnTest.PushCum,
+        OnCreate = ZWBFRecipes.OnCreate.PushCum,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop1;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
+    
     /************************ Milk ************************/
     craftRecipe HandExpression
     {
@@ -109,7 +126,6 @@ module ZWBFRecipes
         {
         }
     }
-
 
     craftRecipe PumpMilk
     {

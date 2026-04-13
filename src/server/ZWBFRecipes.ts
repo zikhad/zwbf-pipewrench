@@ -32,6 +32,12 @@ ZWBFRecipes = {
 		ClearSperm: (_item, character) => {
 			if (!character.isFemale()) return false;
 			return womb.amount > 0;
+		},
+		PushCum: (item, character) => {
+			if (!character.isFemale()) return false;
+			if (womb.amount <= 0) return false;
+			if (new FluidContainerApi(item).isFull()) return false;
+			return true;
 		}
 	},
 	OnCreate: {
@@ -57,6 +63,14 @@ ZWBFRecipes = {
 			const container = items.getInputItems(0).get(0) as InventoryItem;
 			new FluidContainerApi(container).clear();
 			womb.amount = 0;
+		},
+		PushCum: (items, _character) => {
+			const container = items.getInputItems(0).get(0) as InventoryItem; 
+			// Convert from milliliters to liters for the API and call the Fill
+			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount / 1000);
+			// Convert back to milliliters for the womb and remove that amount
+			const amount = Math.floor(filledAmount * 1000);
+			womb.amount -= Math.min(womb.amount, amount);
 		}
 	}
 };

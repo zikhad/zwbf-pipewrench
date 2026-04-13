@@ -30,4 +30,28 @@ module ZWBF {
             }
         }
     }
+    fluid Semen
+    {
+        ColorReference = LightYellow,
+        DisplayName = Semen,
+        Categories
+        {
+            Beverage,
+        }
+        Properties
+        {
+            HungerChange = -50.0,
+            ThirstChange = -3,.0,
+            Calories = 25.0,
+            Proteins = 5.0,
+        }
+        BlendWhiteList
+        {
+            whitelist = true,
+            categories
+            {
+                Beverage,
+            }
+        }
+    }
 }

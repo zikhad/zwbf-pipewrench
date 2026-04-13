@@ -10,7 +10,7 @@ import {
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
-import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, Fluids, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
@@ -271,21 +271,22 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	private intercourse() {
+		if (!this.player) return;
+		const amount = ZombRand(10, 50);
+		this.haloText({
+			text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
+			style: "good",
+		});
 		if (this.hasItem("ZWBF.Condom")) {
-			const inventory = this.player?.getInventory();
-			inventory?.Remove("Condom");
-			inventory?.AddItem("ZWBF.CondomUsed", 1);
+			const inventory = this.player.getInventory();
+			inventory.Remove("Condom");
+			inventory.AddItem("ZWBF.CondomUsed");
+			/* const usedCondom = inventory.getItemFromType("ZWBF.CondomUsed");
+			print("[ZWBF] Used condom container: ", tostring(usedCondom));
+			new FluidContainerApi(usedCondom).fill(Fluids.SEMEN, amount / 1000);*/
 		} else {
-			const amount = ZombRand(10, 50);
 			this.amount += amount;
 			this.total += amount;
-
-			this.haloText({
-				text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
-				arrow: "up",
-				color: "green"
-			});
-
 			this.impregnate();
 		}
 	}
@@ -295,7 +296,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		if (ZombRandFloat(0, 1) >= 1 - this.fertility) {
 			this.haloText({
 				text: getText("IGUI_ZWBF_UI_Fertilized"),
-				color: "green"
+				style: "good"
 			});
 			triggerEvent(ZWBFEventsEnum.PREGNANCY_START);
 		}

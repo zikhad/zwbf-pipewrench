@@ -2,8 +2,9 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
-import { getSpecificPlayer, getText, isDebugEnabled, KahluaTable } from "@asledgehammer/pipewrench";
+import { getSpecificPlayer, getText, isDebugEnabled, KahluaTable, triggerEvent } from "@asledgehammer/pipewrench";
 import { ISToolTip } from "@asledgehammer/pipewrench/client";
+import { ZWBFEventsEnum } from "@constants";
 
 export type Option = {
 	title: string;
@@ -147,6 +148,10 @@ export class ContextMenu {
 				option: "Advance_Pregnancy_Labor",
 				fn: () => this.pregnancy.Debug.advanceToLabor(),
 				condition: () => this.pregnancy.pregnancy != null
+			},
+			{
+				option: "Intercourse",
+				fn: () => triggerEvent(ZWBFEventsEnum.INTERCOURSE),
 			}
 		]
 			.filter(({condition}) => {

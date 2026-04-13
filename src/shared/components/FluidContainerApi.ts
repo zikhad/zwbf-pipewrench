@@ -51,14 +51,13 @@ export class FluidContainerApi {
 	 * Adds fluid to the wrapped container up to the requested amount.
 	 *
 	 * @param fluid The fluid type to add.
-	 * @param amount The maximum amount to add.
+	 * @param amount The maximum amount to add. If not specified, will attempt to fill the container completely.
 	 * @returns The amount actually added to the container.
 	 */
-	fill(fluid: Fluid, amount: number): number {
+	fill(fluid: Fluid, amount?: number): number {
 		const container = this.container;
 		if (!container) return 0;
-
-		const addedFluid = Math.min(container.getFreeCapacity(), amount);
+		const addedFluid = Math.min(container.getFreeCapacity(), amount ?? container.getCapacity());
 		if (addedFluid <= 0) return 0;
 
 		container.addFluid(fluid, addedFluid);
