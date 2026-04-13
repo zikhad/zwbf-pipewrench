@@ -15,8 +15,7 @@ module ZWBF {
 		Tooltip 			= Tooltip_Contraceptive,
 		StaticModel 		= PillBottle,
 		WorldStaticModel 	= PainKillers_Ground,
-		Medical 			= TRUE,
-		Tags				= base:consumable,
+		Medical 			= TRUE
 	}
 
 	item Lactaid
@@ -31,7 +30,6 @@ module ZWBF {
 		Tooltip 			= Tooltip_Lactaid,
 		StaticModel 		= PillBottle,
 		WorldStaticModel 	= PainKillers_Ground,
-		Medical 			= TRUE,
-		Tags				= base:consumable,
+		Medical 			= TRUE
 	}
 }
