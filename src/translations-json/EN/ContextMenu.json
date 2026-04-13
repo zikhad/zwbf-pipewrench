@@ -29,5 +29,6 @@
     "ContextMenu_Milk_Clear_Milk_Title": "Clear Milk",
     "ContextMenu_Milk_Clear_Milk_Description": "Set Milk to 0",
     "ContextMenu_BreastFeed_Baby": "Breasfeed Baby",
-    "ContextMenu_Clean_Sperm": "Clear sperm"
+    "ContextMenu_Clean_Sperm": "Clear sperm",
+    "ContextMenu_Intercourse": "(event) Intercourse"
 }
