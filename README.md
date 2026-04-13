@@ -139,5 +139,6 @@ Contributions are welcome! Please:
 - [x] Fix contraceptive effects (seems not to be working)
 - [x] Check and potentially fix Lactaid
 - [x] Create Sperm fluid
+- [ ] Make distribuitions work
 - [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
 - [ ] Reintroduce Babies or similar artifacts
