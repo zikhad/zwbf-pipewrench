@@ -7,7 +7,7 @@ export enum ZWBFTraitsEnum {
 	PREGNANCY = "zwbf:pregnancy",
 	DAIRY_COW = "zwbf:dairycow",
 	STRONG_MENSTRUAL_CRAMPS = "zwbf:strongmenstrualcramps",
-	NO_MENSNTRUAL_CRAMPS = "zwbf:nomenstrualcramps"
+	NO_MENSTRUAL_CRAMPS = "zwbf:nomenstrualcramps"
 }
 
 export enum CyclePhaseEnum {

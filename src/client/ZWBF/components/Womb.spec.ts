@@ -412,7 +412,7 @@ describe("Womb", () => {
 
 		it.each([
 			{ trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 50 },
-			{ trait: ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS, expectedPain: 0 },
+			{ trait: ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS, expectedPain: 0 },
 			{ trait: null, expectedPain: 25 }
 		])(
 			"should apply pain of $expectedPain when player has trait of $trait",
@@ -430,7 +430,7 @@ describe("Womb", () => {
 
 				expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
 
-				if (trait === ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS) {
+				if (trait === ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS) {
 					expect(menstruationEffectsSpy).not.toHaveBeenCalled();
 				} else {
 					expect(menstruationEffectsSpy).toHaveBeenCalled();

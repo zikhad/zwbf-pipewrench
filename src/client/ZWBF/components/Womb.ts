@@ -350,7 +350,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		this.data!.chances = Womb.chances;
 		if (
 			this.phase == CyclePhaseEnum.MENSTRUATION &&
-			!this.hasZWBFTrait(ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS)
+			!this.hasZWBFTrait(ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS)
 		) {
 			this.menstruationEffects();
 		}
