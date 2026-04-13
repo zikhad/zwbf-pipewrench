@@ -1,3 +1,5 @@
+import { Fluid } from "server/types";
+
 export enum ZWBFTraitsEnum {
 	INFERTILE = "zwbf:infertile",
 	FERTILE = "zwbf:fertile",
@@ -24,4 +26,15 @@ export enum ZWBFEventsEnum {
 	INTERCOURSE = "ZWBFIntercourse",
 	PREGNANCY_START = "ZWBFPregnancyStart",
 	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour"
+}
+
+export const Fluids: Record<string, Fluid> = {
+	HUMAN_MILK: "HumanMilk"
+};
+
+export enum MODS {
+	BABIES = "Babies",
+	ZOMBOWIN = "ZomboWin",
+	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
+	MOODLE_FRAMEWORK = "MoodleFramework"
 }

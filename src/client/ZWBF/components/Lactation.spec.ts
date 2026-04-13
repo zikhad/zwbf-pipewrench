@@ -25,7 +25,7 @@ describe("Lactation", () => {
 	describe("Without player or data", () => {
 		it("returns static bottleAmount and percentage", () => {
 			const lactation = new Lactation();
-			expect(lactation.bottleAmount).toBe(200);
+			expect(lactation.bottleAmount).toBe(0.2);
 			expect(lactation.percentage).toBe(0);
 		});
 
@@ -46,7 +46,7 @@ describe("Lactation", () => {
 		beforeEach(() => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
 				isActive: true,
-				milkAmount: 400,
+				milkAmount: 0.4,
 				expiration: 8,
 				multiplier: 0
 			});
@@ -56,7 +56,7 @@ describe("Lactation", () => {
 			const lactation = new Lactation();
 			lactation.onCreatePlayer(mockedPlayer());
 			expect(lactation.isLactating).toBe(true);
-			expect(lactation.milkAmount).toBe(400);
+			expect(lactation.milkAmount).toBe(0.4);
 		});
 
 		it("useMilk updates milkAmount and checks trait", () => {
@@ -66,15 +66,15 @@ describe("Lactation", () => {
 					HasTrait: SpyHasTrait.mockImplementation(() => true)
 				})
 			);
-			lactation.useMilk(100);
+			lactation.useMilk(0.1);
 			expect(SpyHasTrait).toHaveBeenCalledWith("zwbf:dairycow");
-			expect(lactation.milkAmount).toBe(300);
+			expect(lactation.milkAmount).toBeCloseTo(0.3);
 		});
 
 		describe("Timer events", () => {
 			const data: LactationData = {
 				isActive: true,
-				milkAmount: 400,
+				milkAmount: 0.4,
 				expiration: 1,
 				multiplier: 0
 			};
@@ -91,10 +91,10 @@ describe("Lactation", () => {
 				});
 			});
 			describe("everyTenMinutes", () => {
-				const spyGetAdditionalPain = jest.fn().mockImplementation(() => 24);
+				const spyGetAdditionalPain = jest.fn().mockImplementation(() => 0);
 				const spySetAdditionalPain = jest.fn();
 
-				const spyGetWetness = jest.fn().mockImplementation(() => 24);
+				const spyGetWetness = jest.fn().mockImplementation(() => 0);
 				const spySetWetness = jest.fn();
 
 				beforeEach(() => {
@@ -111,8 +111,8 @@ describe("Lactation", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
 					lactation.onEveryTenMinutes();
-					expect(spySetAdditionalPain).toHaveBeenCalledWith(25);
-					expect(spySetWetness).toHaveBeenCalledWith(25);
+					expect(spySetAdditionalPain).toHaveBeenCalledWith(10);
+					expect(spySetWetness).toHaveBeenCalledWith(10);
 				});
 			});
 			describe("everyHour event", () => {
@@ -134,15 +134,14 @@ describe("Lactation", () => {
 
 		describe("Debug functions", () => {
 			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
-				{ operation: "add", expected: 500 },
-				{ operation: "remove", expected: 300 },
-				{ operation: "set", expected: 100 }
-			])("should $operation milk", ({ operation, expected }) => {
-				const lactation = new Lactation();
-				lactation.onCreatePlayer(mockedPlayer());
-				lactation.Debug.set(400);
-				lactation.Debug[operation](100);
-				expect(lactation.milkAmount).toBe(expected);
+			{ operation: "add", expected: 0.5 },
+			{ operation: "remove", expected: 0.3 },
+			{ operation: "set", expected: 0.1 }
+		])("should $operation milk", ({ operation, expected }) => {
+			const lactation = new Lactation();
+			lactation.onCreatePlayer(mockedPlayer());
+			lactation.Debug.set(0.4);
+			lactation.Debug[operation](0.1);
 			});
 
 			it("should be able to toggle lactation", () => {
@@ -239,56 +238,56 @@ describe("Lactation", () => {
 				state: "non pregnant",
 				fullness: "empty",
 				progress: null,
-				amount: 300,
+				amount: 0.3,
 				expected: "normal_empty.png"
 			},
 			{
 				state: "non pregnant",
 				fullness: "full",
 				progress: null,
-				amount: 900,
+				amount: 0.9,
 				expected: "normal_full.png"
 			},
 			{
 				state: "too early in pregnancy",
 				fullness: "empty",
 				progress: 0,
-				amount: 300,
+				amount: 0.3,
 				expected: "normal_empty.png"
 			},
 			{
 				state: "too early in pregnancy",
 				fullness: "full",
 				progress: 0,
-				amount: 900,
+				amount: 0.9,
 				expected: "normal_full.png"
 			},
 			{
 				state: "pregnancy early",
 				fullness: "empty",
 				progress: 0.5,
-				amount: 300,
+				amount: 0.3,
 				expected: "pregnant_early_empty.png"
 			},
 			{
 				state: "pregnancy early",
 				fullness: "full",
 				progress: 0.5,
-				amount: 900,
+				amount: 0.9,
 				expected: "pregnant_early_full.png"
 			},
 			{
 				state: "pregnancy late",
 				fullness: "empty",
 				progress: 0.9,
-				amount: 300,
+				amount: 0.3,
 				expected: "pregnant_late_empty.png"
 			},
 			{
 				state: "pregnancy late",
 				fullness: "full",
 				progress: 0.9,
-				amount: 900,
+				amount: 0.9,
 				expected: "pregnant_late_full.png"
 			}
 		])(

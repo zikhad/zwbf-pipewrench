@@ -2,7 +2,7 @@ import type { PregnancyData } from "@types";
 import { getActivatedMods, IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
@@ -157,7 +157,11 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	public birth() {
 		if (!this.player) return;
-		if (!getActivatedMods().contains("Babies")) return; // TODO: What happens if Babies the mod is deactivated?
+		if (!getActivatedMods().contains(MODS.BABIES)) {
+			// TODO: What happens if Babies the mod is deactivated?
+			print("[ZWBF] - Babies mod is not activated, cannot give birth.");
+			return;
+		}
 		const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
 		this.player.getInventory().AddItem(`Babies.${baby}`);
 		this.player.setBlockMovement(false);

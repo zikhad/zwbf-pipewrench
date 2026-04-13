@@ -1,0 +1,99 @@
+module ZWBFRecipes
+{
+    import
+    {
+        Base,
+        ZWBF
+    }
+
+    /************************ Vaginal Douche ************************/
+    craftRecipe ClearSperm
+    {
+        timedAction = Making,
+        category = Health,
+        time = 200,
+        Tags = InHandCraft,
+        OnTest = ZWBFRecipes.OnTest.ClearSperm,
+        OnCreate = ZWBFRecipes.OnCreate.ClearSperm,
+        inputs
+        {
+            item 1 [ZWBF.VaginalDouche] flags[Prop1;IsFull] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+    
+    /************************ Condom ************************/
+    craftRecipe OpenCondomBox
+    {
+        timedAction = UnPackBox,
+        category = Health,
+        time = 20,
+        Tags = InHandCraft;CanBeDoneInDark,
+        recipeGroup = OpenBox,
+        inputs
+        {
+            item 1 [ZWBF.CondomBox],
+        }
+        outputs
+        {
+            item 10 ZWBF.Condom,
+        }
+    }
+
+    craftRecipe PlaceCondomsInBox
+    {
+        timedAction = PackingBox,
+        category = Health,
+        time = 20,
+        Tags = InHandCraft;CanBeDoneInDark,
+        inputs
+        {
+            item 10 [ZWBF.Condom],
+        }
+        outputs
+        {
+            item 1 ZWBF.CondomBox,
+        }
+    }
+
+    /************************ Milk ************************/
+    craftRecipe HandExpression
+    {
+        timedAction = Yonchi_breastpump,
+        category = Cooking,
+        time = 800,
+        xpAward = Cooking:3,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.HandExpress,
+        OnCreate = ZWBFRecipes.OnCreate.HandExpress,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop1;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
+
+
+    craftRecipe PumpMilk
+    {
+        timedAction = Yonchi_breastpump,
+        category = Cooking,
+        time = 500,
+        xpAward = Cooking:3,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.BreastPump,
+        OnCreate = ZWBFRecipes.OnCreate.BreastPump,
+        inputs
+        {
+            item 1 [ZWBF.BreastPump] flags[Prop1] mode:keep,
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
+}
