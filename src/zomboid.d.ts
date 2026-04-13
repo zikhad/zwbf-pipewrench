@@ -59,6 +59,16 @@ declare global {
 		of: (this: void, id: string) => unknown;
 	};
 
+	interface ProceduralDistributionEntry {
+		items: unknown[];
+	}
+
+	interface ProceduralDistributionRegistry {
+		list: Record<string, ProceduralDistributionEntry | undefined>;
+	}
+
+	var ProceduralDistributions: ProceduralDistributionRegistry;
+
 	/** Fluid container interface */
 	interface FluidContainer {
 		removeFluid(): void;
