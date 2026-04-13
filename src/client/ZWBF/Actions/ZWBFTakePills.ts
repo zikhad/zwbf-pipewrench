@@ -33,28 +33,28 @@ export abstract class ZWBFTakePills extends ISBaseTimedAction {
 	}
 
 	start() {
-		super.start();
 		this.pills.setJobType(getText(this.contextMenu));
 		this.pills.setJobDelta(0);
 		this.setActionAnim(CharacterActionAnims.TakePills, null);
 		this.setOverrideHandModels(null, this.pills, null);
 		(this.character as IsoGameCharacter).playSound("Pills_A");
+		super.start();
 	}
 
 	stop() {
-		super.stop();
 		this.pills.setJobDelta(0);
+		super.stop();
 	}
 
 	update() {
-		super.update();
 		this.pills.setJobDelta(this.getJobDelta());
+		super.update();
 	}
 
 	perform() {
-		super.perform();
 		// this.pills.getContainer().setDrawDirty(true);
 		this.pills.setJobDelta(0);
 		this.pills.Use();
+		super.perform();
 	}
 }

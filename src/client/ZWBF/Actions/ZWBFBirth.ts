@@ -20,25 +20,28 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 	}
 
 	start() {
-		super.start();
 		this.setActionAnim("blabla_Birthing", null);
+		super.start();
 	}
 
 	update() {
-		super.update();
 		const delta = this.getJobDelta();
 		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			delta,
 			duration: this.maxTime,
 			isActive: true
 		} as AnimationStatus);
+		super.update();
 	}
 
 	perform() {
-		super.perform();
 		this.pregnancy.birth();
+		print("[ZWBF] Birth performed");
 		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			isActive: false
 		} as AnimationStatus);
+		super.perform();
+		// this.stop();
+		// this.forceComplete();
 	}
 }

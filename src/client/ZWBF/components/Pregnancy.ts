@@ -110,14 +110,16 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	onEveryMinute(): void {
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
-		const { current = 0 } = this.pregnancy;
+		const current = this.pregnancy.current ?? 0;
+		const previousInLabor = this.pregnancy.isInLabor ?? false;
 		const updated = Math.min(duration, current + 1);
+		const isInLabor = updated == duration;
 		this.pregnancy = {
 			current: updated,
 			progress: updated / duration,
-			isInLabor: updated == duration
+			isInLabor
 		};
-		if (this.pregnancy.isInLabor) {
+		if (isInLabor && !previousInLabor) {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
@@ -157,13 +159,13 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	public birth() {
 		if (!this.player) return;
-		if (!getActivatedMods().contains(MODS.BABIES)) {
+		if (getActivatedMods().contains(MODS.BABIES)) {
+			const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
+			this.player.getInventory().AddItem(`Babies.${baby}`);	
+		} else {
 			// TODO: What happens if Babies the mod is deactivated?
 			print("[ZWBF] - Babies mod is not activated, cannot give birth.");
-			return;
 		}
-		const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
-		this.player.getInventory().AddItem(`Babies.${baby}`);
 		this.player.setBlockMovement(false);
 		this.weightDebuff = 0;
 		this.stop();
