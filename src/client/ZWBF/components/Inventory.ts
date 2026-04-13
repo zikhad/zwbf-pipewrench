@@ -10,7 +10,6 @@ import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
 import { ISInventoryPaneContextMenu, ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ZWBFFeedBaby } from "@actions/ZWBFFeedBaby";
-import { ZWBTakeLactaid } from "@actions/ZWBFTakeLactaid";
 import * as Events from "@asledgehammer/pipewrench-events";
 
 type Item = InventoryItem & { name: string };
@@ -61,14 +60,6 @@ export class Inventory {
 					this.lactation.milkAmount >= this.lactation.bottleAmount,
 				handler: (item: InventoryItem) =>
 					this.handleItemAction(item, player, new ZWBFFeedBaby(this.lactation, item))
-					
-			},
-			{
-				text: getText("ContextMenu_Take_Lactaid"),
-				itemType: "Lactaid",
-				condition: () => true,
-				handler: (item: InventoryItem) =>
-					this.handleItemAction(item, player, new ZWBTakeLactaid(this.lactation, item)),
 					
 			}
 		];

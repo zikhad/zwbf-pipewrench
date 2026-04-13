@@ -6,7 +6,6 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
-import { CyclePhaseEnum } from "@constants";
 import { InventoryItem, ISBaseTimedAction, IsoGameCharacter } from "@asledgehammer/pipewrench";
 
 jest.mock("@asledgehammer/pipewrench-events");
@@ -46,11 +45,6 @@ describe("Inventory", () => {
 				milkAmount: 0.4,
 				bottleAmount: 0.2
 			})
-		},
-		{
-			scenario: "Take Lactaid",
-			item: "Lactaid",
-			text: "ContextMenu_Take_Lactaid"
 		}
 	])("For $scenario addOption should be called with $text", props => {
 		const {
