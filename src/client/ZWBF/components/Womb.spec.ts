@@ -236,10 +236,10 @@ describe("Womb", () => {
 
 	// === Impregnation mechanics ==
 	describe("Impregnate", () => {
-		test("should start pregnancy when the random is greater than fertility", () => {
-			const womb = new Womb();
-			jest.spyOn(womb as any, "computeFertility").mockReturnValue(1);
-			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(1);
+	it("should start pregnancy when the random is greater than fertility", () => {
+		const womb = new Womb();
+		jest.spyOn(womb, "fertility", "get").mockReturnValue(1);
+		jest.spyOn(SpyPipeWrench, "ZombRandFloat").mockReturnValue(1);
 			(womb as any).impregnate();
 			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_START);
 		});
