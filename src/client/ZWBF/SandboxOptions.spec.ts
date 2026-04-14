@@ -11,7 +11,7 @@ describe("SandboxOptions", () => {
 		expect(WombOptions.capacity).toBe(1);
 		expect(WombOptions.recovery).toBe(7);
 		expect(LactationOptions.capacity).toBe(1);
-		expect(LactationOptions.expiration).toBe(7);
+		expect(LactationOptions.expiration).toBe(168);
 	});
 
 	it("reads nested values from SandboxVars.ZWBF", () => {
@@ -30,6 +30,6 @@ describe("SandboxOptions", () => {
 		expect(WombOptions.capacity).toBe(1.75);
 		expect(WombOptions.recovery).toBe(10);
 		expect(LactationOptions.capacity).toBe(2.4);
-		expect(LactationOptions.expiration).toBe(12);
+		expect(LactationOptions.expiration).toBe(288);
 	});
 });
