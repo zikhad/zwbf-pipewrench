@@ -2,7 +2,6 @@
 import { mock } from "jest-mock-extended";
 import { ZWBFUI } from "./ZWBFUI";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { Lactation } from "./Lactation";
 import { Womb } from "./Womb";
 import { PregnancyData } from "@types";
@@ -41,6 +40,10 @@ describe("ZWBFUI", () => {
 				},
 				"lactation-level-title": {
 					setVisible: jest.fn()
+				},
+				"lactation-level-amount": {
+					setVisible: jest.fn(),
+					setText: jest.fn()
 				},
 				"lactation-level-image": {
 					setVisible: jest.fn(),

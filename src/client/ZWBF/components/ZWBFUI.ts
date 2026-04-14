@@ -219,9 +219,11 @@ export class ZWBFUI {
 		// Womb
 		const { image, phaseTranslation, fertility, amount, total } = this.womb;
 		const { pregnancy } = this.pregnancy;
+		const amountInMilliliters = Math.round(amount * 1000);
+		const totalInMilliliters = Math.round(total * 1000);
 
-		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amount} ml`);
-		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${total} ml`);
+		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amountInMilliliters} ml`);
+		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${totalInMilliliters} ml`);
 		this.UI[this.UIElements.womb.image].setPath(image);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
 

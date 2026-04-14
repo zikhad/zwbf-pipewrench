@@ -1,16 +1,16 @@
 import type { PregnancyData } from "@types";
-import { getActivatedMods, IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
+import { getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
+import { PregnancyOptions } from "../SandboxOptions";
 
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
-	// TODO: how to make sandbox vars work here?
-	private options = {
-		duration: 14 * 24 * 60 // 14 days
+	private readonly options = {
+		duration: PregnancyOptions.duration
 	};
 
 	private readonly BABY_LIST = [
@@ -124,6 +124,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
 		this.moodle?.moodle(this.pregnancy.progress);
+		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 
 	onEveryHour(): void {

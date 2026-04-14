@@ -4,6 +4,7 @@ import { LactationData, LactationImage as LactationImages, PregnancyData } from 
 import { percentageToNumber } from "@utils";
 import { LuaEventManager } from "@asledgehammer/pipewrench";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { LactationOptions } from "@client/SandboxOptions";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
 
@@ -13,8 +14,7 @@ import { Moodle } from "./Moodles";
  * and visual image resolution based on state.
  */
 export class Lactation extends Player<LactationData> implements TimedEvents {
-	private readonly _capacity: number;
-	private readonly _bottleAmount;
+	private readonly _bottleAmount  = 0.2;
 
 	private moodle?: Moodle;
 
@@ -26,8 +26,10 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		}
 	};
 
-	// TODO: Replace with configurable SandBoxVars
-	private readonly options: Record<string, number>;
+	private readonly options = {
+		expiration: LactationOptions.expiration,
+		capacity: LactationOptions.capacity
+	}
 
 	/**
 	 * Debug utilities to modify internal milk data
@@ -38,23 +40,16 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		set: (amount: number) => (this.milkAmount = amount),
 		toggle: (status: boolean) => this.toggle(status)
 	};
-	
+
 	defaultData = {
 		isActive: false,
 		milkAmount: 0,
-		// TODO: Get options from SandboxVars
-		expiration: 7,
+		expiration: LactationOptions.expiration,
 		multiplier: 0
 	};
 
 	constructor() {
 		super("ZWBFLactation");
-		this.options = {
-			expiration: 7,
-			capacity: 1,
-		};
-		this._capacity = this.options.capacity;
-		this._bottleAmount = 0.2;
 	}
 
 	onCreatePlayer(player: IsoPlayer): void {
@@ -197,7 +192,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	/** Maximum milk capacity */
 	private get capacity() {
-		return this._capacity;
+		return this.options.capacity;
 	}
 
 	/** Bottleable milk amount */

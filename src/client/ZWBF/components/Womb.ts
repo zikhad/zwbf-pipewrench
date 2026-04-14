@@ -7,10 +7,11 @@ import {
 	ZombRand,
 	ZombRandFloat
 } from "@asledgehammer/pipewrench";
+import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
-import { CyclePhaseEnum, Fluids, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
@@ -24,11 +25,6 @@ type AnimationSettings = Record<
 	}
 >;
 
-type WombOptions = {
-	recovery: number; // Days to recover after pregnancy
-	capacity: number; // Maximum capacity of the womb
-};
-
 /**
  * Manages reproductive functions, fertility, and pregnancy-related animations
  * for a player character in the game. Handles cycle tracking, fertility logic,
@@ -36,9 +32,9 @@ type WombOptions = {
  */
 export class Womb extends Player<WombData> implements TimedEvents {
 
-	private readonly options: WombOptions = {
-		recovery: 7,
-		capacity: 1000
+	private readonly options = {
+		recovery: WombOptions.recovery,
+		capacity: WombOptions.capacity
 	};
 
 	private _animation: AnimationStatus;
@@ -59,8 +55,13 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		},
 		cycle: {
 			addDay: (amount = 1) => {
-				this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29);
 				this.contraceptive = false;
+				// handle recovery days
+				if (this.cycleDay < 0) {
+					this.cycleDay++;
+				} else {
+					this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29);
+				}
 			},
 			nextPhase: () => {
 				if (this.pregnancy) return;
@@ -272,18 +273,16 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	private intercourse() {
 		if (!this.player) return;
-		const amount = ZombRand(10, 50);
+		const amountInMilliliters = ZombRand(10, 50);
+		const amount = amountInMilliliters / 1000;
 		this.haloText({
-			text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
+			text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amountInMilliliters} ml`,
 			style: "good",
 		});
 		if (this.hasItem("ZWBF.Condom")) {
 			const inventory = this.player.getInventory();
 			inventory.Remove("Condom");
 			inventory.AddItem("ZWBF.CondomUsed");
-			/* const usedCondom = inventory.getItemFromType("ZWBF.CondomUsed");
-			print("[ZWBF] Used condom container: ", tostring(usedCondom));
-			new FluidContainerApi(usedCondom).fill(Fluids.SEMEN, amount / 1000);*/
 		} else {
 			this.amount += amount;
 			this.total += amount;
@@ -319,7 +318,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
-		print("[ZWBF] Minute update - checking fertility - fertility: ", this.fertility);
 		if(this.data) this.data.amount = this.amount;
 	}
 
@@ -327,7 +325,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		// do nothing if empty
 		if(this.amount <= 0) return;
 
-		const amount = ZombRand(0, 50);
+		const amount = ZombRand(0, 50) / 1000;
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
 	}

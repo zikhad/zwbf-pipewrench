@@ -74,7 +74,7 @@ describe("ZWBFRecipes.ts", () => {
 				});
 
 				Object.defineProperty(SpyZWBF.womb, "amount", {
-					get: jest.fn(() => 100),
+					get: jest.fn(() => 0.1),
 					configurable: true
 				});
 			});
@@ -127,7 +127,7 @@ describe("ZWBFRecipes.ts", () => {
 					});
 
 					Object.defineProperty(SpyZWBF.womb, "amount", {
-						get: jest.fn(() => 100),
+						get: jest.fn(() => 0.1),
 						configurable: true
 					});
 				});

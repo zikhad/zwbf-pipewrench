@@ -30,5 +30,6 @@
     "ContextMenu_Milk_Clear_Milk_Description": "Set Milk to 0",
     "ContextMenu_BreastFeed_Baby": "Breasfeed Baby",
     "ContextMenu_Clean_Sperm": "Clear sperm",
-    "ContextMenu_Intercourse": "(event) Intercourse"
+    "ContextMenu_Intercourse_Title": "(event) Intercourse",
+    "ContextMenu_Intercourse_Description": "Trigger Intercourse event"
 }

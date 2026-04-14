@@ -262,10 +262,10 @@ describe("Pregnancy", () => {
 			const spyPregnancySet = jest.spyOn(Player.prototype, "pregnancy", "set");
 			beforeEach(() => {
 				pregnancy = new Pregnancy();
-				(pregnancy as any).options = { duration: 1000 };
 				(pregnancy as any).start = start;
 				(pregnancy as any).stop = stop;
-				// jest.spyOn(Player.prototype, 'pregnancy', 'get').mockReturnValue(null);
+				// Mock PregnancyOptions to use a smaller duration for testing
+				jest.resetModules();
 			});
 			it.each<{
 				method: "start" | "stop" | "advance" | "advanceToLabor";

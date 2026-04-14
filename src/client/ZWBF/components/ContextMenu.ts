@@ -94,7 +94,7 @@ export class ContextMenu {
 		const options = [
 			{
 				option: "Add_Sperm",
-				fn: () => this.womb.Debug.sperm.add(100)
+				fn: () => this.womb.Debug.sperm.add(0.1)
 			},
 			{
 				option: "Remove_Sperm",

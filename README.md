@@ -139,6 +139,8 @@ Contributions are welcome! Please:
 - [x] Fix contraceptive effects (seems not to be working)
 - [x] Check and potentially fix Lactaid
 - [x] Create Sperm fluid
-- [ ] Make distribuitions work
+- [x] Make distribuitions work
+- [x] Fix HaloTextHelper from Moodles.ts
+- [ ] Add fatigue and pain at birth
 - [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
 - [ ] Reintroduce Babies or similar artifacts
