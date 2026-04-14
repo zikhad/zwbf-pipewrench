@@ -2,6 +2,27 @@ import { APPLY_FLAG_KEY, ZWBF_DISTRIBUTION_RULES, applyZWBFDistributions } from 
 
 type Entry = { items: unknown[] };
 
+const getExpectedTableItems = (tableNames: readonly string[]) => {
+	const expectedItemsByTable = new Map<string, unknown[]>();
+
+	for (const tableName of tableNames) {
+		expectedItemsByTable.set(tableName, []);
+	}
+
+	for (const rule of ZWBF_DISTRIBUTION_RULES) {
+		for (const tableName of rule.tableNames) {
+			const expectedItems = expectedItemsByTable.get(tableName);
+			if (!expectedItems) {
+				continue;
+			}
+
+			expectedItems.push(rule.itemType, rule.chance);
+		}
+	}
+
+	return expectedItemsByTable;
+};
+
 const createDistributionTable = (tableNames: readonly string[]) => {
 	const list: Record<string, Entry> = {};
 
@@ -21,19 +42,8 @@ describe("ZWBFDistributions.ts", () => {
 	});
 
 	it("injects item/chance pairs into existing procedural distributions", () => {
-		const tableNames = [
-			"BathroomCabinet",
-			"BathroomCounter",
-			"BathroomShelf",
-			"DrugShackDrugs",
-			"DerelictHouseDrugs",
-			"StoreCounterCleaning",
-			"HospitalRoomCounter",
-			"HospitalRoomShelves",
-			"HospitalRoomWardrobe",
-			"WardrobeChild",
-			"GigamartHousewares"
-		] as const;
+		const tableNames = Array.from(new Set(ZWBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames])));
+		const expectedItemsByTable = getExpectedTableItems(tableNames);
 
 		(globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions = {
 			list: createDistributionTable(tableNames)
@@ -43,14 +53,10 @@ describe("ZWBFDistributions.ts", () => {
 		expect(appliedEntries).toBe(expectedEntries);
 
 		const list = (globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions.list;
-		expect(list.BathroomCounter.items).toContain("ZWBF.Condom");
-		expect(list.BathroomCounter.items).toContain(2);
-		expect(list.BathroomCounter.items).toContain("ZWBF.CondomBox");
-		expect(list.BathroomCounter.items).toContain(0.8);
-		expect(list.BathroomCounter.items).toContain("ZWBF.VaginalDouche");
-		expect(list.BathroomCounter.items).toContain(0.5);
-		expect(list.HospitalRoomShelves.items).toContain("ZWBF.BreastPump");
-		expect(list.HospitalRoomShelves.items).toContain(0.15);
+
+		for (const tableName of tableNames) {
+			expect(list[tableName]?.items).toEqual(expectedItemsByTable.get(tableName));
+		}
 	});
 
 	it("is idempotent once successfully applied", () => {

@@ -23,152 +23,131 @@ type DistributionRule = {
 };
 
 /**
+ * Compact item definition used when several items share the same target tables.
+ */
+type DistributionItem = {
+	readonly itemType: string;
+	readonly chance: number;
+};
+
+/**
+ * Higher-level grouped definition for location-based loot rules.
+ */
+type DistributionGroup = {
+	readonly tableNames: readonly string[];
+	readonly items: readonly DistributionItem[];
+};
+
+/**
  * Global flag key to prevent duplicate distribution injection in the same runtime.
  */
 const APPLY_FLAG_KEY: string = "__ZWBFProceduralDistributionsApplied";
 
 /**
+ * Named groups of procedural distribution tables for reusability and clarity.
+ */
+const TABLE_GROUPS = {
+	/** Bathroom-related distribution tables */
+	bathroom: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"],
+	/** Bedroom side table distribution tables */
+	bedroomSideTables: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"],
+	/** Bedroom dresser distribution tables */
+	bedroomDressers: ["BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck"],
+	/** Hospital-related distribution tables */
+	hospital: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"],
+	/** Hospital room-specific distribution tables */
+	hospitalRoom: ["HospitalRoomCounter", "HospitalRoomShelves"],
+	/** Store-related distribution tables */
+	store: ["GigamartHousewares"],
+	/** Trash bin distribution tables */
+	trashBins: ["BinBar", "BinBathroom", "BinCrepe", "BinDumpster", "BinFireStation", "BinGeneric", "BinHospital", "BinJays", "BinSpiffos", "SafehouseBin", "SafehouseBin_Mid", "SafehouseBin_Late"],
+	/** Drug-related distribution tables */
+	drugLocations: ["DrugShackDrugs", "DerelictHouseDrugs"]
+} as const;
+
+const createDistributionRules = (groups: readonly DistributionGroup[]): readonly DistributionRule[] => {
+	return groups.flatMap(group => group.items.map(item => ({
+		itemType: item.itemType,
+		chance: item.chance,
+		tableNames: group.tableNames
+	})));
+};
+
+/**
  * Default distribution rules for all ZWBF custom items.
  * Defines which items spawn in which procedural loot tables and at what chance weight.
  */
-const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
-	/** Bathroom distributions */
+const ZWBF_DISTRIBUTION_GROUPS: readonly DistributionGroup[] = [
 	{
-		itemType: "ZWBF.Contraceptive",
-		chance: 60,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+		tableNames: TABLE_GROUPS.bathroom,
+		items: [
+			{ itemType: "ZWBF.Contraceptive", chance: 60 },
+			{ itemType: "ZWBF.Lactaid", chance: 40 },
+			{ itemType: "ZWBF.Condom", chance: 80 },
+			{ itemType: "ZWBF.CondomBox", chance: 75 },
+			{ itemType: "ZWBF.VaginalDouche", chance: 30 }
+		]
 	},
 	{
-		itemType: "ZWBF.Lactaid",
-		chance: 40,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+		tableNames: TABLE_GROUPS.bedroomSideTables,
+		items: [
+			{ itemType: "ZWBF.Contraceptive", chance: 40 },
+			{ itemType: "ZWBF.Lactaid", chance: 20 }
+		]
 	},
 	{
-		itemType: "ZWBF.Condom",
-		chance: 80,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+		tableNames: [...TABLE_GROUPS.bedroomDressers, ...TABLE_GROUPS.bedroomSideTables],
+		items: [
+			{ itemType: "ZWBF.Condom", chance: 80 },
+			{ itemType: "ZWBF.CondomBox", chance: 40 }
+		]
 	},
 	{
-		itemType: "ZWBF.CondomBox",
-		chance: 75,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+		tableNames: [...TABLE_GROUPS.bedroomSideTables, "BedroomDresserChild"],
+		items: [{ itemType: "ZWBF.BreastPump", chance: 40 }]
 	},
 	{
-		itemType: "ZWBF.VaginalDouche",
-		chance: 30,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
-	},
-	/** Bedroom distributions */
-	{
-		itemType: "ZWBF.Contraceptive",
-		chance: 40,
-		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+		tableNames: TABLE_GROUPS.hospital,
+		items: [
+			{ itemType: "ZWBF.Contraceptive", chance: 60 },
+			{ itemType: "ZWBF.Lactaid", chance: 50 },
+			{ itemType: "ZWBF.Condom", chance: 50 }
+		]
 	},
 	{
-		itemType: "ZWBF.Lactaid",
-		chance: 20,
-		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+		tableNames: TABLE_GROUPS.hospitalRoom,
+		items: [
+			{ itemType: "ZWBF.CondomBox", chance: 40 },
+			{ itemType: "ZWBF.BreastPump", chance: 50 },
+			{ itemType: "ZWBF.VaginalDouche", chance: 40 }
+		]
 	},
 	{
-		itemType: "ZWBF.Condom",
-		chance: 80,
-		tableNames: ["BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+		tableNames: TABLE_GROUPS.store,
+		items: [
+			{ itemType: "ZWBF.Contraceptive", chance: 50 },
+			{ itemType: "ZWBF.Lactaid", chance: 40 },
+			{ itemType: "ZWBF.Condom", chance: 60 },
+			{ itemType: "ZWBF.CondomBox", chance: 80 },
+			{ itemType: "ZWBF.BreastPump", chance: 40 },
+			{ itemType: "ZWBF.VaginalDouche", chance: 30 }
+		]
 	},
 	{
-		itemType: "ZWBF.CondomBox",
-		chance: 40,
-		tableNames: ["BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+		tableNames: TABLE_GROUPS.trashBins,
+		items: [{ itemType: "ZWBF.CondomUsed", chance: 80 }]
 	},
 	{
-		itemType: "ZWBF.BreastPump",
-		chance: 40,
-		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck", "BedroomDresserChild"]
-	},
-	/** Hospital distributions */
-	{
-		itemType: "ZWBF.Contraceptive",
-		chance: 60,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
-	},
-	{
-		itemType: "ZWBF.Lactaid",
-		chance: 50,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
-	},
-	{
-		itemType: "ZWBF.Condom",
-		chance: 50,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
-	},
-	{
-		itemType: "ZWBF.CondomBox",
-		chance: 40,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
-	},
-	{
-		itemType: "ZWBF.BreastPump",
-		chance: 50,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
-	},
-	{
-		itemType: "ZWBF.VaginalDouche",
-		chance: 40,
-		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
-	},
-	/** Store distributions */
-	{
-		itemType: "ZWBF.Contraceptive",
-		chance: 50,
-		tableNames: ["GigamartHousewares"]
-	},
-	{
-		itemType: "ZWBF.Lactaid",
-		chance: 40,
-		tableNames: ["GigamartHousewares"]
-	},
-	{
-		itemType: "ZWBF.Condom",
-		chance: 60,
-		tableNames: ["GigamartHousewares"]
-	},
-	{
-		itemType: "ZWBF.CondomBox",
-		chance: 80,
-		tableNames: ["GigamartHousewares"]
-	},
-	{
-		itemType: "ZWBF.BreastPump",
-		chance: 40,
-		tableNames: ["GigamartHousewares"]
-	},
-	{
-		itemType: "ZWBF.VaginalDouche",
-		chance: 30,
-		tableNames: ["GigamartHousewares"]
-	},
-	/** Trashbins */
-	{
-		itemType: "ZWBF.CondomUsed",
-		chance: 80,
-		tableNames: ["BinBar", "BinBathroom", "BinCrepe", "BinDumpster", "BinFireStation", "BinGeneric", "BinHospital", "BinJays", "BinSpiffos", "SafehouseBin", "SafehouseBin_Mid", "SafehouseBin_Late"]
-	},
-	/** Drug Shack & Derelict House distributions */
-	{
-		itemType: "ZWBF.Contraceptive",
-		chance: 30,
-		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
-	},
-	{
-		itemType: "ZWBF.Lactaid",
-		chance: 20,
-		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
-	},
-	{
-		itemType: "ZWBF.Condom",
-		chance: 50,
-		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
-	},
+		tableNames: TABLE_GROUPS.drugLocations,
+		items: [
+			{ itemType: "ZWBF.Contraceptive", chance: 30 },
+			{ itemType: "ZWBF.Lactaid", chance: 20 },
+			{ itemType: "ZWBF.Condom", chance: 50 }
+		]
+	}
 ];
+
+const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = createDistributionRules(ZWBF_DISTRIBUTION_GROUPS);
 
 /**
  * Low-level adapter for mutating procedural distribution tables.
