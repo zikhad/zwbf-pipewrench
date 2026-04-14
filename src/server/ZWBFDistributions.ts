@@ -50,7 +50,7 @@ const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
 	},
 	{
 		itemType: "ZWBF.CondomBox",
-		chance: 60,
+		chance: 75,
 		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
 	},
 	{
@@ -59,38 +59,92 @@ const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
 		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
 	},
 	/** Bedroom distributions */
-	/** Hospital distributions */
-	/** Store distributions */
 	{
 		itemType: "ZWBF.Contraceptive",
-		chance: 60,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+		chance: 40,
+		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
 	},
 	{
 		itemType: "ZWBF.Lactaid",
-		chance: 40,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "HospitalRoomCounter", "HospitalRoomShelves"]
+		chance: 20,
+		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
 	},
 	{
 		itemType: "ZWBF.Condom",
 		chance: 80,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf", "BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+		tableNames: ["BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
 	},
-	
 	{
 		itemType: "ZWBF.CondomBox",
 		chance: 40,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "DrugShackDrugs", "StoreCounterCleaning"]
-	},
-	{
-		itemType: "ZWBF.VaginalDouche",
-		chance: 40,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "HospitalRoomCounter", "HospitalRoomShelves"]
+		tableNames: ["BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
 	},
 	{
 		itemType: "ZWBF.BreastPump",
 		chance: 40,
-		tableNames: ["HospitalRoomShelves", "HospitalRoomWardrobe", "WardrobeChild", "GigamartHousewares", "BedroomDresserChild"]
+		tableNames: ["BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck", "BedroomDresserChild"]
+	},
+	/** Hospital distributions */
+	{
+		itemType: "ZWBF.Contraceptive",
+		chance: 60,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
+	},
+	{
+		itemType: "ZWBF.Lactaid",
+		chance: 50,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
+	},
+	{
+		itemType: "ZWBF.Condom",
+		chance: 50,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves", "MedicalClinicDrugs"]
+	},
+	{
+		itemType: "ZWBF.CondomBox",
+		chance: 40,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
+	},
+	{
+		itemType: "ZWBF.BreastPump",
+		chance: 50,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
+	},
+	{
+		itemType: "ZWBF.VaginalDouche",
+		chance: 40,
+		tableNames: ["HospitalRoomCounter", "HospitalRoomShelves"]
+	},
+	/** Store distributions */
+	{
+		itemType: "ZWBF.Contraceptive",
+		chance: 50,
+		tableNames: ["GigamartHousewares"]
+	},
+	{
+		itemType: "ZWBF.Lactaid",
+		chance: 40,
+		tableNames: ["GigamartHousewares"]
+	},
+	{
+		itemType: "ZWBF.Condom",
+		chance: 60,
+		tableNames: ["GigamartHousewares"]
+	},
+	{
+		itemType: "ZWBF.CondomBox",
+		chance: 80,
+		tableNames: ["GigamartHousewares"]
+	},
+	{
+		itemType: "ZWBF.BreastPump",
+		chance: 40,
+		tableNames: ["GigamartHousewares"]
+	},
+	{
+		itemType: "ZWBF.VaginalDouche",
+		chance: 30,
+		tableNames: ["GigamartHousewares"]
 	},
 	/** Trashbins */
 	{
