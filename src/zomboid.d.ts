@@ -14,7 +14,7 @@ declare global {
 	 * Build 42 CharacterStat enum - global accessible from Lua.
 	 * Replaces legacy direct stat getter/setter methods on Stats.
 	 */
-	var CharacterStat: {
+	const CharacterStat: {
 		readonly ANGER: CharacterStatValue;
 		readonly BOREDOM: CharacterStatValue;
 		readonly DISCOMFORT: CharacterStatValue;
@@ -51,11 +51,11 @@ declare global {
 		get(index: number): CharacterTraitRef;
 	};
 
-	var CharacterTrait: {
+	const CharacterTrait: {
 		get: (this: void, id: unknown) => CharacterTraitRef | undefined;
 	};
 
-	var ResourceLocation: {
+	const ResourceLocation: {
 		of: (this: void, id: string) => unknown;
 	};
 
@@ -67,12 +67,20 @@ declare global {
 		list: Record<string, ProceduralDistributionEntry | undefined>;
 	}
 
-	var ProceduralDistributions: ProceduralDistributionRegistry;
+	interface ZWBFSandboxOptions {
+		PregnancyDuration?: number;
+		PregnancyRecovery?: number;
+		WombMaxCapacity?: number;
+		MilkCapacity?: number;
+		MilkExpiration?: number;
+	}
+
+	const ProceduralDistributions: ProceduralDistributionRegistry;
 
 	/** Fluid container interface */
 	interface FluidContainer {
 		removeFluid(): void;
-		addFluid(type: any, amount: number): void;
+		addFluid(type: string, amount: number): void;
 		getCapacity(): number;
 		isFull(): boolean;
 		isEmpty(): boolean;

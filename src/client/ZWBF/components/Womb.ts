@@ -7,10 +7,11 @@ import {
 	ZombRand,
 	ZombRandFloat
 } from "@asledgehammer/pipewrench";
+import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { percentageToNumber } from "@utils";
-import { CyclePhaseEnum, Fluids, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
@@ -24,11 +25,6 @@ type AnimationSettings = Record<
 	}
 >;
 
-type WombOptions = {
-	recovery: number; // Days to recover after pregnancy
-	capacity: number; // Maximum capacity of the womb
-};
-
 /**
  * Manages reproductive functions, fertility, and pregnancy-related animations
  * for a player character in the game. Handles cycle tracking, fertility logic,
@@ -36,10 +32,12 @@ type WombOptions = {
  */
 export class Womb extends Player<WombData> implements TimedEvents {
 
-	private readonly options: WombOptions = {
-		recovery: 7,
-		capacity: 1000
-	};
+	private get options() {
+		return {
+			recovery: WombOptions.recovery,
+			capacity: WombOptions.capacity
+		};
+	}
 
 	private _animation: AnimationStatus;
 	

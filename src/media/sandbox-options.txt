@@ -28,9 +28,9 @@ option ZWBF.WombMaxCapacity {
 
 option ZWBF.MilkCapacity {
     type            = integer,
-    min             = 200,
-    max             = 5000,
-    default         = 1000,
+    min             = 0.3,
+    max             = 5,
+    default         = 1,
     page            = ZWBF,
     translation     = ZWBF_Milk_Capacity,
 }

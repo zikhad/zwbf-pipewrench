@@ -6,12 +6,14 @@ import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
+import { PregnancyOptions } from "../SandboxOptions";
 
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
-	// TODO: how to make sandbox vars work here?
-	private options = {
-		duration: 14 * 24 * 60 // 14 days
-	};
+	private get options() {
+		return {
+			duration: PregnancyOptions.duration
+		};
+	}
 
 	private readonly BABY_LIST = [
 		"Baby_01_b",
