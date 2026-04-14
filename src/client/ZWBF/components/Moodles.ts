@@ -51,15 +51,12 @@ export class Moodle {
 		]).get(+level.toFixed(1));
 
 		if (mapped) {
-			const color =
-				this.type === "Good"
-					? HaloTextHelper.getColorGreen()
-					: HaloTextHelper.getColorRed();
-			HaloTextHelper.addText(
-				this.player,
-				getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`),
-				color
-			);
+			const text = getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`);
+			if (this.type === "Good") {
+				HaloTextHelper.addGoodText(this.player, text);
+				return;
+			}
+			HaloTextHelper.addBadText(this.player, text);
 		}
 	}
 
