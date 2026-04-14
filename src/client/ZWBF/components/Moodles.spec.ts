@@ -74,7 +74,8 @@ describe("Moodles", () => {
 		it.each<{ type: "Good" | "Bad" }>([{ type: "Good" }, { type: "Bad" }])(
 			"Should call a HaloText as Fallback for a $type moodle",
 			({ type }) => {
-				const spy = jest.spyOn(SpyPipewrench.HaloTextHelper, "addText");
+				const method = type === "Good" ? "addGoodText" : "addBadText";
+				const spy = jest.spyOn(SpyPipewrench.HaloTextHelper, method as "addGoodText" | "addBadText");
 				const moodle = new Moodle({
 					name: "TestMoodle",
 					player,
