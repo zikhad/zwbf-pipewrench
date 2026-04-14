@@ -1,0 +1,79 @@
+import { APPLY_FLAG_KEY, ZWBF_DISTRIBUTION_RULES, applyZWBFDistributions } from "./ZWBFDistributions";
+
+type Entry = { items: unknown[] };
+
+const getExpectedTableItems = (tableNames: readonly string[]) => {
+	const expectedItemsByTable = new Map<string, unknown[]>();
+
+	for (const tableName of tableNames) {
+		expectedItemsByTable.set(tableName, []);
+	}
+
+	for (const rule of ZWBF_DISTRIBUTION_RULES) {
+		for (const tableName of rule.tableNames) {
+			const expectedItems = expectedItemsByTable.get(tableName);
+			if (!expectedItems) {
+				continue;
+			}
+
+			expectedItems.push(rule.itemType, rule.chance);
+		}
+	}
+
+	return expectedItemsByTable;
+};
+
+const createDistributionTable = (tableNames: readonly string[]) => {
+	const list: Record<string, Entry> = {};
+
+	for (const tableName of tableNames) {
+		list[tableName] = { items: [] };
+	}
+
+	return list;
+};
+
+describe("ZWBFDistributions.ts", () => {
+	const expectedEntries = ZWBF_DISTRIBUTION_RULES.reduce((count, rule) => count + rule.tableNames.length, 0);
+
+	beforeEach(() => {
+		delete (globalThis as Record<string, unknown>)[APPLY_FLAG_KEY];
+		delete (globalThis as { ProceduralDistributions?: unknown }).ProceduralDistributions;
+	});
+
+	it("injects item/chance pairs into existing procedural distributions", () => {
+		const tableNames = Array.from(new Set(ZWBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames])));
+		const expectedItemsByTable = getExpectedTableItems(tableNames);
+
+		(globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions = {
+			list: createDistributionTable(tableNames)
+		};
+
+		const appliedEntries = applyZWBFDistributions();
+		expect(appliedEntries).toBe(expectedEntries);
+
+		const list = (globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions.list;
+
+		for (const tableName of tableNames) {
+			expect(list[tableName]?.items).toEqual(expectedItemsByTable.get(tableName));
+		}
+	});
+
+	it("is idempotent once successfully applied", () => {
+		const tableNames = ZWBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames]);
+		(globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions = {
+			list: createDistributionTable(tableNames)
+		};
+
+		const firstApply = applyZWBFDistributions();
+		const secondApply = applyZWBFDistributions();
+
+		expect(firstApply).toBe(expectedEntries);
+		expect(secondApply).toBe(0);
+	});
+
+	it("returns zero when procedural distributions are unavailable", () => {
+		const appliedEntries = applyZWBFDistributions();
+		expect(appliedEntries).toBe(0);
+	});
+});
