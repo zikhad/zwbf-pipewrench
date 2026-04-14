@@ -1,4 +1,4 @@
-import { MilkOptions, PregnancyOptions, WombOptions } from "./SandboxOptions";
+import { LactationOptions, PregnancyOptions, WombOptions } from "./SandboxOptions";
 
 describe("SandboxOptions", () => {
 	afterEach(() => {
@@ -10,8 +10,8 @@ describe("SandboxOptions", () => {
 		expect(PregnancyOptions.recovery).toBe(7);
 		expect(WombOptions.capacity).toBe(1000);
 		expect(WombOptions.recovery).toBe(7);
-		expect(MilkOptions.capacity).toBe(1000);
-		expect(MilkOptions.expiration).toBe(7);
+		expect(LactationOptions.capacity).toBe(1);
+		expect(LactationOptions.expiration).toBe(7);
 	});
 
 	it("reads nested values from SandboxVars.ZWBF", () => {
@@ -29,7 +29,7 @@ describe("SandboxOptions", () => {
 		expect(PregnancyOptions.recovery).toBe(10);
 		expect(WombOptions.capacity).toBe(1750);
 		expect(WombOptions.recovery).toBe(10);
-		expect(MilkOptions.capacity).toBe(2400);
-		expect(MilkOptions.expiration).toBe(12);
+		expect(LactationOptions.capacity).toBe(2.4);
+		expect(LactationOptions.expiration).toBe(12);
 	});
 });

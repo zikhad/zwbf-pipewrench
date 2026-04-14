@@ -11,11 +11,10 @@ const DEFAULT_OPTIONS = {
 	},
 	womb: {
 		capacity: 1000, // ml
-		milkCapacity: 1000 // ml
 	},
 	milk: {
 		expiration: 7, // days
-        capacity: 1 // L
+		capacity: 1 // L
 	}
 };
 
@@ -29,7 +28,8 @@ const getSandboxOption = <T extends number | string>(
 	selector: (options: ZWBFSandboxOptions) => T | undefined,
 	fallback: T
 ): T => {
-	const value = selector(SandboxVars?.ZWBF ?? {});
+	const globals = globalThis as { SandboxVars?: { ZWBF?: ZWBFSandboxOptions } };
+	const value = selector(globals.SandboxVars?.ZWBF ?? {});
 	return value ?? fallback;
 };
 
@@ -93,14 +93,17 @@ export const WombOptions = {
  */
 export const LactationOptions = {
 	/**
-	 * Maximum capacity for milk storage in ml.
-	 * Default: 1000 ml
+	 * Maximum capacity for milk storage in liters.
+	 * SandboxVars stores this value in ml, so it is normalized here.
+	 * Default: 1 L
 	 */
 	get capacity(): number {
-		return getSandboxOption<number>(
+		const capacityInMilliliters = getSandboxOption<number>(
 			options => options.MilkCapacity,
 			DEFAULT_OPTIONS.milk.capacity
 		);
+
+		return capacityInMilliliters / 1000;
 	},
 
 	/**
