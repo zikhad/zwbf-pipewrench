@@ -8,7 +8,7 @@ describe("SandboxOptions", () => {
 	it("falls back to defaults when SandboxVars.ZWBF is unavailable", () => {
 		expect(PregnancyOptions.duration).toBe(14 * 24 * 60);
 		expect(PregnancyOptions.recovery).toBe(7);
-		expect(WombOptions.capacity).toBe(1000);
+		expect(WombOptions.capacity).toBe(1);
 		expect(WombOptions.recovery).toBe(7);
 		expect(LactationOptions.capacity).toBe(1);
 		expect(LactationOptions.expiration).toBe(7);
@@ -19,15 +19,15 @@ describe("SandboxOptions", () => {
 			ZWBF: {
 				PregnancyDuration: 21,
 				PregnancyRecovery: 10,
-				WombMaxCapacity: 1750,
-				MilkCapacity: 2400,
+				WombMaxCapacity: 1.75,
+				MilkCapacity: 2.4,
 				MilkExpiration: 12
 			}
 		};
 
 		expect(PregnancyOptions.duration).toBe(21 * 24 * 60);
 		expect(PregnancyOptions.recovery).toBe(10);
-		expect(WombOptions.capacity).toBe(1750);
+		expect(WombOptions.capacity).toBe(1.75);
 		expect(WombOptions.recovery).toBe(10);
 		expect(LactationOptions.capacity).toBe(2.4);
 		expect(LactationOptions.expiration).toBe(12);

@@ -66,11 +66,8 @@ ZWBFRecipes = {
 		},
 		PushCum: (items, _character) => {
 			const container = items.getInputItems(0).get(0) as InventoryItem; 
-			// Convert from milliliters to liters for the API and call the Fill
-			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount / 1000);
-			// Convert back to milliliters for the womb and remove that amount
-			const amount = Math.floor(filledAmount * 1000);
-			womb.amount -= Math.min(womb.amount, amount);
+			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount);
+			womb.amount -= Math.min(womb.amount, filledAmount);
 		}
 	}
 };

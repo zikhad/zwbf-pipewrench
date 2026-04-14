@@ -270,9 +270,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	private intercourse() {
 		if (!this.player) return;
-		const amount = ZombRand(10, 50);
+		const amountInMilliliters = ZombRand(10, 50);
+		const amount = amountInMilliliters / 1000;
 		this.haloText({
-			text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amount} ml`,
+			text: `${getText("IGUI_ZWBF_UI_Sperm")} ${amountInMilliliters} ml`,
 			style: "good",
 		});
 		if (this.hasItem("ZWBF.Condom")) {
@@ -325,7 +326,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		// do nothing if empty
 		if(this.amount <= 0) return;
 
-		const amount = ZombRand(0, 50);
+		const amount = ZombRand(0, 50) / 1000;
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
 	}

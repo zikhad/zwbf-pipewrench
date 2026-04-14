@@ -10,7 +10,7 @@ const DEFAULT_OPTIONS = {
 		recovery: 7 // days
 	},
 	womb: {
-		capacity: 1000, // ml
+		capacity: 1, // L
 	},
 	milk: {
 		expiration: 7, // days
@@ -66,8 +66,8 @@ export const PregnancyOptions = {
  */
 export const WombOptions = {
 	/**
-	 * Maximum capacity of the womb in ml.
-	 * Default: 1000 ml
+	 * Maximum capacity of the womb in liters.
+	 * Default: 1 L
 	 */
 	get capacity(): number {
 		return getSandboxOption<number>(
@@ -94,16 +94,13 @@ export const WombOptions = {
 export const LactationOptions = {
 	/**
 	 * Maximum capacity for milk storage in liters.
-	 * SandboxVars stores this value in ml, so it is normalized here.
 	 * Default: 1 L
 	 */
 	get capacity(): number {
-		const capacityInMilliliters = getSandboxOption<number>(
+		return getSandboxOption<number>(
 			options => options.MilkCapacity,
 			DEFAULT_OPTIONS.milk.capacity
 		);
-
-		return capacityInMilliliters / 1000;
 	},
 
 	/**

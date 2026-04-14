@@ -17,8 +17,8 @@ jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
 
 const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
-	amount: 200,
-	total: 400,
+	amount: 0.2,
+	total: 0.4,
 	cycleDay: 1,
 	fertility: 0,
 	onContraceptive: true,
@@ -99,8 +99,8 @@ describe("Womb", () => {
 				const womb = new Womb();
 				womb.onCreatePlayer(mockedPlayer());
 
-				expect(womb.amount).toBe(200);
-				expect(womb.total).toBe(400);
+				expect(womb.amount).toBe(0.2);
+				expect(womb.total).toBe(0.4);
 				expect(womb.cycleDay).toBe(1);
 				expect(womb.fertility).toBe(0);
 				expect(womb.contraceptive).toBe(true);
@@ -142,7 +142,7 @@ describe("Womb", () => {
 			});
 			it("Should remove sperm periodically", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-					mockedModData({ amount: 100 })
+					mockedModData({ amount: 0.1 })
 				);
 				jest.spyOn(SpyPipeWrench, "ZombRand")
 					.mockReturnValue(10);
@@ -155,7 +155,7 @@ describe("Womb", () => {
 				(womb as any).onEveryTenMinutes();
 				(womb as any).onEveryMinute();
 
-				expect(womb.amount).toBe(90);
+				expect(womb.amount).toBeCloseTo(0.09);
 			});
 			it("should not apply wetness if there is no sperm left", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
@@ -384,7 +384,7 @@ describe("Womb", () => {
 
 			const womb = new Womb();
 			womb.onCreatePlayer(mockedPlayer());
-			expect(womb.amount).toBe(200);
+			expect(womb.amount).toBe(0.2);
 
 			womb.onPregnancyUpdate({ progress: 0.6 });
 			expect(womb.amount).toBe(0);
@@ -471,8 +471,8 @@ describe("Womb", () => {
 		describe("still images", () => {
 			it.each([
 				{ amount: 0, expected: "womb_normal_0.png" },
-				{ amount: 1, expected: "womb_normal_1.png" },
-				{ amount: 1000, expected: "womb_normal_17.png" }
+				{ amount: 0.01, expected: "womb_normal_1.png" },
+				{ amount: 1, expected: "womb_normal_17.png" }
 			])("should return $expected when amount is $amount", ({ amount, expected }) => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 					mockedModData({ amount })
@@ -486,9 +486,9 @@ describe("Womb", () => {
 
 			it.each([
 				{ progress: 0, amount: 0, expected: "conception/womb_conception_0.png" },
-				{ progress: 0, amount: 1000, expected: "conception/womb_conception_17.png" },
-				{ progress: 0.8, amount: 1000, expected: "pregnant/womb_pregnant_4.png" },
-				{ progress: 0.95, amount: 1000, expected: "pregnant/womb_pregnant_6.png" }
+				{ progress: 0, amount: 1, expected: "conception/womb_conception_17.png" },
+				{ progress: 0.8, amount: 1, expected: "pregnant/womb_pregnant_4.png" },
+				{ progress: 0.95, amount: 1, expected: "pregnant/womb_pregnant_6.png" }
 			])(
 				"should return $expected when pregnant with progress $progress and amount $amount",
 				({ progress, amount, expected }) => {
@@ -647,19 +647,19 @@ describe("Womb", () => {
 		});
 		describe("sperm", () => {
 			it.each<{ method: "add" | "set" | "remove"; expected: number }>([
-				{ method: "add", expected: 10 },
-				{ method: "set", expected: 10 },
+				{ method: "add", expected: 0.01 },
+				{ method: "set", expected: 0.01 },
 				{ method: "remove", expected: 0 }
 			])(
 				"when method $method is called, the expected amount should be $expected",
 				({ method, expected }) => {
-					womb.Debug.sperm[method](10);
-					expect(womb.amount).toBe(expected);
+					womb.Debug.sperm[method](0.01);
+					expect(womb.amount).toBeCloseTo(expected);
 				}
 			);
 			it("when method setTotal is called, the total should be set", () => {
-				womb.Debug.sperm.setTotal(10);
-				expect(womb.total).toBe(10);
+				womb.Debug.sperm.setTotal(0.01);
+				expect(womb.total).toBeCloseTo(0.01);
 			});
 		});
 		describe("cycle", () => {
