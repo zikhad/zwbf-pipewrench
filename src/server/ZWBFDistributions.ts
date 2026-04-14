@@ -14,8 +14,11 @@ type ProceduralDistributionList = Record<string, ProceduralDistributionEntry | u
  * Configuration for injecting a custom item into procedural distribution tables.
  */
 type DistributionRule = {
+	/** The type of the item to inject */
 	readonly itemType: string;
+	/** The spawn chance weight for the item in the distribution table */
 	readonly chance: number;
+	/** The names of the procedural distribution tables to inject the item into */
 	readonly tableNames: readonly string[];
 };
 
@@ -27,29 +30,61 @@ const APPLY_FLAG_KEY: string = "__ZWBFProceduralDistributionsApplied";
 /**
  * Default distribution rules for all ZWBF custom items.
  * Defines which items spawn in which procedural loot tables and at what chance weight.
- * @type {readonly DistributionRule[]}
  */
 const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
 	{
-		itemType: "ZWBF.Condom",
-		chance: 2,
-		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf", "DrugShackDrugs", "DerelictHouseDrugs"]
+		itemType: "ZWBF.Contraceptive",
+		chance: 60,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
 	},
 	{
+		itemType: "ZWBF.Lactaid",
+		chance: 40,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "HospitalRoomCounter", "HospitalRoomShelves"]
+	},
+	{
+		itemType: "ZWBF.Condom",
+		chance: 80,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf", "BedroomDresser", "BedroomDresserClassy", "BedroomDresserRedneck", "BedroomSidetable", "BedroomSidetableClassy", "BedroomSidetableRedneck"]
+	},
+	
+	{
 		itemType: "ZWBF.CondomBox",
-		chance: 0.8,
+		chance: 40,
 		tableNames: ["BathroomCabinet", "BathroomCounter", "DrugShackDrugs", "StoreCounterCleaning"]
 	},
 	{
 		itemType: "ZWBF.VaginalDouche",
-		chance: 0.5,
+		chance: 40,
 		tableNames: ["BathroomCabinet", "BathroomCounter", "HospitalRoomCounter", "HospitalRoomShelves"]
 	},
 	{
 		itemType: "ZWBF.BreastPump",
-		chance: 0.15,
-		tableNames: ["HospitalRoomShelves", "HospitalRoomWardrobe", "WardrobeChild", "GigamartHousewares"]
-	}
+		chance: 40,
+		tableNames: ["HospitalRoomShelves", "HospitalRoomWardrobe", "WardrobeChild", "GigamartHousewares", "BedroomDresserChild"]
+	},
+	/** Trashbins */
+	{
+		itemType: "ZWBF.CondomUsed",
+		chance: 80,
+		tableNames: ["BinBar", "BinBathroom", "BinCrepe", "BinDumpster", "BinFireStation", "BinGeneric", "BinHospital", "BinJays", "BinSpiffos", "SafehouseBin", "SafehouseBin_Mid", "SafehouseBin_Late"]
+	},
+	/** Drug Shack & Derelict House distributions */
+	{
+		itemType: "ZWBF.Contraceptive",
+		chance: 30,
+		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
+	},
+	{
+		itemType: "ZWBF.Lactaid",
+		chance: 20,
+		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
+	},
+	{
+		itemType: "ZWBF.Condom",
+		chance: 50,
+		tableNames: ["DrugShackDrugs", "DerelictHouseDrugs"]
+	},
 ];
 
 /**
@@ -58,16 +93,16 @@ const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
  */
 class ProceduralDistributionRepository {
 	/**
-	 * @param {ProceduralDistributionList} list - The procedural distribution list from the game engine
+	 * @param list - The procedural distribution list from the game engine
 	 */
-	public constructor(private readonly list: ProceduralDistributionList) {}
+	public constructor(private readonly list: ProceduralDistributionList) { }
 
 	/**
 	 * Appends an item and its spawn chance to a procedural distribution table.
-	 * @param {string} tableName - Name of the distribution table (e.g., "BathroomCabinet")
-	 * @param {string} itemType - Full item type ID (e.g., "ZWBF.Condom")
-	 * @param {number} chance - Spawn chance weight
-	 * @returns {boolean} True if the item was appended; false if the table does not exist
+	 * @param tableName - Name of the distribution table (e.g., "BathroomCabinet")
+	 * @param itemType - Full item type ID (e.g., "ZWBF.Condom")
+	 * @param chance - Spawn chance weight
+	 * @returns True if the item was appended; false if the table does not exist
 	 */
 	public appendItem(tableName: string, itemType: string, chance: number): boolean {
 		const distribution = this.list[tableName];
@@ -86,17 +121,17 @@ class ProceduralDistributionRepository {
  */
 class ZWBFDistributionRegistrer {
 	/**
-	 * @param {ProceduralDistributionRepository} repository - Repository for table mutation
-	 * @param {readonly DistributionRule[]} rules - Distribution rules to apply
+	 * @param repository - Repository for table mutation
+	 * @param rules - Distribution rules to apply
 	 */
 	public constructor(
 		private readonly repository: ProceduralDistributionRepository,
 		private readonly rules: readonly DistributionRule[]
-	) {}
+	) { }
 
 	/**
 	 * Applies all distribution rules to their target procedural tables.
-	 * @returns {number} Number of successful table injections
+	 * @returns Number of successful table injections
 	 */
 	public apply(): number {
 		let appliedEntries = 0;
@@ -115,7 +150,7 @@ class ZWBFDistributionRegistrer {
 
 /**
  * Safely retrieves the procedural distribution list from the global game engine.
- * @returns {ProceduralDistributionList | undefined} The distribution list, or undefined if unavailable
+ * @returns The distribution list, or undefined if unavailable
  */
 const getProceduralDistributionList = (): ProceduralDistributionList | undefined => {
 	return (globalThis as { ProceduralDistributions?: { list?: ProceduralDistributionList } }).ProceduralDistributions?.list;
@@ -126,7 +161,7 @@ const getProceduralDistributionList = (): ProceduralDistributionList | undefined
  * This function is idempotent—it can be called multiple times without duplicating items.
  * It is automatically invoked on module load.
  *
- * @returns {number} Number of successful injections, or 0 if already applied or unavailable
+ * @returns Number of successful injections, or 0 if already applied or unavailable
  */
 const applyZWBFDistributions = (): number => {
 	const globals = globalThis as Record<string, unknown>;
