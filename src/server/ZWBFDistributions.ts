@@ -32,6 +32,35 @@ const APPLY_FLAG_KEY: string = "__ZWBFProceduralDistributionsApplied";
  * Defines which items spawn in which procedural loot tables and at what chance weight.
  */
 const ZWBF_DISTRIBUTION_RULES: readonly DistributionRule[] = [
+	/** Bathroom distributions */
+	{
+		itemType: "ZWBF.Contraceptive",
+		chance: 60,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+	},
+	{
+		itemType: "ZWBF.Lactaid",
+		chance: 40,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+	},
+	{
+		itemType: "ZWBF.Condom",
+		chance: 80,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+	},
+	{
+		itemType: "ZWBF.CondomBox",
+		chance: 60,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+	},
+	{
+		itemType: "ZWBF.VaginalDouche",
+		chance: 30,
+		tableNames: ["BathroomCabinet", "BathroomCounter", "BathroomShelf"]
+	},
+	/** Bedroom distributions */
+	/** Hospital distributions */
+	/** Store distributions */
 	{
 		itemType: "ZWBF.Contraceptive",
 		chance: 60,
