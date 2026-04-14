@@ -41,30 +41,30 @@ ZWBFRecipes = {
 		}
 	},
 	OnCreate: {
-		TakeContraceptive: (_items, _character) => {
+		TakeContraceptive: () => {
 			womb.contraceptive = true;
 		},
-		TakeLactaid: (_items, _character) => {
+		TakeLactaid: () => {
 			lactation.toggle(true);
 			const multiplier = lactation.multiplier + ZombRandFloat(0, 0.3);
 			lactation.useMilk(0, multiplier);
 		},
-		HandExpress: (items, _character) => {
+		HandExpress: (items) => {
 			const container = items.getInputItems(0).get(0) as InventoryItem;
 			const amount = new FluidContainerApi(container).fill(Fluids.HUMAN_MILK, lactation.bottleAmount);
 			lactation.useMilk(amount * 2, ZombRandFloat(0.05, 0.1)); // Waste half of the milk when hand expressing
 		},
-		BreastPump: (items, _character) => {
+		BreastPump: (items) => {
 			const container = items.getInputItems(1).get(0) as InventoryItem;
 			const amount = new FluidContainerApi(container).fill(Fluids.HUMAN_MILK, lactation.bottleAmount);
 			lactation.useMilk(amount, ZombRandFloat(0.1, 0.2));
 		},
-		ClearSperm: (items, _character) => {
+		ClearSperm: (items) => {
 			const container = items.getInputItems(0).get(0) as InventoryItem;
 			new FluidContainerApi(container).clear();
 			womb.amount = 0;
 		},
-		PushCum: (items, _character) => {
+		PushCum: (items) => {
 			const container = items.getInputItems(0).get(0) as InventoryItem; 
 			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount);
 			womb.amount -= Math.min(womb.amount, filledAmount);
