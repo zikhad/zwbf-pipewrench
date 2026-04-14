@@ -1,6 +1,9 @@
-module Base
+module ZWBF
 {
-    timedAction Yonchi_breastpump
+    import {
+        Base
+    }
+    timedAction PumpMilk
     {
         metabolics  = SedentaryActivity,
         actionAnim  = Yonchi_breastpump,

@@ -26,11 +26,9 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		}
 	};
 
-	private get options(): Record<string, number> {
-		return {
-			expiration: LactationOptions.expiration,
-			capacity: LactationOptions.capacity
-		}
+	private readonly options = {
+		expiration: LactationOptions.expiration,
+		capacity: LactationOptions.capacity
 	}
 
 	/**

@@ -37,22 +37,22 @@ describe("ZWBFDistributions.ts", () => {
 	const expectedEntries = ZWBF_DISTRIBUTION_RULES.reduce((count, rule) => count + rule.tableNames.length, 0);
 
 	beforeEach(() => {
-		delete (globalThis as Record<string, unknown>)[APPLY_FLAG_KEY];
-		delete (globalThis as { ProceduralDistributions?: unknown }).ProceduralDistributions;
+		delete (globalThis as any)[APPLY_FLAG_KEY];
+		delete (globalThis as any).ProceduralDistributions;
 	});
 
 	it("injects item/chance pairs into existing procedural distributions", () => {
 		const tableNames = Array.from(new Set(ZWBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames])));
 		const expectedItemsByTable = getExpectedTableItems(tableNames);
 
-		(globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions = {
+		(globalThis as any).ProceduralDistributions = {
 			list: createDistributionTable(tableNames)
 		};
 
 		const appliedEntries = applyZWBFDistributions();
 		expect(appliedEntries).toBe(expectedEntries);
 
-		const list = (globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions.list;
+		const list = (globalThis as any).ProceduralDistributions.list;
 
 		for (const tableName of tableNames) {
 			expect(list[tableName]?.items).toEqual(expectedItemsByTable.get(tableName));
@@ -61,7 +61,7 @@ describe("ZWBFDistributions.ts", () => {
 
 	it("is idempotent once successfully applied", () => {
 		const tableNames = ZWBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames]);
-		(globalThis as { ProceduralDistributions: { list: Record<string, Entry> } }).ProceduralDistributions = {
+		(globalThis as any).ProceduralDistributions = {
 			list: createDistributionTable(tableNames)
 		};
 

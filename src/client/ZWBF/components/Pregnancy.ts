@@ -9,11 +9,9 @@ import { Moodle } from "./Moodles";
 import { PregnancyOptions } from "../SandboxOptions";
 
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
-	private get options() {
-		return {
-			duration: PregnancyOptions.duration
-		};
-	}
+	private readonly options = {
+		duration: PregnancyOptions.duration
+	};
 
 	private readonly BABY_LIST = [
 		"Baby_01_b",

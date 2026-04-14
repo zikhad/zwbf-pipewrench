@@ -144,7 +144,7 @@ describe("DebugMenu", () => {
 			it.each([
 				{
 					title: "Add_Sperm",
-					expected: () => expect(womb.Debug.sperm.add).toHaveBeenCalledWith(100)
+					expected: () => expect(womb.Debug.sperm.add).toHaveBeenCalledWith(0.1)
 				},
 				{
 					title: "Remove_Sperm",

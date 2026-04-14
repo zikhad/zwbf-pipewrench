@@ -32,12 +32,10 @@ type AnimationSettings = Record<
  */
 export class Womb extends Player<WombData> implements TimedEvents {
 
-	private get options() {
-		return {
-			recovery: WombOptions.recovery,
-			capacity: WombOptions.capacity
-		};
-	}
+	private readonly options = {
+		recovery: WombOptions.recovery,
+		capacity: WombOptions.capacity
+	};
 
 	private _animation: AnimationStatus;
 	
@@ -280,9 +278,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			const inventory = this.player.getInventory();
 			inventory.Remove("Condom");
 			inventory.AddItem("ZWBF.CondomUsed");
-			/* const usedCondom = inventory.getItemFromType("ZWBF.CondomUsed");
-			print("[ZWBF] Used condom container: ", tostring(usedCondom));
-			new FluidContainerApi(usedCondom).fill(Fluids.SEMEN, amount / 1000);*/
 		} else {
 			this.amount += amount;
 			this.total += amount;
@@ -318,7 +313,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
-		print("[ZWBF] Minute update - checking fertility - fertility: ", this.fertility);
 		if(this.data) this.data.amount = this.amount;
 	}
 

@@ -6,14 +6,14 @@
 
 const DEFAULT_OPTIONS = {
 	pregnancy: {
-		duration: 14 * 24 * 60, // 14 days in minutes
+		duration: 14, // 14 days in minutes
 		recovery: 7 // days
 	},
 	womb: {
 		capacity: 1 // L
 	},
 	milk: {
-		expiration: 7, // days
+		expiration: 7, // 7 days in hours
 		capacity: 1 // L
 	}
 };
@@ -49,9 +49,9 @@ class PregnancyOptionsClass extends SandboxOptions {
 	get duration(): number {
 		const days = this.getOption<number>(
 			options => options.PregnancyDuration,
-			DEFAULT_OPTIONS.pregnancy.duration / (24 * 60)
+			DEFAULT_OPTIONS.pregnancy.duration
 		);
-		return days * 24 * 60;
+		return days * 24 * 60 // Convert days to minutes;
 	}
 
 	/**
@@ -113,10 +113,11 @@ class LactationOptionsClass extends SandboxOptions {
 	 * Default: 7 days
 	 */
 	get expiration(): number {
-		return this.getOption<number>(
+		const days = this.getOption<number>(
 			options => options.MilkExpiration,
 			DEFAULT_OPTIONS.milk.expiration
 		);
+		return days * 24; // Convert days to hours
 	}
 }
 

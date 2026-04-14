@@ -2,13 +2,12 @@ module ZWBFRecipes
 {
     import
     {
-        Base,
-        ZWBF
+        Base
     }
 
     /************************ Pills ************************/
     craftRecipe TakeContraceptive {
-        timedAction = TakePills,
+        timedAction = ZWBF.TakePills,
         category = Health,
         time = 20,
         Tags = InHandCraft,
@@ -24,7 +23,7 @@ module ZWBFRecipes
     }
 
     craftRecipe TakeLactaid {
-        timedAction = TakePills,
+        timedAction = ZWBF.TakePills,
         category = Health,
         time = 20,
         Tags = InHandCraft,
@@ -111,7 +110,7 @@ module ZWBFRecipes
     /************************ Milk ************************/
     craftRecipe HandExpression
     {
-        timedAction = Yonchi_breastpump,
+        timedAction = ZWBF.PumpMilk,
         category = Cooking,
         time = 800,
         xpAward = Cooking:3,
@@ -120,7 +119,7 @@ module ZWBFRecipes
         OnCreate = ZWBFRecipes.OnCreate.HandExpress,
         inputs
         {
-            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop1;NotFull;ItemCount],
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
         }
         outputs
         {
@@ -129,7 +128,7 @@ module ZWBFRecipes
 
     craftRecipe PumpMilk
     {
-        timedAction = Yonchi_breastpump,
+        timedAction = ZWBF.PumpMilk,
         category = Cooking,
         time = 500,
         xpAward = Cooking:3,

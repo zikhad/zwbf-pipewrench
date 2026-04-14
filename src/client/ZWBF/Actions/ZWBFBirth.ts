@@ -37,7 +37,6 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 	perform() {
 		super.perform();
 		this.pregnancy.birth();
-		print("[ZWBF] Birth performed");
 		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
 			isActive: false
 		} as AnimationStatus);
