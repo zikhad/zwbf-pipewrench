@@ -55,8 +55,13 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		},
 		cycle: {
 			addDay: (amount = 1) => {
-				this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29);
 				this.contraceptive = false;
+				// handle recovery days
+				if (this.cycleDay < 0) {
+					this.cycleDay++;
+				} else {
+					this.cycleDay = Math.max(1, (this.cycleDay + amount) % 29);
+				}
 			},
 			nextPhase: () => {
 				if (this.pregnancy) return;

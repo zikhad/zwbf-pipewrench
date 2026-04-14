@@ -1,5 +1,5 @@
 import type { PregnancyData } from "@types";
-import { getActivatedMods, IsoPlayer, ZombRand } from "@asledgehammer/pipewrench";
+import { getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
@@ -124,6 +124,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
 		this.moodle?.moodle(this.pregnancy.progress);
+		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 
 	onEveryHour(): void {
