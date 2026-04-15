@@ -1,6 +1,6 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
 import { Pregnancy } from "@client/components/Pregnancy";
-import { ZWBFEventsEnum } from "@constants";
+import { ZWBFAnimations, ZWBFEventsEnum } from "@constants";
 import { AnimationStatus } from "@types";
 
 export class ZWBFActionBirth extends ISBaseTimedAction {
@@ -21,7 +21,7 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 
 	start() {
 		super.start();
-		this.setActionAnim("blabla_Birthing", null);
+		this.setActionAnim(ZWBFAnimations.BIRTH, null);
 	}
 
 	update() {

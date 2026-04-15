@@ -2,7 +2,7 @@
 <animNode>
 	<m_Name>Yonchi_breastpump</m_Name>
 	<m_AnimName>Yonchi_breastpump</m_AnimName>
-	<m_Looped>false</m_Looped>
+	<m_Looped>true</m_Looped>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
 	<m_SpeedScale>0.5</m_SpeedScale>
@@ -10,7 +10,7 @@
 	<m_Conditions>
 		<m_Name>PerformingAction</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_Value>Yonchi_breastpump</m_Value>
+		<m_Value>ZWBF.PumpMilk</m_Value>
 	</m_Conditions>
 	<m_SubStateBoneWeights>
 		<boneName>Dummy01</boneName>
