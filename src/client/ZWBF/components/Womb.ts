@@ -325,7 +325,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		// do nothing if empty
 		if(this.amount <= 0) return;
 
-		const amount = ZombRand(0, 50) / 1000;
+		const amount = ZombRand(0, 5) / 1000;
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
 	}
