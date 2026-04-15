@@ -38,4 +38,11 @@ export enum MODS {
 	ZOMBOWIN = "ZomboWin",
 	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
 	MOODLE_FRAMEWORK = "MoodleFramework"
-}
+};
+
+export enum ZWBFAnimations {
+	TAKE_PILLS = "ZWBF.TakePills",
+	BIRTH = "ZWBF.Birth",
+	PUMP_MILK = "ZWBF.PumpMilk",
+	CLEAN_SELF = "ZWBF.CleanSelf"
+};

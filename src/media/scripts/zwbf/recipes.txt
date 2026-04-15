@@ -41,7 +41,7 @@ module ZWBFRecipes
     /************************ Vaginal Douche ************************/
     craftRecipe ClearSperm
     {
-        timedAction = Making,
+        timedAction = ZWBF.CleanSelf,
         category = Health,
         time = 200,
         Tags = InHandCraft,
@@ -92,7 +92,7 @@ module ZWBFRecipes
 
     craftRecipe PushCum
     {
-        timedAction = Making, /* TODO: Change to a custom animation */
+        timedAction = ZWBF.CleanSelf,
         category = Health,
         time = 200,
         Tags = InHandCraft;CanBeDoneInDark,

@@ -3,16 +3,32 @@ module ZWBF
     import {
         Base
     }
-    timedAction PumpMilk
-    {
-        metabolics  = SedentaryActivity,
-        actionAnim  = Yonchi_breastpump,
-    }
-    
+
     timedAction TakePills
     {
         metabolics = SedentaryActivity,
         actionAnim = TakePills,
         prop1 = Base.Pills,
+    }
+
+    timedAction PumpMilk
+    {
+        metabolics  = SedentaryActivity,
+        actionAnim  = Yonchi_breastpump,
+    }
+
+    timedAction CleanSelf
+    {
+        metabolics  = SedentaryActivity,
+        actionAnim  = blabla_standing_cleans_herself,
+    }
+
+    timedAction Birth
+    {
+        metabolics = HeavyWork,
+        actionAnim = blabla_Birthing,
+        muscleStrainFactor = 1,
+        muscleStrainSkill = Strength,
+        muscleStrainParts = Groin,
     }
 }
