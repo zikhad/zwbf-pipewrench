@@ -16,7 +16,6 @@ ZWBFRecipes = {
 		},
 		TakeLactaid: (_item, character) => {
 			if (!character.isFemale()) return false;
-			if (lactation.isLactating) return false;
 			return true;
 		},
 		HandExpress: (item, character) => {

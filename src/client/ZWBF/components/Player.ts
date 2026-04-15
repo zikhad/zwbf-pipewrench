@@ -92,9 +92,54 @@ export abstract class Player<T> {
 	 * Given a `BodyPartType` return the `BodyPart` to apply numerous effects
 	 * @param part The `BodyPartType` to return
 	 */
-	public getBodyPart(part: BodyPartType): BodyPart | null {
+	private getBodyPart(part: BodyPartType): BodyPart | null {
 		if (!this.player) return null;
 		return this.player.getBodyDamage().getBodyPart(part);
+	}
+
+	/**
+	 * Applies pain and/or bleeding to a specific body part.
+	 * @param part - The body part to affect.
+	 * @param options - Configuration for pain and/or bleeding.
+	 * @param options.pain - Amount of pain to add.
+	 * @param options.bleedTime - Amount of bleed time to add.
+	 * @param options.maxPain - Maximum pain level.
+	 */
+	protected applyBodyEffect(
+		part: BodyPartType,
+		{
+			pain = 0,
+			maxPain,
+			bleedTime = 0,
+			wetness = 0
+		} : Partial<{
+			pain: number;
+			maxPain: number;
+			bleedTime: number;
+			wetness: number;
+		}> = {}
+	): void {
+		const bodyPart = this.getBodyPart(part);
+		if (!bodyPart) return;
+
+		if (pain > 0) {
+			const currentPain = bodyPart.getAdditionalPain();
+			const painToApply = currentPain + pain
+			bodyPart.setAdditionalPain(
+				maxPain ? Math.min(painToApply, maxPain) : painToApply
+			);
+		}
+
+		if (bleedTime > 0) {
+			const currentBleed = bodyPart.getBleedingTime();
+			
+			bodyPart.setBleedingTime(currentBleed + bleedTime);
+		}
+
+		if (wetness > 0) {
+			const currentWetness = bodyPart.getWetness();
+			bodyPart.setWetness(currentWetness + wetness);
+		}
 	}
 
 	/**

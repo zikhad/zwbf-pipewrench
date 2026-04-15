@@ -2,7 +2,6 @@ import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/
 import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
 import { percentageToNumber } from "@utils";
-import { LuaEventManager } from "@asledgehammer/pipewrench";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { LactationOptions } from "@client/SandboxOptions";
 import { Player, TimedEvents } from "./Player";
@@ -44,7 +43,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	defaultData = {
 		isActive: false,
 		milkAmount: 0,
-		expiration: LactationOptions.expiration,
+		expiration: this.options.expiration,
 		multiplier: 0
 	};
 
@@ -65,40 +64,33 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
-
-		LuaEventManager.AddEvent(ZWBFEventsEnum.LACTATION_UPDATE);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
+		if (!this.pregnancy) return;
 
-		const progress = this.pregnancy?.progress ?? 0;
+		const { progress } = this.pregnancy;
 		if (progress < 0.5) return;
 		this.toggle(true);
 		this.useMilk(0, progress);
 	}
 
 	onEveryMinute() {
+		print(`[ZWBF] Lactation update - expiration: ${this.expiration}, milkAmount: ${this.milkAmount}, multiplier: ${this.multiplier}`);
 		triggerEvent(ZWBFEventsEnum.LACTATION_UPDATE, this.data);
 	}
 
 	onEveryTenMinutes() {
 		if (!this.isLactating) return;
-		const torso = this.getBodyPart(BodyPartType.Torso_Upper)!;
 
 		const modifier = percentageToNumber(this.percentage, 25);
-
-		// Apply engorgement pain
-		const currentPain = torso.getAdditionalPain();
-		if (currentPain < 15) {
-			torso.setAdditionalPain(Math.min(15, currentPain + modifier));
-		}
-
-		// Apply wetness
-		const currentWetness = torso.getWetness();
-		if (currentWetness < 25) {
-			torso.setWetness(Math.min(25, currentWetness + modifier));
-		}
+		
+		this.applyBodyEffect(BodyPartType.Torso_Upper, {
+			pain: modifier,
+			maxPain: 15,
+			wetness: modifier
+		});
 
 		// Apply moodle
 		this.moodle?.moodle(this.percentage);
@@ -121,11 +113,12 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	 * Toggles lactation on or off and resets data if needed
 	 */
 	public toggle(status: boolean) {
-		this.data!.isActive = status;
+		this.isLactating = status;
+		this.expiration = this.options.expiration;
 		if (!status) {
 			this.data = {
 				isActive: false,
-				expiration: 0,
+				expiration: this.options.expiration,
 				milkAmount: 0,
 				multiplier: 0
 			};
@@ -138,12 +131,12 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	 * @param multiplier - additional production multiplier
 	 * @param expiration - override expiration value
 	 */
-	public useMilk(amount: number, multiplier?: number, expiration?: number) {
+	public useMilk(amount: number, multiplier?: number) {
 		if (!this.data) return;
 
 		amount = Math.min(amount, this.milkAmount);
 		this.multiplier = Math.max(0, multiplier || 0);
-		this.expiration = 24 * (expiration || this.expiration);
+		this.expiration = this.options.expiration;
 
 		if (this.hasZWBFTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.multiplier *= 1.25;
@@ -185,6 +178,9 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		return (this.milkAmount / this.capacity) * 100;
 	}
 
+	set isLactating(value: boolean) {
+		this.data!.isActive = value;
+	}
 	/** Is the player currently lactating? */
 	get isLactating() {
 		return this.data?.isActive ?? false;
@@ -218,6 +214,9 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	/** Time until spoilage in hours */
 	private set expiration(value: number) {
+		if (this.hasZWBFTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+			this.data!.expiration = value * 1.25;
+		}
 		this.data!.expiration = value;
 	}
 	private get expiration() {

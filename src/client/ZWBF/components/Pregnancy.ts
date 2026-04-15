@@ -1,5 +1,5 @@
 import type { PregnancyData } from "@types";
-import { getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
@@ -113,6 +113,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private onLabor(delta: number) {
 		// TODO: implement pain and fatigue increase
 		print(`[ZWBF] - In labor for ${delta}`);
+		this.applyBodyEffect(BodyPartType.Groin, { pain: 10, maxPain: 75 });
 	}
 
 	onEveryMinute(): void {
