@@ -25,6 +25,7 @@ export enum ZWBFEventsEnum {
 	ANIMATION_UPDATE = "ZWBFAnimationUpdate",
 	INTERCOURSE = "ZWBFIntercourse",
 	PREGNANCY_START = "ZWBFPregnancyStart",
+	PREGNANCY_LABOR = "ZWBFPregnancyLabor",
 	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour"
 }
 

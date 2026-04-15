@@ -77,7 +77,10 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
 
-		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START).addListener(() => this.start());
+		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START)
+			.addListener(() => this.start());
+		new Events.EventEmitter<(delta: number) => void>(ZWBFEventsEnum.PREGNANCY_LABOR)
+			.addListener((delta) => this.onLabor(delta));
 	}
 
 	/**
@@ -105,6 +108,11 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private stop() {
 		this.removeZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
+	}
+
+	private onLabor(delta: number) {
+		// TODO: implement pain and fatigue increase
+		print(`[ZWBF] - In labor for ${delta}`);
 	}
 
 	onEveryMinute(): void {
@@ -162,7 +170,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (!this.player) return;
 		if (getActivatedMods().contains(MODS.BABIES)) {
 			const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
-			this.player.getInventory().AddItem(`Babies.${baby}`);	
+			this.player.getInventory().AddItem(`Babies.${baby}`);
 		} else {
 			// TODO: What happens if Babies the mod is deactivated?
 			print("[ZWBF] - Babies mod is not activated, cannot give birth.");
