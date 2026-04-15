@@ -94,7 +94,7 @@ module ZWBFRecipes
     {
         timedAction = ZWBF.CleanSelf,
         category = Health,
-        time = 200,
+        time = 100,
         Tags = InHandCraft;CanBeDoneInDark,
         OnTest = ZWBFRecipes.OnTest.PushCum,
         OnCreate = ZWBFRecipes.OnCreate.PushCum,
@@ -112,7 +112,7 @@ module ZWBFRecipes
     {
         timedAction = ZWBF.PumpMilk,
         category = Cooking,
-        time = 800,
+        time = 600,
         xpAward = Cooking:3,
         Tags = InHandCraft;Cooking,
         OnTest = ZWBFRecipes.OnTest.HandExpress,
@@ -130,7 +130,7 @@ module ZWBFRecipes
     {
         timedAction = ZWBF.PumpMilk,
         category = Cooking,
-        time = 500,
+        time = 400,
         xpAward = Cooking:3,
         Tags = InHandCraft;Cooking,
         OnTest = ZWBFRecipes.OnTest.BreastPump,

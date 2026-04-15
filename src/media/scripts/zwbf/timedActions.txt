@@ -14,19 +14,19 @@ module ZWBF
     timedAction PumpMilk
     {
         metabolics  = SedentaryActivity,
-        actionAnim  = Yonchi_breastpump,
+        actionAnim  = ZWBF.PumpMilk,
     }
 
     timedAction CleanSelf
     {
         metabolics  = SedentaryActivity,
-        actionAnim  = blabla_standing_cleans_herself,
+        actionAnim  = ZWBF.CleanSelf,
     }
 
     timedAction Birth
     {
         metabolics = HeavyWork,
-        actionAnim = blabla_Birthing,
+        actionAnim = ZWBF.Birth,
         muscleStrainFactor = 1,
         muscleStrainSkill = Strength,
         muscleStrainParts = Groin,
