@@ -141,6 +141,9 @@ Contributions are welcome! Please:
 - [x] Create Sperm fluid
 - [x] Make distribuitions work
 - [x] Fix HaloTextHelper from Moodles.ts
-- [ ] Add fatigue and pain at birth
+- [x] Revamp body effects methods
+- [x] Add pain at birth
+- [x] Add fatigue and at birth
+- [ ] Create triggers event for animations
 - [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
 - [ ] Reintroduce Babies or similar artifacts
