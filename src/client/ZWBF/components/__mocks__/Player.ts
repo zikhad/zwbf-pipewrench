@@ -20,11 +20,11 @@ export class Player<T = unknown> {
 	}
 	onPregnancyUpdate() { }
 
-	hasZWBFTrait(trait: ZWBFTraitsEnum) {
-		return Player.hasZWBFTrait(this.player, trait);
+	hasTrait(trait: ZWBFTraitsEnum) {
+		return Player.hasTrait(this.player, trait);
 	}
 
-	addZWBFTrait(trait: ZWBFTraitsEnum) {
+	addTrait(trait: ZWBFTraitsEnum) {
 		const player = this.player;
 		if (!player) return;
 
@@ -47,7 +47,7 @@ export class Player<T = unknown> {
 		}
 	}
 
-	static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum) {
+	static hasTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum) {
 		if (!player) return false;
 		return player.HasTrait(trait);
 	}
@@ -64,6 +64,11 @@ export class Player<T = unknown> {
 	}> = {}) {
 		return null as never;
 	}
+	applyStatEffect({ stat, value, maxValue }:{
+		stat: keyof typeof CharacterStat;
+		value: number;
+		maxValue?: number;
+	}) { }
 
 	hasItem(arg: never): boolean {
 		return null as never;

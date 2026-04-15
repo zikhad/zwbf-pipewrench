@@ -145,7 +145,7 @@ export class ZWBFUI {
 		this.UI.addText(this.UIElements.womb.cycle.phase.value, "", undefined, "Center");
 		this.UI.nextLine();
 
-		if (!Player.hasZWBFTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
+		if (!Player.hasTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
 			this.UI.addText(
 				this.UIElements.womb.fertility.title,
 				this.label("IGUI_ZWBF_UI_Fertility"),
@@ -227,7 +227,7 @@ export class ZWBFUI {
 		this.UI[this.UIElements.womb.image].setPath(image);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
 
-		if (!Player.hasZWBFTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
+		if (!Player.hasTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
 			const title = getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
 			const progress = pregnancy ? pregnancy.progress : fertility;
 

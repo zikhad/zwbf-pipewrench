@@ -55,11 +55,11 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 		this.onPregnancyUpdate(data);
 	}
 	// Expose protected methods for testing
-	public testHasZWBFTrait(trait: ZWBFTraitsEnum): boolean {
-		return this.hasZWBFTrait(trait);
+	public testHasTrait(trait: ZWBFTraitsEnum): boolean {
+		return this.hasTrait(trait);
 	}
-	public testAddZWBFTrait(trait: ZWBFTraitsEnum): void {
-		this.addZWBFTrait(trait);
+	public testAddTrait(trait: ZWBFTraitsEnum): void {
+		this.addTrait(trait);
 	}
 	public testRemoveZWBFTrait(trait: ZWBFTraitsEnum): void {
 		this.removeZWBFTrait(trait);
@@ -189,10 +189,10 @@ describe("Player class", () => {
 	});
 
 	describe("trait methods", () => {
-		describe("hasZWBFTrait", () => {
+		describe("hasTrait", () => {
 			it("should return false when player is not set", () => {
 				const instance = new ConcretePlayer();
-				const result = instance.testHasZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				const result = instance.testHasTrait(ZWBFTraitsEnum.FERTILE);
 				expect(result).toBe(false);
 				expect(CharacterTraitApi.hasTrait).not.toHaveBeenCalled();
 			});
@@ -202,17 +202,17 @@ describe("Player class", () => {
 				instance.triggerOnCreatePlayer(mockPlayer);
 				(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(true);
 
-				const result = instance.testHasZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				const result = instance.testHasTrait(ZWBFTraitsEnum.FERTILE);
 
 				expect(result).toBe(true);
 				expect(CharacterTraitApi.hasTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
 			});
 		});
 
-		describe("addZWBFTrait", () => {
+		describe("addTrait", () => {
 			it("should do nothing when player is not set", () => {
 				const instance = new ConcretePlayer();
-				instance.testAddZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testAddTrait(ZWBFTraitsEnum.FERTILE);
 				expect(CharacterTraitApi.addTrait).not.toHaveBeenCalled();
 			});
 
@@ -220,7 +220,7 @@ describe("Player class", () => {
 				const instance = new ConcretePlayer();
 				instance.triggerOnCreatePlayer(mockPlayer);
 
-				instance.testAddZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testAddTrait(ZWBFTraitsEnum.FERTILE);
 
 				expect(CharacterTraitApi.addTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
 			});
@@ -243,9 +243,9 @@ describe("Player class", () => {
 			});
 		});
 
-		describe("static hasZWBFTrait", () => {
+		describe("static hasTrait", () => {
 			it("should return false when player is undefined", () => {
-				const result = ConcretePlayer.hasZWBFTrait(undefined, ZWBFTraitsEnum.FERTILE);
+				const result = ConcretePlayer.hasTrait(undefined, ZWBFTraitsEnum.FERTILE);
 				expect(result).toBe(false);
 				expect(CharacterTraitApi.hasTrait).not.toHaveBeenCalled();
 			});
@@ -253,7 +253,7 @@ describe("Player class", () => {
 			it("should delegate to CharacterTraitApi when player is provided", () => {
 				(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(true);
 
-				const result = ConcretePlayer.hasZWBFTrait(mockPlayer, ZWBFTraitsEnum.FERTILE);
+				const result = ConcretePlayer.hasTrait(mockPlayer, ZWBFTraitsEnum.FERTILE);
 
 				expect(result).toBe(true);
 				expect(CharacterTraitApi.hasTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);

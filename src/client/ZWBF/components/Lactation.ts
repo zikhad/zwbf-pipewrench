@@ -77,7 +77,6 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	}
 
 	onEveryMinute() {
-		print(`[ZWBF] Lactation update - expiration: ${this.expiration}, milkAmount: ${this.milkAmount}, multiplier: ${this.multiplier}`);
 		triggerEvent(ZWBFEventsEnum.LACTATION_UPDATE, this.data);
 	}
 
@@ -88,7 +87,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		
 		this.applyBodyEffect(BodyPartType.Torso_Upper, {
 			pain: modifier,
-			maxPain: 15,
+			maxPain: 10,
 			wetness: modifier
 		});
 
@@ -138,7 +137,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		this.multiplier = Math.max(0, multiplier || 0);
 		this.expiration = this.options.expiration;
 
-		if (this.hasZWBFTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+		if (this.hasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.multiplier *= 1.25;
 			this.expiration *= 1.25;
 		}
@@ -214,7 +213,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	/** Time until spoilage in hours */
 	private set expiration(value: number) {
-		if (this.hasZWBFTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+		if (this.hasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.data!.expiration = value * 1.25;
 		}
 		this.data!.expiration = value;

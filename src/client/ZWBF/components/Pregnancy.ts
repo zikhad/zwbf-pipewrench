@@ -98,7 +98,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	 * start Pregnancy (add Player trait)
 	 */
 	private start() {
-		this.addZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
+		this.addTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
 	}
 
@@ -111,9 +111,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	}
 
 	private onLabor(delta: number) {
-		// TODO: implement pain and fatigue increase
-		print(`[ZWBF] - In labor for ${delta}`);
-		this.applyBodyEffect(BodyPartType.Groin, { pain: 10, maxPain: 75 });
+		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
 
 	onEveryMinute(): void {
@@ -178,6 +176,11 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		}
 		this.player.setBlockMovement(false);
 		this.weightDebuff = 0;
+		this.applyStatEffect({
+			stat: "FATIGUE",
+			value: 0.75,
+			maxValue: 0.75
+		});
 		this.stop();
 	}
 }
