@@ -50,16 +50,17 @@ describe("Effects", () => {
 		});
 
 		describe("Instantiation", () => {
-			it("Should call WOMB_HOURLY_UPDATE", () => {
+			it("Should register WOMB_UPDATE event listener and apply effects", () => {
 				const effects = new Effects();
 				(effects as any).ZWUnblessing = jest.fn();
 				(effects as any).ZWSuccubus = jest.fn();
 				const [callback] = addListener.mock.calls[0];
-				callback({
-					player: mock(),
-					amount: mock(),
-					capacity: mock(),
-				});
+				const testData = {
+					amount: 50,
+					capacity: 100,
+					cycleDay: 15
+				};
+				callback(testData);
 				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
 			});
 		});

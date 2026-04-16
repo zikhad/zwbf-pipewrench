@@ -284,13 +284,41 @@ describe("Womb", () => {
 			});
 		});
 		describe("onEveryMinute", () => {
-			it("should update minute data", () => {
-				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
+			it("should update minute data and trigger WOMB_UPDATE with full data including capacity", () => {
+				const data = mockedModData({ cycleDay: 15, onContraceptive: false });
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(data);
 				const womb = new Womb();
 				womb.onCreatePlayer(mockedPlayer());
 				womb.onEveryMinute();
-				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.WOMB_UPDATE, expect.anything());
+				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(
+					ZWBFEventsEnum.WOMB_UPDATE,
+					expect.objectContaining({
+						capacity: expect.any(Number),
+						amount: expect.any(Number),
+						total: expect.any(Number),
+					})
+				);
 			});
+		});
+	});
+
+	// === Capacity Tests ===
+	describe("Capacity", () => {
+		it("should return data.capacity if it exists", () => {
+			const customCapacity = 5;
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
+				mockedModData({ capacity: customCapacity })
+			);
+			const womb = new Womb();
+			womb.onCreatePlayer(mockedPlayer());
+			expect(womb.capacity).toBe(customCapacity);
+		});
+
+		it("should return options.capacity as fallback when data is null", () => {
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
+			const womb = new Womb();
+			// capacity should fall back to options.capacity since data is null
+			expect(womb.capacity).toBeGreaterThan(0);
 		});
 	});
 
