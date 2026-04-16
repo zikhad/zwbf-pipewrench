@@ -10,7 +10,7 @@ module ZWBF {
 		scale		= 1
 	}
 	
-	model Baby_01 {
+	model Baby {
 		mesh = WorldItems/Baby_01,
 		texture = WorldItems/baby_01,
 
@@ -20,7 +20,8 @@ module ZWBF {
 			rotate = 177.3152 17.2140 -4.7104,
 		}
 	}
-	model Baby_01_leftarm
+
+	model Baby_leftarm
 	{
 		mesh = WorldItems/Baby_01_leftarm,
 		texture = WorldItems/baby_01,
