@@ -49,6 +49,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		return this.data?.amount ?? 0;
 	}
 
+	get capacity {
+		return this.options.capacity;
+	}
+
 	public Debug = {
 		sperm: {
 			add: (amount: number) => {

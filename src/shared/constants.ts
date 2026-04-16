@@ -27,7 +27,9 @@ export enum ZWBFEventsEnum {
 	MENSTRUAL_EFFECTS = "ZWBFMenstrualEffects",
 	PREGNANCY_START = "ZWBFPregnancyStart",
 	PREGNANCY_LABOR = "ZWBFPregnancyLabor",
-	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour"
+	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour",
+	ANIMATION = "ZWBFWombAnimation",
+	IMAGE = "ZWBFWombImage"
 }
 
 export const Fluids: Record<string, Fluid> = {
