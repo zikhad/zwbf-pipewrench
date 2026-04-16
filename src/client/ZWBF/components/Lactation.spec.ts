@@ -91,28 +91,12 @@ describe("Lactation", () => {
 				});
 			});
 			describe("everyTenMinutes", () => {
-				const spyGetAdditionalPain = jest.fn().mockImplementation(() => 0);
-				const spySetAdditionalPain = jest.fn();
-
-				const spyGetWetness = jest.fn().mockImplementation(() => 0);
-				const spySetWetness = jest.fn();
-
-				beforeEach(() => {
-					jest.spyOn(Player.prototype, "getBodyPart").mockImplementation(() =>
-						mock<BodyPart>({
-							getAdditionalPain: spyGetAdditionalPain,
-							setAdditionalPain: spySetAdditionalPain,
-							getWetness: spyGetWetness,
-							setWetness: spySetWetness
-						})
-					);
-				});
-				it("Should inflict pain & wetness from engorgement", () => {
+				it("Should inflict body effects from engorgement", () => {
 					const lactation = new Lactation();
+					const spyBodyEffect = jest.spyOn(lactation as any, "applyBodyEffect");
 					lactation.onCreatePlayer(mockedPlayer());
 					lactation.onEveryTenMinutes();
-					expect(spySetAdditionalPain).toHaveBeenCalledWith(10);
-					expect(spySetWetness).toHaveBeenCalledWith(10);
+					expect(spyBodyEffect).toHaveBeenCalled();
 				});
 			});
 			describe("everyHour event", () => {

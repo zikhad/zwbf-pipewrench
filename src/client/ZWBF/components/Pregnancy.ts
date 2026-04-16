@@ -1,5 +1,5 @@
 import type { PregnancyData } from "@types";
-import { getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
@@ -77,7 +77,10 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
 
-		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START).addListener(() => this.start());
+		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START)
+			.addListener(() => this.start());
+		new Events.EventEmitter<(delta: number) => void>(ZWBFEventsEnum.PREGNANCY_LABOR)
+			.addListener((delta) => this.onLabor(delta));
 	}
 
 	/**
@@ -95,7 +98,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	 * start Pregnancy (add Player trait)
 	 */
 	private start() {
-		this.addZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
+		this.addTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
 	}
 
@@ -105,6 +108,10 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private stop() {
 		this.removeZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
+	}
+
+	private onLabor(delta: number) {
+		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
 
 	onEveryMinute(): void {
@@ -162,13 +169,18 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (!this.player) return;
 		if (getActivatedMods().contains(MODS.BABIES)) {
 			const baby = this.BABY_LIST[ZombRand(0, this.BABY_LIST.length)];
-			this.player.getInventory().AddItem(`Babies.${baby}`);	
+			this.player.getInventory().AddItem(`Babies.${baby}`);
 		} else {
 			// TODO: What happens if Babies the mod is deactivated?
 			print("[ZWBF] - Babies mod is not activated, cannot give birth.");
 		}
 		this.player.setBlockMovement(false);
 		this.weightDebuff = 0;
+		this.applyStatEffect({
+			stat: "FATIGUE",
+			value: 0.75,
+			maxValue: 0.75
+		});
 		this.stop();
 	}
 }

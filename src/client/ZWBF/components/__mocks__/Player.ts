@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer } from "@asledgehammer/pipewrench";
 import { PregnancyData } from "../../../../types";
 import { ZWBFTraitsEnum } from "@constants";
 export class Player<T = unknown> {
@@ -13,18 +13,18 @@ export class Player<T = unknown> {
 	public _pregnancy?: PregnancyData;
 	public defaultData?: T;
 
-	constructor() {}
+	constructor() { }
 
 	onCreatePlayer(player: IsoPlayer) {
 		this.player = player;
 	}
-	onPregnancyUpdate() {}
+	onPregnancyUpdate() { }
 
-	hasZWBFTrait(trait: ZWBFTraitsEnum) {
-		return Player.hasZWBFTrait(this.player, trait);
+	hasTrait(trait: ZWBFTraitsEnum) {
+		return Player.hasTrait(this.player, trait);
 	}
 
-	addZWBFTrait(trait: ZWBFTraitsEnum) {
+	addTrait(trait: ZWBFTraitsEnum) {
 		const player = this.player;
 		if (!player) return;
 
@@ -47,7 +47,7 @@ export class Player<T = unknown> {
 		}
 	}
 
-	static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum) {
+	static hasTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum) {
 		if (!player) return false;
 		return player.HasTrait(trait);
 	}
@@ -56,11 +56,25 @@ export class Player<T = unknown> {
 		return null as never;
 	}
 
+	applyBodyEffect(part: BodyPartType, options: Partial<{
+		pain: number;
+		maxPain: number;
+		bleedTime: number;
+		wetness: number;
+	}> = {}) {
+		return null as never;
+	}
+	applyStatEffect({ stat, value, maxValue }:{
+		stat: keyof typeof CharacterStat;
+		value: number;
+		maxValue?: number;
+	}) { }
+
 	hasItem(arg: never): boolean {
 		return null as never;
 	}
 
-	haloText(...args: never[]) {}
+	haloText(...args: never[]) { }
 
 	get skinColorIndex() {
 		return 0;
@@ -70,10 +84,10 @@ export class Player<T = unknown> {
 		return null as never;
 	}
 
-	set data(value: T) {}
+	set data(value: T) { }
 
 	get pregnancy() {
 		return null as never;
 	}
-	set pregnancy(value: PregnancyData) {}
+	set pregnancy(value: PregnancyData) { }
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { BodyPart } from "@asledgehammer/pipewrench";
+import { BodyPart, BodyPartType } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { CyclePhase, WombData } from "@types";
@@ -111,6 +111,9 @@ describe("Womb", () => {
 
 	// === Event System Tests ===
 	describe("Event System", () => {
+		beforeEach(() => {
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
+		});
 		describe("Timer events", () => {
 			describe.each([
 				{ event: "everyOneMinute", handler: "onEveryMinute" },
@@ -146,8 +149,6 @@ describe("Womb", () => {
 				);
 				jest.spyOn(SpyPipeWrench, "ZombRand")
 					.mockReturnValue(10);
-				jest.spyOn(Player.prototype, "getBodyPart")
-					.mockReturnValue(mock<BodyPart>());
 
 				const womb = new Womb();
 				womb.onCreatePlayer(mockedPlayer());
@@ -209,7 +210,7 @@ describe("Womb", () => {
 					{ condom: true, impregnate: false },
 					{ condom: false, impregnate: true }
 				])(
-					"when player has condom is $condom should impregnate should be $impregnate",
+					"when player has condom: $condom impregnate should be called: $impregnate",
 					({ condom, impregnate }) => {
 						jest.spyOn(Player.prototype, "hasItem").mockReturnValue(condom);
 						const player = mockedPlayer({
@@ -393,33 +394,25 @@ describe("Womb", () => {
 
 	// === Menstruation ===
 	describe("Menstruation", () => {
-		const spySetAdditionalPain = jest.fn();
+		const spyApplyDamage = jest.fn();
 		beforeEach(() => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 				mockedModData({ cycleDay: 1 })
 			);
-
-			const mockBodyPart = mock<BodyPart>({
-				getAdditionalPain: jest.fn().mockReturnValue(0),
-				setBleedingTime: jest.fn().mockReturnValue(0),
-				setAdditionalPain: spySetAdditionalPain
-			});
-
-			jest.spyOn(Player.prototype, "getBodyPart").mockReturnValue(mockBodyPart);
 		});
 
 		it.each([
-			{ trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 50 },
+			{ trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 10 },
 			{ trait: ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS, expectedPain: 0 },
-			{ trait: null, expectedPain: 25 }
+			{ trait: null, expectedPain: 5 }
 		])(
-			"should apply pain of $expectedPain when player has trait of $trait",
+			"should call apply damage with pain of $expectedPain when player has trait of $trait",
 			({ trait, expectedPain }) => {
 				const womb = new Womb();
 
-				const menstruationEffectsSpy = jest.spyOn(womb as any, "menstruationEffects");
+				const spyApplyDamage = jest.spyOn(womb as any, "applyBodyEffect");
 
 				womb.onCreatePlayer(
 					mockedPlayer({
@@ -431,23 +424,13 @@ describe("Womb", () => {
 				expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
 
 				if (trait === ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS) {
-					expect(menstruationEffectsSpy).not.toHaveBeenCalled();
+					expect(spyApplyDamage).not.toHaveBeenCalled();
 				} else {
-					expect(menstruationEffectsSpy).toHaveBeenCalled();
-					expect(spySetAdditionalPain).toHaveBeenCalledWith(expectedPain);
+					expect(spyApplyDamage).toHaveBeenCalledWith(BodyPartType.Groin, expect.objectContaining({ pain: expectedPain }));
 				}
 			}
 		);
 
-		/*
-		it("Should not apply menstruation effects depending on chance", () => {
-			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(0);
-			const womb = new Womb();
-			const spy = jest.spyOn(womb as any, "applyBleeding");
-			(womb as any).menstruationEffects();
-			expect(spy).not.toHaveBeenCalled();
-		});
-		 */
 		it("should not apply menstruation effects outside menstruation phase", () => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 				mockedModData({ cycleDay: 5 })

@@ -41,7 +41,13 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	
 	private readonly animations: AnimationSettings;
 	
-	public amount = 0;
+	set amount(value:number) {
+		this.data!.amount = value;
+	}
+
+	get amount() {
+		return this.data?.amount ?? 0;
+	}
 
 	public Debug = {
 		sperm: {
@@ -219,6 +225,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		).addListener(data => this.onAnimationUpdate(data));
 
 		new Events.EventEmitter(ZWBFEventsEnum.INTERCOURSE).addListener(() => this.intercourse());
+		new Events.EventEmitter(ZWBFEventsEnum.MENSTRUAL_EFFECTS).addListener(() => this.menstruationEffects());
 	}
 
 	private isAllowedAnimation(
@@ -318,7 +325,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
-		if(this.data) this.data.amount = this.amount;
 	}
 
 	onEveryTenMinutes(): void {
@@ -348,15 +354,15 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		this.data!.chances = Womb.chances;
 		if (
 			this.phase == CyclePhaseEnum.MENSTRUATION &&
-			!this.hasZWBFTrait(ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS)
+			!this.hasTrait(ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS)
 		) {
 			this.menstruationEffects();
 		}
 	}
 
 	private computeFertilityBonus() {
-		if (this.hasZWBFTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
-		if (this.hasZWBFTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
+		if (this.hasTrait(ZWBFTraitsEnum.FERTILE)) return 0.25;
+		if (this.hasTrait(ZWBFTraitsEnum.HYPERFERTILE)) return 0.5;
 		return 0;
 	}
 
@@ -365,7 +371,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	 * @returns Fertility chance between 0 and 1.
 	 */
 	private computeFertility() {
-		const isInfetile = this.hasZWBFTrait(ZWBFTraitsEnum.INFERTILE);
+		const isInfetile = this.hasTrait(ZWBFTraitsEnum.INFERTILE);
 		if (
 			!this.data ||
 			isInfetile ||
@@ -393,29 +399,24 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		if (day < 16) return CyclePhaseEnum.OVULATION;
 		return CyclePhaseEnum.LUTEAL;
 	}
-
-	/** Applies bleeding effects */
-	private applyBleeding() {
-		const maxPain = this.hasZWBFTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS)
-			? 50
-			: 25;
-		const groin = this.getBodyPart(BodyPartType.Groin)!;
-		const pain = groin.getAdditionalPain();
-		const bleedTime = groin.getBleedingTime();
-		groin.setBleedingTime(Math.min(10, bleedTime));
-		groin.setAdditionalPain(Math.max(maxPain, pain + ZombRand(0, maxPain)));
-	}
 	
 	/** Applies wetness effects */
 	private applyWetness() {
 		const amount = ZombRand(10, 100);
-		const groin = this.getBodyPart(BodyPartType.Groin)!;
-		groin.setWetness(groin.getWetness() + amount);
+		this.applyBodyEffect(BodyPartType.Groin, { wetness: amount });
 	}
 
 	/** Apply menstrual effects like bleeding and pain */
 	private menstruationEffects() {
-		this.applyBleeding();
+		const hasStrongCramps = this.hasTrait(ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS);
+		this.applyBodyEffect(
+			BodyPartType.Groin,
+			{
+				bleedTime: ZombRand(1, 5),
+				pain: hasStrongCramps ? ZombRand(10, 25) : ZombRand(5, 15),
+				maxPain: hasStrongCramps ? 50 : 25
+			}
+		);
 	}
 
 	/**

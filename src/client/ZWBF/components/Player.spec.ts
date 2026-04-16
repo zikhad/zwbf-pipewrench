@@ -55,11 +55,11 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 		this.onPregnancyUpdate(data);
 	}
 	// Expose protected methods for testing
-	public testHasZWBFTrait(trait: ZWBFTraitsEnum): boolean {
-		return this.hasZWBFTrait(trait);
+	public testHasTrait(trait: ZWBFTraitsEnum): boolean {
+		return this.hasTrait(trait);
 	}
-	public testAddZWBFTrait(trait: ZWBFTraitsEnum): void {
-		this.addZWBFTrait(trait);
+	public testAddTrait(trait: ZWBFTraitsEnum): void {
+		this.addTrait(trait);
 	}
 	public testRemoveZWBFTrait(trait: ZWBFTraitsEnum): void {
 		this.removeZWBFTrait(trait);
@@ -113,21 +113,6 @@ describe("Player class", () => {
 			const [callback] = addListener.mock.calls[0];
 			callback(mock<PregnancyData>());
 			expect(addListener).toHaveBeenCalledWith(expect.any(Function));
-		});
-	});
-
-	describe("getBodyPart", () => {
-		it("getBodyPart returns body part if player exists", () => {
-			const instance = new ConcretePlayer("TEST_KEY");
-			instance.triggerOnCreatePlayer(mockPlayer);
-
-			const part = instance.getBodyPart(BodyPartType.Torso_Upper);
-			expect(part).toBe(mockBodyPart);
-		});
-		it("getBodyPart return null if player does not exists", () => {
-			const instance = new ConcretePlayer("TEST_KEY");
-			const part = instance.getBodyPart(BodyPartType.Torso_Upper);
-			expect(part).toBeNull();
 		});
 	});
 
@@ -204,10 +189,10 @@ describe("Player class", () => {
 	});
 
 	describe("trait methods", () => {
-		describe("hasZWBFTrait", () => {
+		describe("hasTrait", () => {
 			it("should return false when player is not set", () => {
 				const instance = new ConcretePlayer();
-				const result = instance.testHasZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				const result = instance.testHasTrait(ZWBFTraitsEnum.FERTILE);
 				expect(result).toBe(false);
 				expect(CharacterTraitApi.hasTrait).not.toHaveBeenCalled();
 			});
@@ -217,17 +202,17 @@ describe("Player class", () => {
 				instance.triggerOnCreatePlayer(mockPlayer);
 				(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(true);
 
-				const result = instance.testHasZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				const result = instance.testHasTrait(ZWBFTraitsEnum.FERTILE);
 
 				expect(result).toBe(true);
 				expect(CharacterTraitApi.hasTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
 			});
 		});
 
-		describe("addZWBFTrait", () => {
+		describe("addTrait", () => {
 			it("should do nothing when player is not set", () => {
 				const instance = new ConcretePlayer();
-				instance.testAddZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testAddTrait(ZWBFTraitsEnum.FERTILE);
 				expect(CharacterTraitApi.addTrait).not.toHaveBeenCalled();
 			});
 
@@ -235,7 +220,7 @@ describe("Player class", () => {
 				const instance = new ConcretePlayer();
 				instance.triggerOnCreatePlayer(mockPlayer);
 
-				instance.testAddZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testAddTrait(ZWBFTraitsEnum.FERTILE);
 
 				expect(CharacterTraitApi.addTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
 			});
@@ -258,9 +243,9 @@ describe("Player class", () => {
 			});
 		});
 
-		describe("static hasZWBFTrait", () => {
+		describe("static hasTrait", () => {
 			it("should return false when player is undefined", () => {
-				const result = ConcretePlayer.hasZWBFTrait(undefined, ZWBFTraitsEnum.FERTILE);
+				const result = ConcretePlayer.hasTrait(undefined, ZWBFTraitsEnum.FERTILE);
 				expect(result).toBe(false);
 				expect(CharacterTraitApi.hasTrait).not.toHaveBeenCalled();
 			});
@@ -268,7 +253,7 @@ describe("Player class", () => {
 			it("should delegate to CharacterTraitApi when player is provided", () => {
 				(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(true);
 
-				const result = ConcretePlayer.hasZWBFTrait(mockPlayer, ZWBFTraitsEnum.FERTILE);
+				const result = ConcretePlayer.hasTrait(mockPlayer, ZWBFTraitsEnum.FERTILE);
 
 				expect(result).toBe(true);
 				expect(CharacterTraitApi.hasTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
@@ -327,6 +312,121 @@ describe("Player class", () => {
 			// Mock the _pregnancy ModData to return null
 			(instance as any)._pregnancy = { data: null };
 			expect(instance.pregnancy).toBeNull();
+		});
+	});
+
+	describe("applyDamage", () => {
+		const setAdditionalPain = jest.fn();
+		const getAdditionalPain = jest.fn().mockReturnValue(0);
+		const setBleedingTime = jest.fn();
+		const getBleedingTime = jest.fn().mockReturnValue(0);
+
+		beforeEach(() => {
+			jest.clearAllMocks();
+			getAdditionalPain.mockReturnValue(0);
+			getBleedingTime.mockReturnValue(0);
+			(mockBodyPart as any).getAdditionalPain = getAdditionalPain;
+			(mockBodyPart as any).setAdditionalPain = setAdditionalPain;
+			(mockBodyPart as any).getBleedingTime = getBleedingTime;
+			(mockBodyPart as any).setBleedingTime = setBleedingTime;
+		});
+
+		class ConcretePlayerWithApplyDamage extends ConcretePlayer {
+			public testApplyDamage(
+				part: BodyPartType,
+				options?: Partial<{ pain: number; bleedTime: number }>
+			): void {
+				this.applyBodyEffect(part, options);
+			}
+		}
+
+		it("should apply pain to a body part", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 50 });
+			expect(setAdditionalPain).toHaveBeenCalledWith(50);
+		});
+
+		it("should apply bleed time to a body part", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { bleedTime: 10 });
+			expect(setBleedingTime).toHaveBeenCalledWith(10);
+		});
+
+		it("should apply both pain and bleed time", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 25, bleedTime: 5 });
+			expect(setAdditionalPain).toHaveBeenCalledWith(25);
+			expect(setBleedingTime).toHaveBeenCalledWith(5);
+		});
+
+		it("should add pain to existing pain", () => {
+			getAdditionalPain.mockReturnValue(30);
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 20 });
+			expect(setAdditionalPain).toHaveBeenCalledWith(50); // 30 + 20
+		});
+
+		it("should add bleed time to existing bleed time", () => {
+			getBleedingTime.mockReturnValue(5);
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { bleedTime: 3 });
+			expect(setBleedingTime).toHaveBeenCalledWith(8); // 5 + 3
+		});
+
+		it("should not apply negative pain values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: -10 });
+			expect(setAdditionalPain).not.toHaveBeenCalled();
+		});
+
+		it("should not apply zero pain values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 0 });
+			expect(setAdditionalPain).not.toHaveBeenCalled();
+		});
+
+		it("should not apply negative bleed time values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { bleedTime: -5 });
+			expect(setBleedingTime).not.toHaveBeenCalled();
+		});
+
+		it("should not apply zero bleed time values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { bleedTime: 0 });
+			expect(setBleedingTime).not.toHaveBeenCalled();
+		});
+
+		it("should do nothing if body part does not exist", () => {
+			(mockBodyDamage.getBodyPart as jest.Mock).mockReturnValue(null);
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 50 });
+			expect(setAdditionalPain).not.toHaveBeenCalled();
+			(mockBodyDamage.getBodyPart as jest.Mock).mockReturnValue(mockBodyPart);
+		});
+
+		it("should do nothing if player is not defined", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.testApplyDamage(BodyPartType.Groin, { pain: 50 });
+			expect(setAdditionalPain).not.toHaveBeenCalled();
+		});
+
+		it("should do nothing if options are undefined", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin);
+			expect(setAdditionalPain).not.toHaveBeenCalled();
+			expect(setBleedingTime).not.toHaveBeenCalled();
 		});
 	});
 });

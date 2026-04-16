@@ -1,9 +1,10 @@
 import { BodyPart, BodyPartType, HaloTextHelper, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { PregnancyData } from "@types";
-import { ModData } from "./ModData";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
+import { increaseClamped } from "@client/Utils";
+import { ModData } from "./ModData";
 
 export interface TimedEvents {
 	/**
@@ -92,9 +93,89 @@ export abstract class Player<T> {
 	 * Given a `BodyPartType` return the `BodyPart` to apply numerous effects
 	 * @param part The `BodyPartType` to return
 	 */
-	public getBodyPart(part: BodyPartType): BodyPart | null {
+	private getBodyPart(part: BodyPartType): BodyPart | null {
 		if (!this.player) return null;
 		return this.player.getBodyDamage().getBodyPart(part);
+	}
+
+	/**
+	 * Applies pain, bleeding, and wetness effects to a specific body part.
+	 *
+	 * Each effect is applied as a positive delta. Pain can be optionally capped by `maxPain`.
+	 * Resulting values will never be lower than their current values.
+	 *
+	 * @param part - The body part to affect.
+	 * @param options - Configuration for effects.
+	 * @param options.pain - Amount of pain to add.
+	 * @param options.maxPain - Optional upper bound for pain.
+	 * @param options.bleedTime - Amount of bleed time to add.
+	 * @param options.wetness - Amount of wetness to add.
+	 */
+	protected applyBodyEffect(
+		part: BodyPartType,
+		{
+			pain = 0,
+			maxPain,
+			bleedTime = 0,
+			wetness = 0
+		}: Partial<{
+			pain: number;
+			maxPain: number;
+			bleedTime: number;
+			wetness: number;
+		}> = {}
+	): void {
+		const bodyPart = this.getBodyPart(part);
+		if (!bodyPart) return;
+
+		if (pain > 0) {
+			const current = bodyPart.getAdditionalPain();
+			bodyPart.setAdditionalPain(
+				increaseClamped(current, pain, maxPain)
+			);
+		}
+
+		if (bleedTime > 0) {
+			const current = bodyPart.getBleedingTime();
+			bodyPart.setBleedingTime(
+				increaseClamped(current, bleedTime)
+			);
+		}
+
+		if (wetness > 0) {
+			const current = bodyPart.getWetness();
+			bodyPart.setWetness(
+				increaseClamped(current, wetness)
+			);
+		}
+	}
+
+	/**
+	 * Applies a stat modification to the player.
+	 *
+	 * The stat will be increased by `value`, optionally capped by `maxValue`.
+	 * The resulting value will never be lower than the current stat value.
+	 *
+	 * @param options.stat - The stat to modify.
+	 * @param options.value - The amount to add to the current stat.
+	 * @param options.maxValue - Optional upper bound for the resulting stat.
+	 */
+	protected applyStatEffect({
+		stat,
+		value,
+		maxValue
+	}: {
+		stat: keyof typeof CharacterStat;
+		value: number;
+		maxValue?: number;
+	}) {
+		const stats = this.player?.getStats();
+		if (!stats) return;
+
+		const statKey = CharacterStat[stat];
+		const current = stats.get(statKey);
+
+		stats.set(statKey, increaseClamped(current, value, maxValue));
 	}
 
 	/**
@@ -138,11 +219,11 @@ export abstract class Player<T> {
 		this.pregnancy = data;
 	}
 
-	protected hasZWBFTrait(trait: ZWBFTraitsEnum): boolean {
+	protected hasTrait(trait: ZWBFTraitsEnum): boolean {
 		return this.player ? CharacterTraitApi.hasTrait(this.player, trait) : false;
 	}
 
-	protected addZWBFTrait(trait: ZWBFTraitsEnum): void {
+	protected addTrait(trait: ZWBFTraitsEnum): void {
 		if (!this.player) return;
 		CharacterTraitApi.addTrait(this.player, trait);
 	}
@@ -152,7 +233,7 @@ export abstract class Player<T> {
 		CharacterTraitApi.removeTrait(this.player, trait);
 	}
 
-	public static hasZWBFTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum): boolean {
+	public static hasTrait(player: IsoPlayer | undefined, trait: ZWBFTraitsEnum): boolean {
 		if (!player) return false;
 		return CharacterTraitApi.hasTrait(player, trait);
 	}
@@ -175,7 +256,7 @@ export abstract class Player<T> {
 	}
 
 	get pregnancy(): PregnancyData | null {
-		if (!this.hasZWBFTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
+		if (!this.hasTrait(ZWBFTraitsEnum.PREGNANCY)) return null;
 		return this._pregnancy?.data ?? null;
 	}
 

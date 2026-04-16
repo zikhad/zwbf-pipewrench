@@ -152,6 +152,10 @@ export class ContextMenu {
 			{
 				option: "Intercourse",
 				fn: () => triggerEvent(ZWBFEventsEnum.INTERCOURSE),
+			},
+			{
+				option: "Menstrual_Effects",
+				fn: () => triggerEvent(ZWBFEventsEnum.MENSTRUAL_EFFECTS),
 			}
 		]
 			.filter(({condition}) => {

@@ -32,6 +32,7 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 			duration: this.maxTime,
 			isActive: true
 		} as AnimationStatus);
+		triggerEvent(ZWBFEventsEnum.PREGNANCY_LABOR, delta);
 	}
 
 	perform() {

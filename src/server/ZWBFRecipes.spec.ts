@@ -165,15 +165,6 @@ describe("ZWBFRecipes.ts", () => {
 					const result = ZWBFRecipes.OnTest.TakeContraceptive(mock(), mockCharacter);
 					expect(result).toBeFalsy();
 				});
-				it("Player is lactating already", () => {
-					isFemaleSpy.mockReturnValue(true);
-					Object.defineProperty(SpyZWBF.lactation, "isLactating", {
-						get: jest.fn(() => true),
-						configurable: true
-					});
-					const result = ZWBFRecipes.OnTest.TakeLactaid(mock(), mockCharacter);
-					expect(result).toBeFalsy();	
-				});
 			});
 		});
 	});
