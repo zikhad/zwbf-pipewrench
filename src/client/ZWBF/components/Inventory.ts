@@ -5,9 +5,7 @@ import {
 	ISBaseTimedAction,
 	IsoGameCharacter
 } from "@asledgehammer/pipewrench";
-import { Lactation } from "./Lactation";
-import { Pregnancy } from "./Pregnancy";
-import { Womb } from "./Womb";
+import { Lactation } from "@client/components/Lactation";
 import { ISInventoryPaneContextMenu, ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ZWBFFeedBaby } from "@actions/ZWBFFeedBaby";
 import * as Events from "@asledgehammer/pipewrench-events";
@@ -19,19 +17,13 @@ type MenuContext = {
 
 type InventoryProps = {
 	lactation: Lactation;
-	pregnancy: Pregnancy;
-	womb: Womb;
 };
 
 export class Inventory {
 	private lactation: Lactation;
-	private pregnancy: Pregnancy;
-	private womb: Womb;
 
 	constructor(props: InventoryProps) {
 		this.lactation = props.lactation;
-		this.pregnancy = props.pregnancy;
-		this.womb = props.womb;
 
 		Events.onFillInventoryObjectContextMenu.addListener((playerId, context, items) => {
 			this.buildInventoryContextMenu(playerId, context, items);

@@ -1,4 +1,4 @@
-import { AnimationStatus, CyclePhase, PregnancyData, WombData } from "@types";
+import { CyclePhase, PregnancyData, WombData } from "@types";
 import {
 	BodyPartType,
 	getText,
@@ -10,23 +10,10 @@ import {
 import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
-import { percentageToNumber } from "@utils";
 import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
-import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 
 /**
- * Defines settings for animation steps and optional looping.
- */
-type AnimationSettings = Record<
-	string,
-	{
-		steps: number[];
-		loop?: number;
-	}
->;
-
-/**
- * Manages reproductive functions, fertility, and pregnancy-related animations
+ * Manages reproductive functions, fertility, and pregnancy-related variables
  * for a player character in the game. Handles cycle tracking, fertility logic,
  * and dynamic image rendering for different states.
  */
@@ -36,10 +23,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		recovery: WombOptions.recovery,
 		capacity: WombOptions.capacity
 	};
-
-	private _animation: AnimationStatus;
-	
-	private readonly animations: AnimationSettings;
 	
 	set amount(value:number) {
 		this.data!.amount = value;
@@ -47,6 +30,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	get amount() {
 		return this.data?.amount ?? 0;
+	}
+
+	get capacity() {
+		return this.data?.capacity ?? this.options.capacity;
 	}
 
 	public Debug = {
@@ -90,6 +77,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	};
 
 	defaultData = {
+		capacity: this.options.capacity,
 		amount: 0,
 		total: 0,
 		cycleDay: ZombRand(1, 28),
@@ -160,51 +148,11 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		}[this.phase];
 	}
 
-	set animation(value: AnimationStatus) {
-		this._animation = value;
-	}
-
-	get animation() {
-		return this._animation;
-	}
-
 	/**
-	 * Initializes the Womb system with animation presets.
+	 * Initializes the Womb system.
 	 */
 	constructor() {
 		super("ZWBFWomb");
-		this._animation = {
-			isActive: false,
-			delta: 0,
-			duration: 0
-		};
-		this.animations = {
-			normal: {
-				steps: [
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-				].flat()
-			},
-			pregnant: {
-				steps: [
-					[0, 1, 2, 3, 2, 1],
-					[0, 1, 2, 3, 2, 1],
-					[0, 1, 2, 3, 2, 1],
-					[0, 1, 2, 3, 2, 1],
-					[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-				].flat()
-			},
-			condom: {
-				steps: [0, 1, 2, 3, 4, 5, 6],
-				loop: 4
-			},
-			birth: {
-				steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-			}
-		};
 	}
 
 	/**
@@ -217,65 +165,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
-		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
-
-		new Events.EventEmitter<(data: AnimationStatus) => void>(
-			ZWBFEventsEnum.ANIMATION_UPDATE
-		).addListener(data => this.onAnimationUpdate(data));
 
 		new Events.EventEmitter(ZWBFEventsEnum.INTERCOURSE).addListener(() => this.intercourse());
 		new Events.EventEmitter(ZWBFEventsEnum.MENSTRUAL_EFFECTS).addListener(() => this.menstruationEffects());
-	}
-
-	private isAllowedAnimation(
-		excludedTags: string[] = ["Oral", "Masturbation", "Anal", "Solo", "Mast"]
-	) {
-		// when in labor, there is no need to check ZomboWin animations
-		if (this.pregnancy?.isInLabor) return true;
-
-		const getAnim = () => {
-			const { queue }: { queue: { animation: string }[] } = ISTimedActionQueue.getTimedActionQueue(this.player);
-
-			return queue[0]?.animation ?? null;
-			/* if (queue.length > 0) {
-				const { animation } = queue[0];
-				return animation;
-			}
-			return null; */
-		};
-
-		const getAnimInfo = () => {
-			const currentAnim = getAnim();
-			if (!currentAnim) return null;
-
-			for (const data of ZomboWinAnimationData) {
-				for (const { stages } of data.actors) {
-					const { perform } = stages[0];
-					if (perform == currentAnim) {
-						return data;
-					}
-				}
-			}
-			return null;
-		};
-
-		const tags = getAnimInfo()?.tags;
-		if (!tags) return false;
-		return !tags.some(tag => excludedTags.includes(tag));
-	}
-
-	/**
-	 * Applies animation updates to internal state.
-	 * @param data - New animation status.
-	 */
-	public onAnimationUpdate(data: AnimationStatus) {
-		this.animation = data;
-		if (!this.isAllowedAnimation()) {
-			this.animation = {
-				isActive: false
-			};
-		}
 	}
 
 	private intercourse() {
@@ -325,6 +218,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
+		triggerEvent(ZWBFEventsEnum.WOMB_UPDATE, this.data);
 	}
 
 	onEveryTenMinutes(): void {
@@ -334,14 +228,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		const amount = ZombRand(0, 5) / 1000;
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
-	}
-
-	onEveryHour(): void {
-		triggerEvent(ZWBFEventsEnum.WOMB_HOURLY_UPDATE, {
-			player: this.player,
-			amount: this.amount,
-			capacity: this.options.capacity
-		});
 	}
 
 	onEveryDay(): void {
@@ -417,97 +303,5 @@ export class Womb extends Player<WombData> implements TimedEvents {
 				maxPain: hasStrongCramps ? 50 : 25
 			}
 		);
-	}
-
-	/**
-	 * Builds image path for non-animated state.
-	 */
-	private getStillImage(): string {
-		const pregnancy = this.pregnancy;
-		const getStatus = () => {
-			if (!pregnancy) return "normal";
-			if (pregnancy.progress > 0.05) return "pregnant";
-			return "conception";
-		};
-
-		const getImageIndex = () => {
-			if (pregnancy && pregnancy.progress > 0.05) {
-				return percentageToNumber(
-					(pregnancy.progress > 0.9 ? 1 : pregnancy.progress) * 100,
-					6
-				);
-			}
-			if (this.amount === 0) return 0;			
-			const percentage = Math.floor((this.amount / this.options.capacity) * 100);
-			const index = percentageToNumber(percentage, 17);
-			return Math.max(1, index);
-		};
-
-		const status = getStatus();
-		const imageIndex = getImageIndex();
-
-		return `media/ui/womb/${status}/womb_${status}_${imageIndex}.png`;
-	}
-
-	/**
-	 * Gets the animation type and corresponding settings.
-	 */
-	private getAnimationSetting(): { animation: AnimationSettings[string]; type: string } {
-		if (this.hasItem("ZWBF.Condom")) {
-			return {
-				animation: this.animations["condom"],
-				type: "condom"
-			};
-		} else if (this.pregnancy?.isInLabor) {
-			return {
-				animation: this.animations["birth"],
-				type: "birth"
-			};
-		} else if ((this.pregnancy?.progress || 0) > 0.5) {
-			return {
-				animation: this.animations["pregnant"],
-				type: "pregnant"
-			};
-		}
-		return {
-			animation: this.animations["normal"],
-			type: "normal"
-		};
-	}
-
-	/**
-	 * Computes the current animation frame image based on delta and loop settings.
-	 */
-	private sceneImage(): string {
-		const { duration = 1, delta = 0 } = this.animation;
-		const { animation, type } = this.getAnimationSetting();
-		const { steps, loop = 1 } = animation;
-
-		const loopDuration = duration / loop;
-		const currentLoopDelta = (delta * duration) % loopDuration;
-		const stepDuration = loopDuration / steps.length;
-
-		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
-		const step = steps[stepIndex];
-
-		const getFullness = () => {
-			if (type !== "normal") return "";
-			if (this.amount > this.options.capacity / 2) return "/full";
-			return "/empty";
-		};
-
-		const fullness = getFullness();
-
-		return `media/ui/animation/${type}${fullness}/${step}.png`;
-	}
-
-	/**
-	 * Determines the current womb image to render.
-	 */
-	get image() {
-		if (!this.data) return "";
-
-		if (this.animation.isActive) return this.sceneImage();
-		return this.getStillImage();
 	}
 }

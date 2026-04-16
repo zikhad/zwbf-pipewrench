@@ -1,4 +1,4 @@
-import { IsoPlayer, KahluaTable } from "@asledgehammer/pipewrench";
+import { KahluaTable } from "@asledgehammer/pipewrench";
 
 type ModDataProps<T> = {
 	/** The player object from PZ */
@@ -24,7 +24,6 @@ type LactationImage = {
 type PregnancyData = {
 	progress: number;
 	current?: number;
-	// duration: number;
 	isInLabor?: boolean;
 };
 
@@ -39,24 +38,10 @@ type CyclePhase =
 
 type WombData = {
 	amount: number;
+	capacity: number;
 	total: number;
 	cycleDay: number;
 	fertility: number;
 	onContraceptive: boolean;
 	chances: Record<CyclePhase, number>;
-};
-
-/**
- * Describes animation status including whether it's active and the time progress.
- */
-type AnimationStatus = {
-	isActive: boolean;
-	delta?: number;
-	duration?: number;
-};
-
-type WombEventData = {
-	player: IsoPlayer;
-	amount: number;
-	capacity: number;
 };

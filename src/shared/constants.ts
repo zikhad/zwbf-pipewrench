@@ -22,12 +22,25 @@ export enum CyclePhaseEnum {
 export enum ZWBFEventsEnum {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
 	LACTATION_UPDATE = "ZWBFLactationUpdate",
-	ANIMATION_UPDATE = "ZWBFAnimationUpdate",
+	WOMB_UPDATE = "ZWBFWombUpdate",
 	INTERCOURSE = "ZWBFIntercourse",
 	MENSTRUAL_EFFECTS = "ZWBFMenstrualEffects",
 	PREGNANCY_START = "ZWBFPregnancyStart",
 	PREGNANCY_LABOR = "ZWBFPregnancyLabor",
-	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour"
+	ANIMATION = "ZWBFWombAnimation",
+	ANIMATION_STOP = "ZWBFWombAnimationStop",
+	IMAGE = "ZWBFWombImage"
+}
+
+export enum ITEMS {
+	CONDOM = "ZWBF.Condom",
+	CONDOM_BOX = "ZWBF.CondomBox",
+	CONDOM_USED = "ZWBF.CondomUsed",
+	LACTAID = "ZWBF.Lactaid",
+	CONTRACEPTIVE = "ZWBF.Contraceptive",
+	VAGINAL_DOUCHE = "ZWBF.VaginalDouche",
+	BREAST_PUMP = "ZWBF.BreastPump",
+
 }
 
 export const Fluids: Record<string, Fluid> = {
@@ -40,11 +53,11 @@ export enum MODS {
 	ZOMBOWIN = "ZomboWin",
 	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
 	MOODLE_FRAMEWORK = "MoodleFramework"
-};
+}
 
 export enum ZWBFAnimations {
 	TAKE_PILLS = "ZWBF.TakePills",
 	BIRTH = "ZWBF.Birth",
 	PUMP_MILK = "ZWBF.PumpMilk",
 	CLEAN_SELF = "ZWBF.CleanSelf"
-};
+}

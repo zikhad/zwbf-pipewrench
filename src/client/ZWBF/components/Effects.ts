@@ -1,7 +1,7 @@
-import { getActivatedMods, IsoPlayer } from "@asledgehammer/pipewrench";
+import { getActivatedMods, getPlayer, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { MODS, ZWBFEventsEnum } from "@constants";
-import { WombEventData } from "@types";
+import { WombData } from "@types";
 import { percentageToNumber } from "@utils";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
@@ -9,9 +9,10 @@ export class Effects {
 	constructor() {
 		if (!getActivatedMods().contains(MODS.ZOMBOWIN_DEFEAT)) return;
 
-		new Events.EventEmitter<( data: WombEventData ) => void>(
-			ZWBFEventsEnum.WOMB_HOURLY_UPDATE
-		).addListener(({ player, amount,  capacity }) => {
+		new Events.EventEmitter<( data: WombData ) => void>(
+			ZWBFEventsEnum.WOMB_UPDATE
+		).addListener(({ amount,  capacity }) => {
+			const player = getPlayer();
 			this.ZWUnblessing(player, amount);
 			this.ZWSuccubus(player, amount, capacity);
 		});

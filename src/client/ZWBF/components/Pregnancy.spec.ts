@@ -229,6 +229,38 @@ describe("Pregnancy", () => {
 		});
 	});
 
+	// === PREGNANCY_UPDATE Event ===
+	describe("PREGNANCY_UPDATE Event", () => {
+		it("should trigger PREGNANCY_UPDATE with entire data object during onEveryMinute", () => {
+			const mockTrigger = jest.spyOn(SpyPipewrench, "triggerEvent");
+			const mockPlayer = mock<IsoPlayer>({ setBlockMovement: jest.fn() });
+			const pregnancy = new Pregnancy();
+			(pregnancy as any).onCreatePlayer(mockPlayer);
+
+			const testData = mock<PregnancyData>({
+				current: 100,
+				progress: 0.5,
+				isInLabor: false
+			});
+			
+			// Set both the data property and pregnancy getter to ensure test works
+			Object.defineProperty(pregnancy, "data", {
+				value: testData,
+				writable: true,
+				configurable: true
+			});
+			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(testData);
+
+			(pregnancy as any).onEveryMinute();
+
+			const updateCalls = mockTrigger.mock.calls.filter(
+				(call) => call[0] === "ZWBFPregnancyUpdate"
+			);
+			expect(updateCalls.length).toBeGreaterThan(0);
+			expect(updateCalls[0][1]).toEqual(testData);
+		});
+	});
+
 	// === Methods ===
 	describe("Methods", () => {
 		it("Birth should remove Pregnancy trait", () => {
