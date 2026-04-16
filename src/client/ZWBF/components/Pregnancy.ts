@@ -109,7 +109,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
 		this.moodle?.moodle(this.pregnancy.progress);
-		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.data);
+		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 
 	onEveryHour(): void {
