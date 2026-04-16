@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
+import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { ITEMS } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
 import { Pregnancy } from "./Pregnancy";
-import { ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import { PregnancyData } from "@types";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
@@ -263,15 +263,10 @@ describe("Pregnancy", () => {
 
 	// === Methods ===
 	describe("Methods", () => {
-		it("Birth should remove Pregnancy trait", () => {
+		it("Birth should remove Pregnancy trait and add baby item", () => {
 			const remove = jest.fn();
 			const AddItem = jest.fn();
 			const setBlockMovement = jest.fn();
-			jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
-				mock<ArrayList>({
-					contains: jest.fn().mockReturnValue(true)
-				})
-			);
 			const pregnancy = new Pregnancy();
 			(pregnancy as any).onCreatePlayer({
 				...player,
@@ -282,6 +277,7 @@ describe("Pregnancy", () => {
 			});
 			pregnancy.birth();
 			expect(remove).toHaveBeenCalled();
+			expect(AddItem).toHaveBeenCalledWith(ITEMS.BABY);
 		});
 	});
 
