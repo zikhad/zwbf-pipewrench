@@ -22,7 +22,6 @@ export enum CyclePhaseEnum {
 export enum ZWBFEventsEnum {
 	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
 	LACTATION_UPDATE = "ZWBFLactationUpdate",
-	ANIMATION_UPDATE = "ZWBFAnimationUpdate",
 	INTERCOURSE = "ZWBFIntercourse",
 	MENSTRUAL_EFFECTS = "ZWBFMenstrualEffects",
 	PREGNANCY_START = "ZWBFPregnancyStart",
@@ -30,6 +29,17 @@ export enum ZWBFEventsEnum {
 	WOMB_HOURLY_UPDATE = "ZWBFWombOnEveryHour",
 	ANIMATION = "ZWBFWombAnimation",
 	IMAGE = "ZWBFWombImage"
+}
+
+export enum ITEMS {
+	CONDOM = "ZWBF.Condom",
+	CONDOM_BOX = "ZWBF.CondomBox",
+	CONDOM_USED = "ZWBF.CondomUsed",
+	LACTAID = "ZWBF.Lactaid",
+	CONTRACEPTIVE = "ZWBF.Contraceptive",
+	VAGINAL_DOUCHE = "ZWBF.VaginalDouche",
+	BREAST_PUMP = "ZWBF.BreastPump",
+
 }
 
 export const Fluids: Record<string, Fluid> = {

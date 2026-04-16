@@ -1,32 +1,36 @@
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Womb } from "@client/components/Womb";
-import { Pregnancy } from "@client/components/Pregnancy";
 import { percentageToNumber } from "@client/Utils";
-import { ZWBFEventsEnum } from "@constants";
+import { ITEMS, ZWBFEventsEnum } from "@constants";
 
 
 export enum ANIMATIONS {
+    INTERCOURSE = "intercourse",
+    BIRTH = "birth"
+}
+
+enum ANIMATION_KEY {
     NORMAL = "normal",
     PREGNANT = "pregnant",
     CONDOM = "condom",
     BIRTH = "birth"
 }
 
-type AnimationSettings = Record<ANIMATIONS, { steps: number[], loop?: number }>;
+type AnimationSettings = Record<ANIMATION_KEY, { steps: number[], loop?: number }>;
 
 export type AnimationConfig = {
     animation: ANIMATIONS;
     duration: number;
     delta: number;
-}
+};
 
 
 
 export class Animation {
-    public static image: string = "media/ui/animation/normal/empty/1.png";
+    public static wombImage: string = "media/ui/womb/normal/womb_normal_0.png";
 
     private readonly animations: AnimationSettings = {
-        [ANIMATIONS.NORMAL]: {
+        [ANIMATION_KEY.NORMAL]: {
             steps: [
                 [0, 1, 2, 3, 4, 3, 2, 1],
                 [0, 1, 2, 3, 4, 3, 2, 1],
@@ -35,7 +39,7 @@ export class Animation {
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             ].flat()
         },
-        [ANIMATIONS.PREGNANT]: {
+        [ANIMATION_KEY.PREGNANT]: {
             steps: [
                 [0, 1, 2, 3, 2, 1],
                 [0, 1, 2, 3, 2, 1],
@@ -44,11 +48,11 @@ export class Animation {
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
             ].flat()
         },
-        [ANIMATIONS.CONDOM]: {
+        [ANIMATION_KEY.CONDOM]: {
             steps: [0, 1, 2, 3, 4, 5, 6],
             loop: 4
         },
-        [ANIMATIONS.BIRTH]: {
+        [ANIMATION_KEY.BIRTH]: {
             steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         }
     };
@@ -67,8 +71,25 @@ export class Animation {
         return "empty";
     }
 
+    private animationKey(key: ANIMATIONS ): ANIMATION_KEY {
+        if(key === ANIMATIONS.BIRTH) {
+            return ANIMATION_KEY.BIRTH;
+        }
+        const { hasItem, pregnancy } = this.womb;
+        if (hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
+        if (pregnancy && pregnancy.progress > 0.5) return ANIMATION_KEY.PREGNANT;
+        return ANIMATION_KEY.NORMAL;
+    }
+
+    /**
+     * Event that updates the image of womb animated version
+     * @param props.animation The ENUM for the animation to be used
+     * @param props.delta Animation delta time
+     * @param props.duration The duration of the animation  
+    * */
     onAnimation({ animation, delta, duration = 1 }: AnimationConfig) {
-        const { steps, loop = 1 } = this.animations[animation];
+        const key = this.animationKey(animation);
+        const { steps, loop = 1 } = this.animations[key];
         const fullness = this.fullness;
         const loopDuration = duration / loop;
         const currentLoopDelta = (delta * duration) % loopDuration;
@@ -77,8 +98,8 @@ export class Animation {
 		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
 		const step = steps[stepIndex];
 
-        const fullnessPath = (animation == ANIMATIONS.NORMAL) ? `/${fullness}` : "";
-        Animation.image = `media/ui/animation/${animation}${fullnessPath}/${step}.png`;
+        const fullnessPath = (key == ANIMATION_KEY.NORMAL) ? `/${fullness}` : "";
+        Animation.wombImage = `media/ui/animation/${animation}${fullnessPath}/${step}.png`;
     }
 
     
@@ -91,19 +112,21 @@ export class Animation {
 
     private get imageIndex() {
         const { pregnancy, amount, capacity } = this.womb;
-        if (!pregnancy) {
-            if (amount === 0) return 0; 
-            const percentage = Math.floor((amount / capacity) * 100);
-            const index = percentageToNumber(percentage, 17);
-            return Math.max(1, index);
-        }
-        if(pregnancy.progress > 0.05) {
+        if(pregnancy && pregnancy.progress > 0.05) {
             const percentage = (pregnancy.progress > 0.9 ? 1 : pregnancy.progress);
             return percentageToNumber(percentage, 6);
         }
+        if (amount === 0) return 0; 
+        const percentage = Math.floor((amount / capacity) * 100);
+        const index = percentageToNumber(percentage, 17);
+        return Math.max(1, index);
+        
     }
 
+    /**
+     * Event that updates the still image of Womb
+     */
     onImage() {
-        return `media/ui/womb/${this.status}/womb_${this.status}_${this.imageIndex}.png`;
+        Animation.wombImage = `media/ui/womb/${this.status}/womb_${this.status}_${this.imageIndex}.png`;
     }
 }

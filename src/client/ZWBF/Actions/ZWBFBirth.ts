@@ -1,7 +1,7 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
+import { AnimationConfig, ANIMATIONS } from "@client/components/Animation";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { ZWBFAnimations, ZWBFEventsEnum } from "@constants";
-import { AnimationStatus } from "@types";
 
 export class ZWBFActionBirth extends ISBaseTimedAction {
 	private pregnancy: Pregnancy;
@@ -27,19 +27,19 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 	update() {
 		super.update();
 		const delta = this.getJobDelta();
-		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
-			delta,
-			duration: this.maxTime,
-			isActive: true
-		} as AnimationStatus);
 		triggerEvent(ZWBFEventsEnum.PREGNANCY_LABOR, delta);
+		triggerEvent(ZWBFEventsEnum.ANIMATION, {
+			animation: ANIMATIONS.BIRTH,
+			delta,
+			duration: this.maxTime
+		} as AnimationConfig);
+	}
+	stop() {
+		triggerEvent(ZWBFEventsEnum.IMAGE);
 	}
 
 	perform() {
 		super.perform();
 		this.pregnancy.birth();
-		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
-			isActive: false
-		} as AnimationStatus);
 	}
 }

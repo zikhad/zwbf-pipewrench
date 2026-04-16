@@ -1,6 +1,6 @@
 import { getActivatedMods, ISBaseTimedAction, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
+import { AnimationConfig, ANIMATIONS } from "@client/components/Animation";
 import { MODS, ZWBFEventsEnum } from "@constants";
-import type { AnimationStatus } from "@types";
 
 if (getActivatedMods().contains(MODS.ZOMBOWIN)) {
 
@@ -17,16 +17,16 @@ if (getActivatedMods().contains(MODS.ZOMBOWIN)) {
 		if (character.isFemale()) {
 			const duration = action.duration;
 			const delta = action.getJobDelta();
-			triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, {
-				isActive: true,
+			triggerEvent(ZWBFEventsEnum.ANIMATION, {
+				animation: ANIMATIONS.INTERCOURSE,
 				delta,
 				duration
-			} as AnimationStatus);
+			} as AnimationConfig);
 		}
 	});
 	
 	table.insert(ActionEvents.Stop, () => {
-		triggerEvent(ZWBFEventsEnum.ANIMATION_UPDATE, { isActive: false } as AnimationStatus);
+		triggerEvent(ZWBFEventsEnum.IMAGE);
 	});
 }
 
