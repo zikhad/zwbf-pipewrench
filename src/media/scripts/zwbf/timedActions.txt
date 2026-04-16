@@ -36,5 +36,7 @@ module ZWBF
     {
         metabolics  = LightDomestic,
         actionAnim  = ZWBF.FeedBaby,
+        sound       = ZWBF.FeedBaby,
+        prop1       = ZWBF.Baby
     }
 }
