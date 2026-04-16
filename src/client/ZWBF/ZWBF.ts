@@ -14,11 +14,7 @@ export const pregnancy = new Pregnancy();
 export const effects = new Effects();
 export const animation = new Animation(womb);
 
-export const inventory = new Inventory({
-	lactation,
-	pregnancy,
-	womb
-});
+export const inventory = new Inventory({ lactation });
 
 export const UI = new ZWBFUI({
 	lactation,

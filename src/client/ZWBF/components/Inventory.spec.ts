@@ -21,9 +21,7 @@ describe("Inventory", () => {
 	});
 	it("should call listener correctly", () => {
 		new Inventory({
-			lactation: mock(),
-			pregnancy: mock(),
-			womb: mock()
+			lactation: mock()
 		});
 		const [callback] = addListener.mock.calls[0];
 		callback(0, context, []);
@@ -50,15 +48,11 @@ describe("Inventory", () => {
 		const {
 			item,
 			text,
-			lactation = mock<Lactation>(),
-			pregnancy = mock<Pregnancy>(),
-			womb = mock<Womb>()
+			lactation = mock<Lactation>()
 		} = props;
 
 		new Inventory({
-			lactation,
-			pregnancy,
-			womb
+			lactation
 		});
 
 		const [callback] = addListener.mock.calls[0];
