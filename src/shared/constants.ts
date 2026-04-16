@@ -40,6 +40,7 @@ export enum ITEMS {
 	CONTRACEPTIVE = "ZWBF.Contraceptive",
 	VAGINAL_DOUCHE = "ZWBF.VaginalDouche",
 	BREAST_PUMP = "ZWBF.BreastPump",
+	BABY = "ZWBF.Baby"
 
 }
 
@@ -49,7 +50,6 @@ export const Fluids: Record<string, Fluid> = {
 };
 
 export enum MODS {
-	BABIES = "Babies",
 	ZOMBOWIN = "ZomboWin",
 	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
 	MOODLE_FRAMEWORK = "MoodleFramework"
