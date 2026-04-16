@@ -76,4 +76,17 @@ module ZWBF {
 			}
 		}
 	}
+	
+	item Baby_01
+	{
+		DisplayCategory		= Babies,
+        ItemType			= base:normal,
+        Icon 				= baby,
+		Weight 				= 2.0,
+        DisplayName			= Baby,
+	    StaticModel			= Baby_01_leftarm,
+	    primaryAnimMask		= babyright,
+        secondaryAnimMask	= babyleft,
+        WorldStaticModel	= Baby_01
+	}
 }

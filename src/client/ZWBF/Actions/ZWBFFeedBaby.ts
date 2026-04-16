@@ -47,8 +47,8 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 		baby.getModData().feedBaby = timestamp;
 		baby.setAlarmSet(true);
 
-		if (soundEmitter.isPlaying("BreastfeedBaby")) {
-			soundEmitter.stopSoundByName("BreastfeedBaby");
+		if (soundEmitter.isPlaying("ZWBF.BreastfeedBaby")) {
+			soundEmitter.stopSoundByName("ZWBF.BreastfeedBaby");
 		}
 
 		if (baby.isRinging()) {
@@ -63,9 +63,9 @@ export class ZWBFFeedBaby extends ISBaseTimedAction {
 		super.start();
 		this.baby.setJobType(getText("ContextMenu_BreastFeed_Baby"));
 		this.baby.setJobDelta(0.0);
-		this.setActionAnim("FeedBaby", null);
+		this.setActionAnim("ZWBF.FeedBaby", null);
 		this.setOverrideHandModels(null, this.baby, null);
-		(this.character as IsoGameCharacter).playSound("BreastfeedBaby");
+		(this.character as IsoGameCharacter).playSound("ZWBF.BreastfeedBaby");
 	}
 	update() {
 		super.update();
