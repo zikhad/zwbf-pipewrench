@@ -10,6 +10,7 @@ if (getActivatedMods().contains(MODS.ZOMBOWIN)) {
 		if (character.isFemale()) {
 			triggerEvent(ZWBFEventsEnum.INTERCOURSE);
 		}
+		triggerEvent(ZWBFEventsEnum.ANIMATION_STOP);
 	});
 	
 	table.insert(ActionEvents.Update, (action: ISBaseTimedAction) => {
@@ -26,7 +27,7 @@ if (getActivatedMods().contains(MODS.ZOMBOWIN)) {
 	});
 	
 	table.insert(ActionEvents.Stop, () => {
-		triggerEvent(ZWBFEventsEnum.IMAGE);
+		triggerEvent(ZWBFEventsEnum.ANIMATION_STOP);
 	});
 }
 

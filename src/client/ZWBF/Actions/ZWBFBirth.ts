@@ -35,11 +35,12 @@ export class ZWBFActionBirth extends ISBaseTimedAction {
 		} as AnimationConfig);
 	}
 	stop() {
-		triggerEvent(ZWBFEventsEnum.IMAGE);
+		triggerEvent(ZWBFEventsEnum.ANIMATION_STOP);
 	}
 
 	perform() {
 		super.perform();
 		this.pregnancy.birth();
+		triggerEvent(ZWBFEventsEnum.ANIMATION_STOP);
 	}
 }

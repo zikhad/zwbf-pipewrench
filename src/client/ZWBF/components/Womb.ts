@@ -218,7 +218,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
-		triggerEvent(ZWBFEventsEnum.IMAGE);
 	}
 
 	onEveryTenMinutes(): void {

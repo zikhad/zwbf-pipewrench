@@ -1,6 +1,6 @@
-import { getText, IsoPlayer } from "@asledgehammer/pipewrench";
+import { getText, IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFTraitsEnum } from "@constants";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
@@ -222,6 +222,8 @@ export class ZWBFUI {
 		const { pregnancy } = this.pregnancy;
 		const amountInMilliliters = Math.round(amount * 1000);
 		const totalInMilliliters = Math.round(total * 1000);
+
+		triggerEvent(ZWBFEventsEnum.IMAGE);
 
 		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amountInMilliliters} ml`);
 		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${totalInMilliliters} ml`);

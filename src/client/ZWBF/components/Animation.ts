@@ -24,10 +24,9 @@ export type AnimationConfig = {
     delta: number;
 };
 
-
-
 export class Animation {
     public static wombImage: string = "media/ui/womb/normal/womb_normal_0.png";
+    private static isAnimationActive = false;
 
     private readonly animations: AnimationSettings = {
         [ANIMATION_KEY.NORMAL]: {
@@ -61,6 +60,7 @@ export class Animation {
         private readonly womb: Womb
     ) {
         new Events.EventEmitter<(data: AnimationConfig) => void>(ZWBFEventsEnum.ANIMATION).addListener((data) => this.onAnimation(data));
+        new Events.EventEmitter(ZWBFEventsEnum.ANIMATION_STOP).addListener(() => this.onAnimationStop());
         new Events.EventEmitter(ZWBFEventsEnum.IMAGE).addListener(() => this.onImage());
     }
 
@@ -71,6 +71,12 @@ export class Animation {
         return "empty";
     }
 
+    /**
+     * This helper will extract a valid animationKey given a animation to run
+     * Since the normal animation can either be condom / pregnant or normal
+     * @param key The animation to extract key from
+     * @returns A valid animation key
+     */
     private animationKey(key: ANIMATIONS ): ANIMATION_KEY {
         if(key === ANIMATIONS.BIRTH) {
             return ANIMATION_KEY.BIRTH;
@@ -88,6 +94,7 @@ export class Animation {
      * @param props.duration The duration of the animation  
     * */
     onAnimation({ animation, delta, duration = 1 }: AnimationConfig) {
+        Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
         const { steps, loop = 1 } = this.animations[key];
         const fullness = this.fullness;
@@ -100,6 +107,10 @@ export class Animation {
 
         const fullnessPath = (key == ANIMATION_KEY.NORMAL) ? `/${fullness}` : "";
         Animation.wombImage = `media/ui/animation/${animation}${fullnessPath}/${step}.png`;
+    }
+
+    onAnimationStop() {
+        Animation.isAnimationActive = false;
     }
 
     
@@ -127,6 +138,7 @@ export class Animation {
      * Event that updates the still image of Womb
      */
     onImage() {
+        if (Animation.isAnimationActive) return;
         Animation.wombImage = `media/ui/womb/${this.status}/womb_${this.status}_${this.imageIndex}.png`;
     }
 }
