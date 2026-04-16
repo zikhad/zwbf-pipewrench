@@ -37,6 +37,11 @@ ZWBFRecipes = {
 			if (womb.amount <= 0) return false;
 			if (new FluidContainerApi(item).isFull()) return false;
 			return true;
+		},
+		BreastFeedBaby: (item, character) => {
+			if (!character.isFemale()) return false;
+			if(lactation.milkAmount < lactation.bottleAmount) return false;
+			return true;
 		}
 	},
 	OnCreate: {
@@ -67,6 +72,9 @@ ZWBFRecipes = {
 			const container = items.getInputItems(0).get(0) as InventoryItem; 
 			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount);
 			womb.amount -= Math.min(womb.amount, filledAmount);
+		},
+		BreastFeedBaby: (items) => {
+			lactation.useMilk(lactation.bottleAmount, ZombRandFloat(0.2, 0.5));
 		}
 	}
 };

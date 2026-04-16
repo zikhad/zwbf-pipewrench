@@ -13,13 +13,13 @@ module ZWBF
 
     timedAction PumpMilk
     {
-        metabolics  = SedentaryActivity,
+        metabolics  = LightDomestic,
         actionAnim  = ZWBF.PumpMilk,
     }
 
     timedAction CleanSelf
     {
-        metabolics  = SedentaryActivity,
+        metabolics  = LightDomestic,
         actionAnim  = ZWBF.CleanSelf,
     }
 
@@ -30,5 +30,11 @@ module ZWBF
         muscleStrainFactor = 1,
         muscleStrainSkill = Strength,
         muscleStrainParts = Groin,
+    }
+
+    timedAction FeedBaby
+    {
+        metabolics  = LightDomestic,
+        actionAnim  = ZWBF.FeedBaby,
     }
 }
