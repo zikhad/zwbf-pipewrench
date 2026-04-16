@@ -41,7 +41,9 @@ describe("ZWBFRecipes.ts", () => {
 		{ name: "HandExpress", type: "lactation" },
 		{ name: "BreastPump", type: "lactation" },
 		/* Womb */
-		{ name: "ClearSperm", type: "womb" }
+		{ name: "ClearSperm", type: "womb" },
+		/* Baby */
+		{ name: "BreastFeedBaby", type: "baby" }
 	];
 
 	beforeEach(() => {
@@ -297,6 +299,17 @@ describe("ZWBFRecipes.ts", () => {
 				};
 				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
 				expect(amountSetter).toHaveBeenCalled();
+			});
+		});
+
+		describe("Baby recipe", () => {
+			it("BreastFeedBaby should call useMilk with bottleAmount", () => {
+				Object.defineProperty(SpyZWBF.lactation, "milkAmount", {
+					get: jest.fn(() => 0.4),
+					configurable: true
+				});
+				ZWBFRecipes.OnCreate.BreastFeedBaby(undefined as any, mockCharacter);
+				expect(SpyZWBF.lactation.useMilk).toHaveBeenCalledWith(0.2, expect.any(Number));
 			});
 		});
 	});
