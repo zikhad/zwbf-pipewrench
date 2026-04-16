@@ -2,7 +2,6 @@
 import { mock } from "jest-mock-extended";
 import { BodyPart, BodyPartType } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
-import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { CyclePhase, WombData } from "@types";
 import { Womb } from "./Womb";
 import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
@@ -49,27 +48,6 @@ describe("Womb", () => {
 		jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(null);
 		jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
 
-		// getTimedActionQueue should always return an valid value
-		ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() => ({
-			queue: [{ animation: "allowed" }]
-		}));
-
-		// should mock ZomboWin animation data
-		const ZomboWinAnimationData = [
-			{
-				prefix: "mocked",
-				id: "mocked",
-				tags: ["allowed"],
-				actors: [
-					{ gender: "Female", stages: [{ perform: "allowed", duration: 1000 }] },
-					{ gender: "Male", stages: [{ perform: "allowed", duration: 1000 }] }
-				]
-			}
-		];
-		Object.defineProperty(global, "ZomboWinAnimationData", {
-			value: ZomboWinAnimationData,
-			writable: true
-		});
 	});
 
 	// === Basic Instantiation Tests ===
@@ -86,7 +64,6 @@ describe("Womb", () => {
 				expect(womb.fertility).toBe(0);
 				expect(womb.contraceptive).toBe(false);
 				expect(womb.phase).toBe("Recovery");
-				expect(womb.image).toBe("");
 			});
 		});
 
@@ -181,26 +158,13 @@ describe("Womb", () => {
 					addListener: mockAddListener
 				}));
 			});
-			describe("Animation", () => {
-				it("should setup animation update event listener on player creation", () => {
-					const womb = new Womb();
-					womb.onCreatePlayer(mockedPlayer());
-
-					const [listenerFn] = mockAddListener.mock.calls[0];
-					const testAnimationData = { isActive: true, delta: 0.5, duration: 1000 };
-
-					listenerFn(testAnimationData);
-					expect(womb.animation).toEqual(testAnimationData);
-				});
-			});
-
 			describe("Intercourse", () => {
 				it("should call intercourse via event Listener", () => {
 					const womb = new Womb();
 					womb.onCreatePlayer(mockedPlayer());
 
-					// The intercourse is the second call of the Event.Emitter
-					const [listenerFn] = mockAddListener.mock.calls[1];
+					// The intercourse is the first EventEmitter call
+					const [listenerFn] = mockAddListener.mock.calls[0];
 					const spyIntercourse = jest.spyOn(womb as any, "intercourse");
 
 					listenerFn();
@@ -442,158 +406,6 @@ describe("Womb", () => {
 
 			expect(womb.phase).not.toBe(CyclePhaseEnum.MENSTRUATION);
 			expect(menstruationEffectsSpy).not.toHaveBeenCalled();
-		});
-	});
-
-	// === Image Rendering Tests ===
-	describe("Image Rendering", () => {
-		beforeEach(() => {
-			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
-		});
-
-		describe("still images", () => {
-			it.each([
-				{ amount: 0, expected: "womb_normal_0.png" },
-				{ amount: 0.01, expected: "womb_normal_1.png" },
-				{ amount: 1, expected: "womb_normal_17.png" }
-			])("should return $expected when amount is $amount", ({ amount, expected }) => {
-				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-					mockedModData({ amount })
-				);
-
-				const womb = new Womb();
-				womb.onCreatePlayer(mockedPlayer());
-				
-				expect(womb.image).toBe(`media/ui/womb/normal/${expected}`);
-			});
-
-			it.each([
-				{ progress: 0, amount: 0, expected: "conception/womb_conception_0.png" },
-				{ progress: 0, amount: 1, expected: "conception/womb_conception_17.png" },
-				{ progress: 0.8, amount: 1, expected: "pregnant/womb_pregnant_4.png" },
-				{ progress: 0.95, amount: 1, expected: "pregnant/womb_pregnant_6.png" }
-			])(
-				"should return $expected when pregnant with progress $progress and amount $amount",
-				({ progress, amount, expected }) => {
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress });
-					jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-						mockedModData({ amount })
-					);
-
-					const womb = new Womb();
-					womb.onCreatePlayer(mockedPlayer());
-					womb.onPregnancyUpdate({ progress });
-
-					expect(womb.image).toBe(`media/ui/womb/${expected}`);
-				}
-			);
-		});
-
-		describe("scene images", () => {
-			const sceneTestCases = [
-				{
-					amount: 0,
-					isPregnant: false,
-					condom: false,
-					expected: "media/ui/animation/normal/empty/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: false,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: false,
-					condom: false,
-					expected: "media/ui/animation/normal/full/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: false,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: true,
-					condom: false,
-					expected: "media/ui/animation/pregnant/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: true,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: true,
-					condom: false,
-					expected: "media/ui/animation/pregnant/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: true,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				}
-			];
-
-			it.each(sceneTestCases)(
-				"should return $expected when pregnant: $isPregnant, condom: $condom, amount: $amount",
-				({ isPregnant, condom, amount, expected }) => {
-					jest.spyOn(Player.prototype, "hasItem").mockReturnValue(condom);
-					jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-						mockedModData({ amount })
-					);
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
-						isPregnant ? { progress: 0.6 } : null
-					);
-
-					const womb = new Womb();
-					womb.onCreatePlayer(mockedPlayer());
-
-					womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-
-					expect(womb.image).toBe(expected);
-				}
-			);
-
-			it("should return labor animation", () => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({
-					progress: 1,
-					isInLabor: true
-				});
-
-				const womb = new Womb();
-				womb.onCreatePlayer(mockedPlayer());
-				womb.onAnimationUpdate({ isActive: true });
-
-				expect(womb.image).toBe("media/ui/animation/birth/0.png");
-			});
-
-			it("should not animate when animation is not queued", () => {
-				ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() => ({
-					queue: []
-				}));
-				const womb = new Womb();
-				womb.onCreatePlayer(mockedPlayer());
-				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-				expect(womb.animation.isActive).toBe(false);
-			});
-
-			it("should not animate when ZomboWin animation data is not present", () => {
-				Object.defineProperty(global, "ZomboWinAnimationData", {
-					value: [],
-					writable: true
-				});
-				const womb = new Womb();
-				womb.onCreatePlayer(mockedPlayer());
-				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-				expect(womb.animation.isActive).toBe(false);
-			});
 		});
 	});
 

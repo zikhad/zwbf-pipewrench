@@ -4,6 +4,7 @@ import { ZWBFUI } from "./ZWBFUI";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Lactation } from "./Lactation";
 import { Womb } from "./Womb";
+import { Animation } from "@client/components/Animation";
 import { PregnancyData } from "@types";
 import { Pregnancy } from "./Pregnancy";
 import { mockedPlayer } from "@test/mock";
@@ -188,7 +189,6 @@ describe("ZWBFUI", () => {
 					}),
 					pregnancy: mock<Pregnancy>({ pregnancy }),
 					womb: mock<Womb>({
-						image: "womb.png",
 						phaseTranslation: "mock-phase",
 						fertility: 0.75,
 						amount: 200,

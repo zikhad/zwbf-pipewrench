@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { triggerEvent, ArrayList } from "@asledgehammer/pipewrench";
 import { ZWBFEventsEnum } from "@constants";
-import { AnimationStatus } from "@types";
+import { AnimationConfig, ANIMATIONS } from "@client/components/Animation";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { mock } from "jest-mock-extended";
 
@@ -58,7 +58,7 @@ describe("AnimationHandler Event Insertion", () => {
 		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.INTERCOURSE);
 	});
 
-	it("should trigger ANIMATION_UPDATE on Update with payload", () => {
+	it("should trigger ANIMATION event on Update with payload", () => {
 		const mockCharacter = { isFemale: () => true };
 		const mockAction = {
 			character: mockCharacter,
@@ -67,17 +67,15 @@ describe("AnimationHandler Event Insertion", () => {
 		};
 
 		ActionEvents.Update[0](mockAction);
-		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION_UPDATE, {
-			isActive: true,
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION, {
+			animation: ANIMATIONS.INTERCOURSE,
 			delta: 0.5,
 			duration: 30
-		} as AnimationStatus);
+		} as AnimationConfig);
 	});
 
-	it("should trigger ANIMATION_UPDATE false on Stop", () => {
+	it("should trigger ANIMATION_STOP on Stop", () => {
 		ActionEvents.Stop[0]();
-		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION_UPDATE, {
-			isActive: false
-		} as AnimationStatus);
+		expect(triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.ANIMATION_STOP);
 	});
 });
