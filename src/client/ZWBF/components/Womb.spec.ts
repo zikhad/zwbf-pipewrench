@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { mock } from "jest-mock-extended";
-import { BodyPart, BodyPartType } from "@asledgehammer/pipewrench";
+import { BodyPartType } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import { CyclePhase, WombData } from "@types";
 import { Womb } from "./Womb";
@@ -16,6 +15,7 @@ jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
 
 const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
+	capacity: 1,
 	amount: 0.2,
 	total: 0.4,
 	cycleDay: 1,
@@ -95,7 +95,6 @@ describe("Womb", () => {
 			describe.each([
 				{ event: "everyOneMinute", handler: "onEveryMinute" },
 				{ event: "everyTenMinutes", handler: "onEveryTenMinutes" },
-				{ event: "everyHours", handler: "onEveryHour" },
 				{ event: "everyDays", handler: "onEveryDay" }
 			])("For $event", ({ event, handler }) => {
 				const mockEventListener = jest.fn();
@@ -284,11 +283,13 @@ describe("Womb", () => {
 				expect(womb.data?.chances).toEqual(mockChances);
 			});
 		});
-		describe("onEveryHour", () => {
-			it("should update hourly data", () => {
+		describe("onEveryMinute", () => {
+			it("should update minute data", () => {
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 				const womb = new Womb();
-				womb.onEveryHour();
-				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.WOMB_HOURLY_UPDATE, expect.anything());
+				womb.onCreatePlayer(mockedPlayer());
+				womb.onEveryMinute();
+				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.WOMB_UPDATE, expect.anything());
 			});
 		});
 	});
@@ -358,7 +359,6 @@ describe("Womb", () => {
 
 	// === Menstruation ===
 	describe("Menstruation", () => {
-		const spyApplyDamage = jest.fn();
 		beforeEach(() => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 

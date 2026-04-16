@@ -33,7 +33,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	}
 
 	get capacity() {
-		return this.options.capacity;
+		return this.data?.capacity ?? this.options.capacity;
 	}
 
 	public Debug = {
@@ -77,6 +77,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	};
 
 	defaultData = {
+		capacity: this.options.capacity,
 		amount: 0,
 		total: 0,
 		cycleDay: ZombRand(1, 28),
@@ -164,7 +165,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
-		Events.everyHours.addListener(() => this.onEveryHour());
 		Events.everyDays.addListener(() => this.onEveryDay());
 
 		new Events.EventEmitter(ZWBFEventsEnum.INTERCOURSE).addListener(() => this.intercourse());
@@ -218,6 +218,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	onEveryMinute(): void {
 		this.fertility = this.computeFertility();
+		triggerEvent(ZWBFEventsEnum.WOMB_UPDATE, this.data);
 	}
 
 	onEveryTenMinutes(): void {
@@ -227,14 +228,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		const amount = ZombRand(0, 5) / 1000;
 		this.amount -= Math.min(this.amount, amount);
 		this.applyWetness();
-	}
-
-	onEveryHour(): void {
-		triggerEvent(ZWBFEventsEnum.WOMB_HOURLY_UPDATE, {
-			player: this.player,
-			amount: this.amount,
-			capacity: this.options.capacity
-		});
 	}
 
 	onEveryDay(): void {

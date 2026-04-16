@@ -79,8 +79,8 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START)
 			.addListener(() => this.start());
-		new Events.EventEmitter<(delta: number) => void>(ZWBFEventsEnum.PREGNANCY_LABOR)
-			.addListener((delta) => this.onLabor(delta));
+		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_LABOR)
+			.addListener(() => this.onLabor());
 	}
 
 	/**
@@ -110,7 +110,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		this.resetVariables();
 	}
 
-	private onLabor(delta: number) {
+	private onLabor() {
 		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
 
@@ -131,7 +131,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			ISTimedActionQueue.add(new ZWBFActionBirth(this));
 		}
 		this.moodle?.moodle(this.pregnancy.progress);
-		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
+		triggerEvent(ZWBFEventsEnum.PREGNANCY_UPDATE, this.data);
 	}
 
 	onEveryHour(): void {
