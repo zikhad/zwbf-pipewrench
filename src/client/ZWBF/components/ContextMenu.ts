@@ -130,12 +130,12 @@ export class ContextMenu {
 			},
 			{
 				option: "Add_Pregnancy",
-				fn: () => this.pregnancy.Debug.start(),
+				fn: () => triggerEvent(ZWBFEventsEnum.PREGNANCY_START),
 				condition: () => this.pregnancy.pregnancy == null
 			},
 			{
 				option: "Remove_Pregnancy",
-				fn: () => this.pregnancy.Debug.stop(),
+				fn: () => triggerEvent(ZWBFEventsEnum.PREGNANCY_STOP),
 				condition: () => this.pregnancy.pregnancy != null
 			},
 			{

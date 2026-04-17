@@ -1,8 +1,8 @@
 import type { PregnancyData } from "@types";
-import { BodyPartType, getActivatedMods, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { ITEMS, MODS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { ITEMS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ZWBFActionBirth } from "@actions/ZWBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
@@ -16,8 +16,6 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private moodle?: Moodle;
 
 	public Debug = {
-		start: () => this.start(),
-		stop: () => this.stop(),
 		advance: (minutes: number) => {
 			if (!this.pregnancy) return;
 
@@ -57,8 +55,10 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_START)
 			.addListener(() => this.start());
-		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_LABOR)
-			.addListener(() => this.onLabor());
+		new Events.EventEmitter(ZWBFEventsEnum.PREGNANCY_STOP)
+			.addListener(() => this.stop());
+		new Events.EventEmitter<(delta:number) => void>(ZWBFEventsEnum.PREGNANCY_LABOR)
+			.addListener((delta) => this.onLabor(delta));
 	}
 
 	/**
@@ -84,11 +84,11 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	 * stop Pregnancy (remove Player trait)
 	 */
 	private stop() {
-		this.removeZWBFTrait(ZWBFTraitsEnum.PREGNANCY);
+		this.removeTrait(ZWBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
 	}
 
-	private onLabor() {
+	private onLabor(_delta: number) {
 		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
 

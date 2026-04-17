@@ -228,7 +228,7 @@ export abstract class Player<T> {
 		CharacterTraitApi.addTrait(this.player, trait);
 	}
 
-	protected removeZWBFTrait(trait: ZWBFTraitsEnum): void {
+	protected removeTrait(trait: ZWBFTraitsEnum): void {
 		if (!this.player) return;
 		CharacterTraitApi.removeTrait(this.player, trait);
 	}

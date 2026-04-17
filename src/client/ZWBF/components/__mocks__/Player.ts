@@ -35,7 +35,7 @@ export class Player<T = unknown> {
 		traits.add(traitRef);
 	}
 
-	removeZWBFTrait(trait: ZWBFTraitsEnum) {
+	removeTrait(trait: ZWBFTraitsEnum) {
 		const player = this.player;
 		if (!player) return;
 

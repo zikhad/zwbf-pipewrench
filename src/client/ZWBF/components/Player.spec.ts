@@ -61,8 +61,8 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 	public testAddTrait(trait: ZWBFTraitsEnum): void {
 		this.addTrait(trait);
 	}
-	public testRemoveZWBFTrait(trait: ZWBFTraitsEnum): void {
-		this.removeZWBFTrait(trait);
+	public testRemoveTrait(trait: ZWBFTraitsEnum): void {
+		this.removeTrait(trait);
 	}
 }
 
@@ -226,10 +226,10 @@ describe("Player class", () => {
 			});
 		});
 
-		describe("removeZWBFTrait", () => {
+		describe("removeTrait", () => {
 			it("should do nothing when player is not set", () => {
 				const instance = new ConcretePlayer();
-				instance.testRemoveZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testRemoveTrait(ZWBFTraitsEnum.FERTILE);
 				expect(CharacterTraitApi.removeTrait).not.toHaveBeenCalled();
 			});
 
@@ -237,7 +237,7 @@ describe("Player class", () => {
 				const instance = new ConcretePlayer();
 				instance.triggerOnCreatePlayer(mockPlayer);
 
-				instance.testRemoveZWBFTrait(ZWBFTraitsEnum.FERTILE);
+				instance.testRemoveTrait(ZWBFTraitsEnum.FERTILE);
 
 				expect(CharacterTraitApi.removeTrait).toHaveBeenCalledWith(mockPlayer, ZWBFTraitsEnum.FERTILE);
 			});
