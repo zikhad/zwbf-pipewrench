@@ -44,20 +44,10 @@ export class ZWBFEmbeddedHealthTabViewFactory implements ZWBFHealthTabViewFactor
 
 		const width = window.panel?.width ?? window.width ?? 400;
 		const height = (window.height ?? 400) - 8;
-		const view = panelCtor.new(panelCtor, 0, 8, width, height);
+		const view = panelCtor.new(0, 8, width, height);
 		if (view.initialise) {
 			view.initialise();
 		}
-
-		const originalRender = view.render;
-		view.render = function(this: UIElementLike) {
-			if (originalRender) {
-				originalRender.call(this);
-			}
-			if (this.drawTextCentre) {
-				this.drawTextCentre(getText(TAB_INFO_TEXT), (this.width ?? 0) / 2, 20, 1, 1, 1, 1);
-			}
-		};
 		view.infoText = getText(TAB_INFO_TEXT);
 		return view;
 	}
