@@ -4,6 +4,7 @@
 -- All class names are prefixed with ZWBF to avoid conflicts.
 
 require "ISUI/ISCollapsableWindow"
+require "ISUI/ISPanel"
 require "ISUI/ISUIElement"
 require "ISUI/ISImage"
 require "ISUI/ISButton"
@@ -560,4 +561,68 @@ function NewZWBFUI()
     ui:instantiate();
     table.insert(allZWBFUI, ui);
     return ui;
+end
+
+
+-- ---------------------------------------------------------------------------
+-- ZWBFSimplePanel  (embeddable panel – no floating window chrome)
+-- ---------------------------------------------------------------------------
+
+ZWBFSimplePanel = ISPanel:derive("ZWBFSimplePanel");
+
+function ZWBFSimplePanel:new(x, y, width, height)
+    local o = ISPanel:new(x, y, width, height);
+    setmetatable(o, self);
+    self.__index = self;
+
+    o.noNameElements   = {};
+    o.namedElements    = {};
+    o.lineAct          = 1;
+    o.elemY            = {};
+    o.elemH            = {};
+    o.elemW            = {};
+    o.elemX            = {};
+    o.lineColumnCount  = {};
+    o.columnAct        = 0;
+    o.yAct             = 0;
+    o.pxlW             = width;
+    o.forceColumnWidht = {};
+    o.deltaY           = 0;
+    o.lineHaveImages   = false;
+    o.defaultLineHeight = getTextManager():getFontHeight(UIFont.Small) + 4;
+    o.matriceLayout    = {};
+    table.insert(o.elemY, 0);
+    table.insert(o.lineColumnCount, 0);
+    return o;
+end
+
+-- Share layout methods with ZWBFSimpleUI (self operates on panel state via self)
+ZWBFSimplePanel.addLineToMatrices        = ZWBFSimpleUI.addLineToMatrices;
+ZWBFSimplePanel.setElementsPositionAndSize = ZWBFSimpleUI.setElementsPositionAndSize;
+ZWBFSimplePanel.setBorderToAllElements   = ZWBFSimpleUI.setBorderToAllElements;
+ZWBFSimplePanel.nextColumn               = ZWBFSimpleUI.nextColumn;
+ZWBFSimplePanel.nextLine                 = ZWBFSimpleUI.nextLine;
+ZWBFSimplePanel.initAndAddToTable        = ZWBFSimpleUI.initAndAddToTable;
+ZWBFSimplePanel.addText                  = ZWBFSimpleUI.addText;
+ZWBFSimplePanel.addProgressBar           = ZWBFSimpleUI.addProgressBar;
+ZWBFSimplePanel.addButton                = ZWBFSimpleUI.addButton;
+ZWBFSimplePanel.addImage                 = ZWBFSimpleUI.addImage;
+
+function ZWBFSimplePanel:setWidthPixel(pxlW)
+    self.pxlW = pxlW;
+    self:setWidth(pxlW);
+end
+
+-- Finalise layout; no UIManager registration (panel is already a tab child).
+function ZWBFSimplePanel:saveLayout()
+    self:nextLine();
+    self:setElementsPositionAndSize();
+end
+
+--- Create a new embeddable ZWBF panel (for use as a tab view).
+--- @return ZWBFSimplePanel
+function NewZWBFPanel(x, y, width, height)
+    local panel = ZWBFSimplePanel:new(x, y, width, height);
+    panel:initialise();
+    return panel;
 end

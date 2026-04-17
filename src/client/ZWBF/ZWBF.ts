@@ -13,7 +13,7 @@ export const womb = new Womb();
 export const pregnancy = new Pregnancy();
 export const effects = new Effects();
 export const animation = new Animation(womb);
-export const healthTabPOC = new ZWBFHealthTabInjector();
+export const healthTabPOC = new ZWBFHealthTabInjector({ lactation, womb, pregnancy });
 
 export const UI = new ZWBFUI({
 	lactation,

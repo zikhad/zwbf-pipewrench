@@ -26,6 +26,19 @@ globalThis.print = jest.fn();
 	open: jest.fn(),
 });
 
+(globalThis as any).NewZWBFPanel = () => ({
+	setWidthPixel: jest.fn(),
+	setHeight: jest.fn(),
+	addText: jest.fn(),
+	nextLine: jest.fn(),
+	addProgressBar: jest.fn(),
+	addButton: jest.fn(),
+	addImage: jest.fn(),
+	setBorderToAllElements: jest.fn(),
+	saveLayout: jest.fn(),
+	yAct: 0,
+});
+
 (globalThis as any).ZWBFRecipes = {};
 
 (globalThis as any).CharacterStat = {
