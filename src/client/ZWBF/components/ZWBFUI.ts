@@ -54,7 +54,7 @@ export class ZWBFUI {
 	private readonly pregnancy?: Pregnancy;
 	private readonly womb?: Womb;
 
-	private UI?: SimpleUI;
+	private UI?: ZWBFSimpleUI;
 
 	// private readonly tabManager: ZWBFTabManager;
 
@@ -193,7 +193,7 @@ export class ZWBFUI {
 	}
 
 	private onCreateUI() {
-		this.UI = NewUI();
+		this.UI = NewZWBFUI();
 
 		this.UI.setWidthPixel(200);
 		this.UI.setTitle(getText("IGUI_ZWBF_UI_Panel"));

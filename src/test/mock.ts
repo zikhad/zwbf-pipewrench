@@ -4,7 +4,7 @@ import { mock } from "jest-mock-extended";
 
 globalThis.print = jest.fn();
 
-(globalThis as any).NewUI = () => ({
+(globalThis as any).NewZWBFUI = () => ({
 	setWidthPixel: jest.fn(),
 	setHeight: jest.fn(),
 	setVisible: jest.fn(),

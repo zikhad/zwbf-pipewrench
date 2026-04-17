@@ -27,10 +27,10 @@ describe("ZWBFUI", () => {
 	const addButton = jest.fn();
 
 	beforeEach(() => {
-		const defaultNewUI = NewUI();
+		const defaultNewUI = NewZWBFUI();
 		addButton.mockClear();
 
-		Object.defineProperty(global, "NewUI", {
+		Object.defineProperty(global, "NewZWBFUI", {
 			writable: true,
 			value: () => ({
 				...defaultNewUI,
