@@ -235,6 +235,18 @@ describe("ZWBFHealthTabPOC", () => {
 			expect(view).toBe(panelMock);
 		});
 
+		it("calls a detached NewZWBFPanel function reference safely", () => {
+			const panelMock = makePanelMock();
+			const newZWBFPanel = jest.fn().mockReturnValue(panelMock);
+			(globalThis as any).NewZWBFPanel = newZWBFPanel;
+
+			const factory = new ZWBFEmbeddedHealthTabViewFactory();
+			const view = factory.create({ width: 250, height: 180 });
+
+			expect(newZWBFPanel).toHaveBeenCalledWith(0, 8, 250, 172);
+			expect(view).toBe(panelMock);
+		});
+
 		it("uses panel.width over window.width when available", () => {
 			const panelMock = makePanelMock();
 			(globalThis as any).NewZWBFPanel = jest.fn().mockReturnValue(panelMock);

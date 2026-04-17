@@ -36,10 +36,11 @@ export class ZWBFEmbeddedHealthTabViewFactory implements ZWBFHealthTabViewFactor
 	public create(window: CharacterInfoWindowLike): ZWBFSimplePanel {
 		pipewrenchRequire("ZWBF/ZWBFSimpleUI");
 		const globals = globalThis as { NewZWBFPanel?: (x: number, y: number, w: number, h: number) => ZWBFSimplePanel };
-		if (!globals.NewZWBFPanel) return {} as ZWBFSimplePanel;
+		const newZWBFPanel = globals.NewZWBFPanel;
+		if (!newZWBFPanel) return {} as ZWBFSimplePanel;
 		const width = window.panel?.width ?? window.width ?? 400;
 		const height = (window.height ?? 400) - 8;
-		return globals.NewZWBFPanel(0, 8, width, height);
+		return newZWBFPanel(0, 8, width, height);
 	}
 }
 
