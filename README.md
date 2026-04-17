@@ -79,23 +79,93 @@ Built-in debugging utilities for testing and development:
 This mod provides extensive event hooks for other mods to integrate with:
 
 ### Events
-- `ZWBFPregnancyUpdate`: Fired when pregnancy data changes
-- `ZWBFLactationUpdate`: Fired when lactation data changes
-- `ZWBFAnimationUpdate`: Fired during animation sequences
-- `ZWBFIntercourse`: Fired during intercourse events
-- `ZWBFPregnancyStart`: Fired when pregnancy begins
-- `ZWBFWombOnEveryHour`: Fired hourly for womb updates
-
-### Usage Example
+#### `ZWBFPregnancyUpdate`: Fired when pregnancy data changes
 ```lua
--- Listen for pregnancy events
-Events.On("ZWBFPregnancyUpdate", function(data)
-    -- Handle pregnancy update
-end)
-
--- Trigger custom events
-triggerEvent("ZWBFIntercourse", { player = player, protected = true })
+Events.ZWBFPregnancyUpdate.Add(function ({
+  progress --[[ number ]],
+  current --[[ number ]],
+  isInLabor --[[ boolean ]]
+}) {
+  -- called every minute during pregnancy
+});
 ```
+#### `ZWBFLactationUpdate`: Fired every minute with lactation data
+```lua
+Events.ZWBFLactationUpdate.Add(function ({
+  isActive --[[ boolean ]],
+  milkAmount --[[ number ]],
+  multiplier --[[ number ]],
+  expiration --[[ how many minues due expiration ]]
+}) {
+  -- called every minute
+});
+```
+#### `ZWBFWombUpdate`: Fired every minute with womb data
+```lua
+Events.ZWBFLactationUpdate.Add(function ({
+  amount --[[ number ]],
+	capacity --[[ number ]],
+	total --[[ number ]],
+	cycleDay --[[ number ]],
+	fertility --[[ number ]],
+	onContraceptive --[[ boolean ]],
+	chances --[[ Table<CyclePhase, number>]]
+}) {
+  -- called every minute
+  -- chances is a table as follows
+  --[[
+    {
+      Recovery = 0,
+      Menstruation = 0,
+      Follicular = ZombRandFloat(0, 0.3),
+      Ovulation = ZombRandFloat(0, 0.4) ,
+      Luteal = ZombRandFloat(0.85, 1) ,
+      Pregnant = ZombRandFloat(0, 0.3) 
+    }
+  ]]
+});
+```
+#### `ZWBFPregnancyLabor`: Fired during labor
+```lua
+  Events.ZWBFPregnancyLabor.Add(function (delta --[[ number ]]) {
+    -- delta is a number between 0-1 that represents how far along the labor is
+  });
+```
+### Triggers
+#### `ZWBFIntercourse`: Trigger for intercourse event
+This will check for condoms and handle intercourse based on current conditions
+```lua
+  triggerEvent("ZWBFIntercourse");
+```
+#### `ZWBFMenstrualEffects`: Trigger for menstruation effects
+```lua
+  triggerEvent("ZWBFMenstrualEffects");
+```
+#### `ZWBFPregnancyStart`: Trigge to start pregnancy
+```lua
+  triggerEvent("ZWBFPregnancyStart");
+```
+#### `ZWBFWombAnimation`: Triggers a womb animation
+Usually triggered inside a Update of a **Custom Animation**
+```lua
+  triggerEvent("ZWBFWombAnimation", {
+    animation = "intercourse" --[[ A valid womb animation ]],
+    delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
+    duration: 1 --[[ number - usualy the action.duration ]]
+  });
+```
+#### `ZWBFWombAnimationStop`: Clear the womb animation state
+usually is called at Perform / Stop of a custom animation. ensure the `Animation.wombImage` can show the still image again
+```lua
+  triggerEvent("ZWBFWombAnimationStop");
+```
+#### `ZWBFWombImage`: Updates the womb image for the current static image
+This will update the `Animation.wombImage` based on current womb / pregnancy state
+```lua
+  triggerEvent("ZWBFWombImage");
+```
+
+---
 
 ## Installation
 
@@ -108,7 +178,6 @@ triggerEvent("ZWBFIntercourse", { player = player, protected = true })
 
 - **Project Zomboid**: Build 41.78 or later
 - **42UIAPI**: Required for UI functionality
-- **PipeWrench**: Framework for mod development
 
 ## Configuration
 
@@ -144,6 +213,6 @@ Contributions are welcome! Please:
 - [x] Revamp body effects methods
 - [x] Add pain at birth
 - [x] Add fatigue and at birth
-- [ ] Create triggers event for animations
+- [x] Create triggers event for animations
+- [x] Reintroduce Babies or similar artifacts
 - [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
-- [ ] Reintroduce Babies or similar artifacts
