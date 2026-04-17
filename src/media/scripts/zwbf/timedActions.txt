@@ -21,6 +21,7 @@ module ZWBF
     {
         metabolics  = LightDomestic,
         actionAnim  = ZWBF.CleanSelf,
+        sound       = ZWBF.CleanSelf,
     }
 
     timedAction Birth

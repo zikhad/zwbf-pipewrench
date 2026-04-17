@@ -69,10 +69,10 @@ module ZWBF {
 		component FluidContainer
 		{
 			ContainerName = VaginalDouche,
-			Capacity = 1.0,
+			Capacity = 0.5,
 			Fluids
 			{
-				fluid = Water:1.0,
+				fluid = Water:0.5,
 			}
 		}
 	}
