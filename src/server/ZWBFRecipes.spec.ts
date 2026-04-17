@@ -3,6 +3,8 @@ import { IsoGameCharacter, InventoryItem } from "@asledgehammer/pipewrench";
 import * as SpyZWBF from "../client/ZWBF/ZWBF";
 
 import { ZWBFRecipes } from "./ZWBFRecipes";
+import { Fluids } from "@constants";
+import { CraftRecipeData, Fluid } from "./types";
 
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("../client/ZWBF/ZWBF", () => ({
@@ -18,17 +20,40 @@ jest.mock("../client/ZWBF/ZWBF", () => ({
 
 describe("ZWBFRecipes.ts", () => {
 	const isFemaleSpy = jest.fn();
-	const mockCharacter = mock<IsoGameCharacter>({ isFemale: isFemaleSpy });
-
-	const createMockItemWithContainer = (isFull: boolean = false) => {
+	const hasBabySpy = jest.fn();
+	const mockCharacter = mock<IsoGameCharacter>({
+		isFemale: isFemaleSpy,
+		getInventory: () => ({ contains: hasBabySpy })
+	} as unknown as IsoGameCharacter);
+	const createMockItemWithContainer = ({
+		removeFluid = jest.fn(),
+		addFluid = jest.fn(),
+		getFreeCapacity = jest.fn(() => 0),
+		getCapacity = jest.fn(() => 1.0),
+		isFull = jest.fn(() => false),
+		isEmpty = jest.fn(() => false),
+		getAmount = jest.fn(() => 0),
+		getPrimaryFluid = jest.fn(() => Fluids.HUMAN_MILK)
+	}: Partial<{
+		removeFluid: () => void;
+		addFluid: () => void;
+		getFreeCapacity: () => number;
+		getCapacity: () => number;
+		isFull: () => boolean,
+		isEmpty: () => boolean,
+		getAmount: () => number,
+		getPrimaryFluid: () => Fluid
+	}> = {}) => {
 		return mock<InventoryItem>({
 			getFluidContainer: jest.fn(() => ({
-				removeFluid: jest.fn(),
-				addFluid: jest.fn(),
-				getFreeCapacity: jest.fn(() => isFull ? 0 : 1.0),
-				getCapacity: jest.fn(() => 1.0),
-				isFull: jest.fn(() => isFull),
-				isEmpty: jest.fn(() => false)
+				removeFluid,
+				addFluid,
+				getFreeCapacity,
+				getCapacity,
+				isFull,
+				isEmpty,
+				getAmount,
+				getPrimaryFluid,
 			}))
 		});
 	};
@@ -41,7 +66,11 @@ describe("ZWBFRecipes.ts", () => {
 		{ name: "HandExpress", type: "lactation" },
 		{ name: "BreastPump", type: "lactation" },
 		/* Womb */
-		{ name: "ClearSperm", type: "womb" }
+		{ name: "ClearSperm", type: "womb" },
+		{ name: "PushCum", type: "womb" },
+		/* Baby */
+		{ name: "BreastFeedBaby", type: "baby" },
+		{ name: "BottleFeedBaby", type: "baby" }
 	];
 
 	beforeEach(() => {
@@ -67,6 +96,7 @@ describe("ZWBFRecipes.ts", () => {
 		describe("Truthy scenarios", () => {
 			beforeEach(() => {
 				isFemaleSpy.mockReturnValue(true);
+				hasBabySpy.mockReturnValue(true);
 
 				Object.defineProperty(SpyZWBF.lactation, "milkAmount", {
 					get: jest.fn(() => 0.4),
@@ -80,7 +110,10 @@ describe("ZWBFRecipes.ts", () => {
 			});
 
 			it.each(scenarios)("Should return true for $name", ({ name }) => {
-				const mockItem = createMockItemWithContainer(false);
+				const mockItem = createMockItemWithContainer({
+					isFull: jest.fn(() => false),
+					getAmount: jest.fn(() => 1)
+				});
 				const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 				expect(result).toBeTruthy();
 			});
@@ -91,7 +124,7 @@ describe("ZWBFRecipes.ts", () => {
 					isFemaleSpy.mockReturnValue(false);
 				});
 				it.each(scenarios)("Should return false for $name", ({ name }) => {
-					const mockItem = createMockItemWithContainer(false);
+					const mockItem = createMockItemWithContainer({ isFull: jest.fn(() => false) });
 					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
@@ -112,7 +145,7 @@ describe("ZWBFRecipes.ts", () => {
 				});
 				const filteredScenarios = scenarios.filter(({ type }) => type !== "pill");
 				it.each(filteredScenarios)("Should return false for $name", ({ name }) => {
-					const mockItem = createMockItemWithContainer(false);
+					const mockItem = createMockItemWithContainer({ isFull: jest.fn(() => false) });
 					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
@@ -135,13 +168,13 @@ describe("ZWBFRecipes.ts", () => {
 				const lactationScenarios = scenarios.filter(({ type }) => type === "lactation");
 
 				it.each(lactationScenarios)("Should return false for $name when container is full", ({ name }) => {
-					const mockItem = createMockItemWithContainer(true);
+					const mockItem = createMockItemWithContainer({ isFull: jest.fn(() => true) });
 					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
 
 				it("Should return true for ClearSperm even when container is full", () => {
-					const mockItem = createMockItemWithContainer(true);
+					const mockItem = createMockItemWithContainer({ isFull: jest.fn(() => true) });
 					const result = ZWBFRecipes.OnTest.ClearSperm(mockItem, mockCharacter);
 					expect(result).toBeTruthy();
 				});
@@ -163,6 +196,31 @@ describe("ZWBFRecipes.ts", () => {
 						configurable: true
 					});
 					const result = ZWBFRecipes.OnTest.TakeContraceptive(mock(), mockCharacter);
+					expect(result).toBeFalsy();
+				});
+			});
+			describe("Player does not have a Baby", () => {
+				beforeEach(() => {
+					isFemaleSpy.mockReturnValue(true);
+					hasBabySpy.mockReturnValue(false);
+				});
+				const babyScenarios = scenarios.filter(({ type }) => type === "baby");
+				it.each(babyScenarios)("Should return false for $name", ({ name }) => {
+					const mockItem = createMockItemWithContainer();
+					const result = ZWBFRecipes.OnTest[name](mockItem, mockCharacter);
+					expect(result).toBeFalsy();
+				});
+			});
+			describe("Primary Fluid is NOT Milk", () => {
+				beforeEach(() => {
+					isFemaleSpy.mockReturnValue(true);
+					hasBabySpy.mockReturnValue(true);
+				});
+				it("Should return false for BottleFeedBaby ", () => {
+					const mockItem = createMockItemWithContainer({
+						getPrimaryFluid: jest.fn(() => Fluids.SEMEN)
+					});
+					const result = ZWBFRecipes.OnTest.BottleFeedBaby(mockItem, mockCharacter);
 					expect(result).toBeFalsy();
 				});
 			});
@@ -201,66 +259,54 @@ describe("ZWBFRecipes.ts", () => {
 		describe("Lactation recipes", () => {
 			const filteredScenarios = scenarios.filter(({ type }) => type == "lactation");
 			it.each(filteredScenarios)("should call useMilk for $name", ({ name }) => {
-				const removeFluid = jest.fn();
-				const addFluid = jest.fn();
 				const getFreeCapacity = jest.fn(() => 1.0);
 				const isFull = jest.fn(() => false);
 				const isEmpty = jest.fn(() => false);
 				const getCapacity = jest.fn(() => 1.0);
 
-				const mockContainerItem = mock<InventoryItem>({
-					getFluidContainer: jest.fn(() => ({
-						removeFluid,
-						addFluid,
-						getFreeCapacity,
-						getCapacity,
-						isFull,
-						isEmpty
-					}))
+				const mockContainerItem = createMockItemWithContainer({
+					isFull,
+					isEmpty,
+					getCapacity,
+					getFreeCapacity,
 				});
 
 				const mockItems = {
 					getInputItems: jest.fn(() => ({
 						get: jest.fn(() => mockContainerItem)
 					}))
-				};
-				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
+				} as unknown as CraftRecipeData;
+				ZWBFRecipes.OnCreate[name](mockItems, mockCharacter);
 				expect(SpyZWBF.lactation.useMilk).toHaveBeenCalled();
 			});
 		});
-
 		describe("Milk bottle creation", () => {
 			const filteredScenarios = scenarios.filter(({ name }) => ["HandExpress", "BreastPump"].includes(name));
 			it.each(filteredScenarios)("should fill created result with HumanMilk for $name", ({ name }) => {
-				const removeFluid = jest.fn();
 				const addFluid = jest.fn();
 				const getFreeCapacity = jest.fn(() => 1.0);
 				const isFull = jest.fn(() => false);
 				const isEmpty = jest.fn(() => false);
 				const getCapacity = jest.fn(() => 1.0);
 				
-				const mockContainerItem = mock<InventoryItem>({
-					getFluidContainer: jest.fn(() => ({
-						removeFluid,
-						addFluid,
-						getFreeCapacity,
-						getCapacity,
-						isFull,
-						isEmpty
-					}))
-				});
+				const mockContainerItem = createMockItemWithContainer({
+					getFreeCapacity,
+					addFluid,
+					isFull,
+					isEmpty,
+					getCapacity
+				})
 
-				const mockItems = {
-					getInputItems: jest.fn((index: number) => ({
+				const mockItems = mock<CraftRecipeData>({
+					getInputItems: jest.fn(() => ({
 						get: jest.fn(() => mockContainerItem)
 					}))
-				};
+				} as unknown as CraftRecipeData);
 
-				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
+				ZWBFRecipes.OnCreate[name](mockItems, mockCharacter);
 				expect(addFluid).toHaveBeenCalledWith("HumanMilk", 0.2);
 			});
 		})
-
 		describe("Womb recipes", () => {
 			const amountSetter = jest.fn();
 			beforeEach(() => {
@@ -272,31 +318,44 @@ describe("ZWBFRecipes.ts", () => {
 
 			const filteredScenarios = scenarios.filter(({ type }) => type == "womb");
 			it.each(filteredScenarios)("should call womb functions on $name", ({ name }) => {
-				const removeFluid = jest.fn();
-				const addFluid = jest.fn();
 				const getFreeCapacity = jest.fn(() => 1.0);
-				const isFull = jest.fn(() => false);
-				const isEmpty = jest.fn(() => false);
 				const getCapacity = jest.fn(() => 1.0);
 				
-				const mockContainerItem = mock<InventoryItem>({
-					getFluidContainer: jest.fn(() => ({
-						removeFluid,
-						addFluid,
-						getFreeCapacity,
-						getCapacity,
-						isFull,
-						isEmpty
-					}))
+				const mockContainerItem = createMockItemWithContainer({
+					getCapacity,
+					getFreeCapacity
 				});
 				
-				const mockItems = {
+				const mockItems = mock<CraftRecipeData>({
 					getInputItems: jest.fn(() => ({
 						get: jest.fn(() => mockContainerItem)
 					}))
-				};
-				ZWBFRecipes.OnCreate[name](mockItems as any, mockCharacter);
+				} as unknown as CraftRecipeData);
+				ZWBFRecipes.OnCreate[name](mockItems, mockCharacter);
 				expect(amountSetter).toHaveBeenCalled();
+			});
+		});
+		describe("Baby recipes", () => {
+			it("BreastFeedBaby should call useMilk with bottleAmount", () => {
+				Object.defineProperty(SpyZWBF.lactation, "milkAmount", {
+					get: jest.fn(() => 0.4),
+					configurable: true
+				});
+				ZWBFRecipes.OnCreate.BreastFeedBaby(mock(), mock());
+				expect(SpyZWBF.lactation.useMilk).toHaveBeenCalledWith(0.2, expect.any(Number));
+			});
+			it("BottleFeedBaby should gather bottleAmount from lactation to use it", () => {
+				const mockContainerItem = createMockItemWithContainer({});
+				const mockItems = mock<CraftRecipeData>({
+					getInputItems: jest.fn(() => ({
+						get: jest.fn(() => mockContainerItem)
+					}))
+				} as unknown as CraftRecipeData);
+
+				const bottleAmountSpy = jest.spyOn(SpyZWBF.lactation, "bottleAmount", "get");
+
+				ZWBFRecipes.OnCreate.BottleFeedBaby(mockItems, mock());
+				expect(bottleAmountSpy).toHaveBeenCalled();
 			});
 		});
 	});

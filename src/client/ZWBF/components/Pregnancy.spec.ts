@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
+import { IsoPlayer } from "@asledgehammer/pipewrench";
+import { ITEMS, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
 import { Pregnancy } from "./Pregnancy";
-import { ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import { PregnancyData } from "@types";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
@@ -21,6 +21,7 @@ describe("Pregnancy", () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+		jest.resetAllMocks();
 		jest.spyOn(Events, "EventEmitter").mockReturnValue({ addListener: jest.fn() } as any);
 	});
 
@@ -207,24 +208,25 @@ describe("Pregnancy", () => {
 		});
 		describe("Custom Events", () => {
 			const addListener = jest.fn();
+			const listener = jest.fn();
 			beforeEach(() => {
 				(Events.EventEmitter as jest.Mock).mockImplementation(() => ({
 					addListener
 				}));
+				jest.spyOn(Player.prototype as any, "addTrait").mockImplementation(listener);
+				jest.spyOn(Player.prototype as any, "removeTrait").mockImplementation(listener);
+				jest.spyOn(Player.prototype as any, "applyBodyEffect").mockImplementation(listener);
 			});
-			it("Should start pregnancy", () => {
-				const add = jest.fn();
-
+			it.each([
+				{ name: ZWBFEventsEnum.PREGNANCY_START, index: 0 },
+				{ name: ZWBFEventsEnum.PREGNANCY_STOP, index: 1 },
+				{ name: ZWBFEventsEnum.PREGNANCY_LABOR, index: 2 },
+			])('should call listener for $name', ({ index }) => {
 				const pregnancy = new Pregnancy();
-
-				(pregnancy as any).onCreatePlayer({
-					...player,
-					HasTrait: jest.fn().mockReturnValue(false),
-					getTraits: () => ({ add })
-				});
-				const [callback] = addListener.mock.calls[0];
+				(pregnancy as any).onCreatePlayer(mock());
+				const [callback] = addListener.mock.calls[index];
 				callback();
-				expect(add).toHaveBeenCalled();
+				expect(listener).toHaveBeenCalled();
 			});
 		});
 	});
@@ -263,50 +265,38 @@ describe("Pregnancy", () => {
 
 	// === Methods ===
 	describe("Methods", () => {
-		it("Birth should remove Pregnancy trait", () => {
-			const remove = jest.fn();
+		it("Birth should remove Pregnancy trait and add baby item", () => {
+			const removeTrait = jest.fn();
 			const AddItem = jest.fn();
-			const setBlockMovement = jest.fn();
-			jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
-				mock<ArrayList>({
-					contains: jest.fn().mockReturnValue(true)
+			const pregnancy = new Pregnancy();
+			jest.spyOn(Player.prototype as any, "removeTrait").mockImplementation(removeTrait);
+			(pregnancy as any).onCreatePlayer(
+				mock({
+					getInventory: () => ({ AddItem })
 				})
 			);
-			const pregnancy = new Pregnancy();
-			(pregnancy as any).onCreatePlayer({
-				...player,
-				HasTrait: jest.fn().mockReturnValue(true),
-				setBlockMovement,
-				getInventory: () => ({ AddItem }),
-				getTraits: () => ({ remove })
-			});
 			pregnancy.birth();
-			expect(remove).toHaveBeenCalled();
+			expect(removeTrait).toHaveBeenCalledWith(ZWBFTraitsEnum.PREGNANCY);
+			expect(AddItem).toHaveBeenCalledWith(ITEMS.BABY);
 		});
 	});
 
 	// === Debug Functions ===
 	describe("Debug", () => {
 		describe("Pregnancy data not defined", () => {
-			const start = jest.fn();
-			const stop = jest.fn();
 			let pregnancy: Pregnancy;
 			const spyPregnancySet = jest.spyOn(Player.prototype, "pregnancy", "set");
 			beforeEach(() => {
 				pregnancy = new Pregnancy();
-				(pregnancy as any).start = start;
-				(pregnancy as any).stop = stop;
 				// Mock PregnancyOptions to use a smaller duration for testing
 				jest.resetModules();
 			});
 			it.each<{
-				method: "start" | "stop" | "advance" | "advanceToLabor";
+				method: "advance" | "advanceToLabor";
 				data: PregnancyData | null;
 				args?: number;
 				expected: () => void;
 			}>([
-				{ method: "start", data: null, expected: () => expect(start).toHaveBeenCalled() },
-				{ method: "stop", data: null, expected: () => expect(stop).toHaveBeenCalled() },
 				{
 					method: "advance",
 					data: null,

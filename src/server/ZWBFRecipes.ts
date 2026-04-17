@@ -1,6 +1,7 @@
+
 import { ZombRandFloat, InventoryItem } from "@asledgehammer/pipewrench";
 import { lactation, womb } from "@client/ZWBF";
-import { Fluids } from "@constants";
+import { Fluids, ITEMS } from "@constants";
 import { Recipe } from "server/types";
 import { FluidContainerApi } from "@shared/components/FluidContainerApi";
 
@@ -35,8 +36,19 @@ ZWBFRecipes = {
 		PushCum: (item, character) => {
 			if (!character.isFemale()) return false;
 			if (womb.amount <= 0) return false;
-			if (new FluidContainerApi(item).isFull()) return false;
-			return true;
+			return !new FluidContainerApi(item).isFull();
+		},
+		BreastFeedBaby: (_item, character) => {
+			if (!character.isFemale()) return false;
+			return lactation.milkAmount >= lactation.bottleAmount;
+		},
+		BottleFeedBaby: (item, character) => {
+			if (!character.isFemale()) return false;
+			if (!character.getInventory().contains(ITEMS.BABY)) return false;
+			
+			const container = new FluidContainerApi(item);
+			if (container.primaryFluid !== Fluids.HUMAN_MILK) return false;
+			return container.amount >= lactation.bottleAmount;
 		}
 	},
 	OnCreate: {
@@ -67,10 +79,15 @@ ZWBFRecipes = {
 			const container = items.getInputItems(0).get(0) as InventoryItem; 
 			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount);
 			womb.amount -= Math.min(womb.amount, filledAmount);
+		},
+		BreastFeedBaby: () => {
+			lactation.useMilk(lactation.bottleAmount, ZombRandFloat(0.2, 0.5));
+		},
+		BottleFeedBaby: (items) => {
+			const container = items.getInputItems(0).get(0) as InventoryItem; 
+			new FluidContainerApi(container).clear(lactation.bottleAmount);
 		}
 	}
 };
 
 export { ZWBFRecipes };
-
-// ZWBFRecipes = ZWBFRecipesImpl;

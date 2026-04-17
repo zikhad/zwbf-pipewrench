@@ -38,7 +38,7 @@ module ZWBFRecipes
         }
     }
 
-    /************************ Vaginal Douche ************************/
+    /************************ Vaginal Cleaning ************************/
     craftRecipe ClearSperm
     {
         timedAction = ZWBF.CleanSelf,
@@ -50,6 +50,23 @@ module ZWBFRecipes
         inputs
         {
             item 1 [ZWBF.VaginalDouche] flags[Prop1;IsFull] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+
+        craftRecipe PushCum
+    {
+        timedAction = ZWBF.CleanSelf,
+        category = Health,
+        time = 100,
+        Tags = InHandCraft;CanBeDoneInDark,
+        OnTest = ZWBFRecipes.OnTest.PushCum,
+        OnCreate = ZWBFRecipes.OnCreate.PushCum,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
         }
         outputs
         {
@@ -89,23 +106,6 @@ module ZWBFRecipes
             item 1 ZWBF.CondomBox,
         }
     }
-
-    craftRecipe PushCum
-    {
-        timedAction = ZWBF.CleanSelf,
-        category = Health,
-        time = 100,
-        Tags = InHandCraft;CanBeDoneInDark,
-        OnTest = ZWBFRecipes.OnTest.PushCum,
-        OnCreate = ZWBFRecipes.OnCreate.PushCum,
-        inputs
-        {
-            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
-        }
-        outputs
-        {
-        }
-    }
     
     /************************ Milk ************************/
     craftRecipe HandExpression
@@ -139,6 +139,42 @@ module ZWBFRecipes
         {
             item 1 [ZWBF.BreastPump] flags[Prop1] mode:keep,
             item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
+        }
+        outputs
+        {
+        }
+    }
+
+    /************************ Baby ************************/
+    craftRecipe BreastFeedBaby
+    {
+        timedAction = ZWBF.FeedBaby,
+        time = 500,
+        category = Cooking,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.BreastFeedBaby,
+        OnCreate = ZWBFRecipes.OnCreate.BreastFeedBaby,
+        inputs
+        {
+            item 1 [ZWBF.Baby] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+
+    craftRecipe BottleFeedBaby
+    {
+        timedAction = ZWBF.FeedBaby,
+        time = 500,
+        category = Cooking,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.BottleFeedBaby,
+        OnCreate = ZWBFRecipes.OnCreate.BottleFeedBaby,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted] mode:keep flags[Prop1],
+            -fluid 0.2 [ZWBF.HumanMilk]
         }
         outputs
         {

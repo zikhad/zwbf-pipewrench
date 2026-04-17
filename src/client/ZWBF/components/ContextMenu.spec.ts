@@ -8,6 +8,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
+import { ZWBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("@asledgehammer/pipewrench/client");
@@ -24,8 +25,6 @@ describe("DebugMenu", () => {
 		});
 		const pregnancy = mock<Pregnancy>({
 			Debug: {
-				start: jest.fn(),
-				stop: jest.fn(),
 				advance: jest.fn(),
 				advanceToLabor: jest.fn()
 			}
@@ -178,12 +177,12 @@ describe("DebugMenu", () => {
 				{
 					title: "Add_Pregnancy",
 					mockCondition: () => ((pregnancy as any).pregnancy = null),
-					expected: () => expect(pregnancy.Debug.start).toHaveBeenCalled()
+					expected: () => expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_START)
 				},
 				{
 					title: "Remove_Pregnancy",
 					mockCondition: () => ((pregnancy as any).pregnancy = mock()),
-					expected: () => expect(pregnancy.Debug.stop).toHaveBeenCalled()
+					expected: () => expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_STOP)
 				},
 				{
 					title: "Advance_Pregnancy",

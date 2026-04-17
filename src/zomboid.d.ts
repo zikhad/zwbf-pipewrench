@@ -4,6 +4,8 @@
  * and declares CharacterStat as a global.
  */
 
+import { Fluid } from "server/types";
+
 export {};
 
 /** Opaque type representing a CharacterStat enum value (Java-backed). */
@@ -79,12 +81,14 @@ declare global {
 
 	/** Fluid container interface */
 	interface FluidContainer {
-		removeFluid(): void;
+		removeFluid(amount?: number): void;
 		addFluid(type: string, amount: number): void;
+		getAmount(): number;
 		getCapacity(): number;
 		isFull(): boolean;
 		isEmpty(): boolean;
 		getFreeCapacity(): number;
+		getPrimaryFluid(): Fluid
 	}
 }
 
