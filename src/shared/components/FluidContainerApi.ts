@@ -77,6 +77,7 @@ export class FluidContainerApi {
 	 * Clears any fluid from the wrapped container.
 	 */
 	public clear(amount?: number): void {
-		this.container?.removeFluid(amount);
+		if (typeof amount == "number") this.container?.removeFluid(amount);
+		this.container?.removeFluid();
 	}
 }

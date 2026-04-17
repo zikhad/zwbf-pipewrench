@@ -36,13 +36,11 @@ ZWBFRecipes = {
 		PushCum: (item, character) => {
 			if (!character.isFemale()) return false;
 			if (womb.amount <= 0) return false;
-			if (new FluidContainerApi(item).isFull()) return false;
-			return true;
+			return !new FluidContainerApi(item).isFull();
 		},
 		BreastFeedBaby: (_item, character) => {
 			if (!character.isFemale()) return false;
-			if(lactation.milkAmount < lactation.bottleAmount) return false;
-			return true;
+			return lactation.milkAmount >= lactation.bottleAmount;
 		},
 		BottleFeedBaby: (item, character) => {
 			if (!character.isFemale()) return false;
@@ -50,8 +48,7 @@ ZWBFRecipes = {
 			
 			const container = new FluidContainerApi(item);
 			if (container.primaryFluid !== Fluids.HUMAN_MILK) return false;
-			if (container.amount < lactation.bottleAmount) return false;
-			return true;
+			return container.amount >= lactation.bottleAmount;
 		}
 	},
 	OnCreate: {
@@ -83,7 +80,7 @@ ZWBFRecipes = {
 			const filledAmount = new FluidContainerApi(container).fill(Fluids.SEMEN, womb.amount);
 			womb.amount -= Math.min(womb.amount, filledAmount);
 		},
-		BreastFeedBaby: (items) => {
+		BreastFeedBaby: () => {
 			lactation.useMilk(lactation.bottleAmount, ZombRandFloat(0.2, 0.5));
 		},
 		BottleFeedBaby: (items) => {
