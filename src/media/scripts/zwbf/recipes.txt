@@ -156,7 +156,25 @@ module ZWBFRecipes
         OnCreate = ZWBFRecipes.OnCreate.BreastFeedBaby,
         inputs
         {
-            item 1 [ZWBF.Baby] mode:keep flags[Prop2],
+            item 1 [ZWBF.Baby] mode:keep,
+        }
+        outputs
+        {
+        }
+    }
+
+    craftRecipe BottleFeedBaby
+    {
+        timedAction = ZWBF.FeedBaby,
+        time = 500,
+        category = Cooking,
+        Tags = InHandCraft;Cooking,
+        OnTest = ZWBFRecipes.OnTest.BottleFeedBaby,
+        OnCreate = ZWBFRecipes.OnCreate.BottleFeedBaby,
+        inputs
+        {
+            item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted] mode:keep flags[Prop1],
+            -fluid 0.2 [ZWBF.HumanMilk]
         }
         outputs
         {

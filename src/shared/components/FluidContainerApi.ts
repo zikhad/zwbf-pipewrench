@@ -23,11 +23,19 @@ export class FluidContainerApi {
 		return this.item.getFluidContainer?.() ?? null;
 	}
 
+	public get amount() {
+		return this.container?.getAmount() ?? 0
+	}
+
+	public get primaryFluid(): Fluid | null {
+		return this.container?.getPrimaryFluid().toString() ?? null;
+	}
+
 	/**
 	 * Returns true when the wrapped inventory item exposes a fluid container.
 	 * @returns True if the item has a fluid container, false otherwise.
 	 */
-	hasContainer(): boolean {
+	public hasContainer(): boolean {
 		return this.container !== null;
 	}
 
@@ -35,7 +43,7 @@ export class FluidContainerApi {
 	 * Returns true when the wrapped fluid container exists and is full.
 	 * @returns True if the container is full, false otherwise.
 	 */
-	isFull(): boolean {
+	public isFull(): boolean {
 		return this.container?.isFull() ?? false;
 	}
 
@@ -43,9 +51,10 @@ export class FluidContainerApi {
 	 * Returns true when the wrapped fluid container exists and is empty.
 	 * @returns True if the container is empty, false otherwise.
 	 */
-	isEmpty(): boolean {
+	public isEmpty(): boolean {
 		return this.container?.isEmpty() ?? false;
 	}
+	
 
 	/**
 	 * Adds fluid to the wrapped container up to the requested amount.
@@ -54,7 +63,7 @@ export class FluidContainerApi {
 	 * @param amount The maximum amount to add. If not specified, will attempt to fill the container completely.
 	 * @returns The amount actually added to the container.
 	 */
-	fill(fluid: Fluid, amount?: number): number {
+	public fill(fluid: Fluid, amount?: number): number {
 		const container = this.container;
 		if (!container) return 0;
 		const addedFluid = Math.min(container.getFreeCapacity(), amount ?? container.getCapacity());
@@ -67,7 +76,8 @@ export class FluidContainerApi {
 	/**
 	 * Clears any fluid from the wrapped container.
 	 */
-	clear(): void {
+	public clear(amount?: number): void {
+		if (typeof amount == "number") this.container?.removeFluid(amount);
 		this.container?.removeFluid();
 	}
 }

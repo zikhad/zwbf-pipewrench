@@ -1,6 +1,8 @@
 import { mock } from "jest-mock-extended";
-import { InventoryItem, Part } from "@asledgehammer/pipewrench";
+import { InventoryItem } from "@asledgehammer/pipewrench";
 import { FluidContainerApi } from "./FluidContainerApi";
+import { Fluid } from "../../server/types";
+import { Fluids } from "@constants";
 
 const getMockedItem = ({
 	capacity = 1,
@@ -9,7 +11,9 @@ const getMockedItem = ({
 	isEmpty = false,
 	addFluid = jest.fn(),
 	removeFluid = jest.fn(),
-	isFluidContainer = true
+	isFluidContainer = true,
+	primaryFluid = Fluids.HUMAN_MILK,
+	amount = 1,
 }: Partial<{
 	capacity: number;
 	freeCapacity: number;
@@ -18,8 +22,9 @@ const getMockedItem = ({
 	addFluid: jest.Mock;
 	removeFluid: jest.Mock;
 	isFluidContainer: boolean;
+	primaryFluid: Fluid;
+	amount: number;
 }> = {}) => {
-
 	if (isFluidContainer) {
 		return mock<InventoryItem>({
 			getFluidContainer: jest.fn(() => ({
@@ -28,15 +33,16 @@ const getMockedItem = ({
 				getFreeCapacity: jest.fn(() => freeCapacity),
 				getCapacity: jest.fn(() => capacity),
 				isFull: jest.fn(() => isFull),
-				isEmpty: jest.fn(() => isEmpty)
+				isEmpty: jest.fn(() => isEmpty),
+				getPrimaryFluid: jest.fn(() => primaryFluid),
+				getAmount: jest.fn(() => amount),
 			}))
 		});
 	}
 	return mock<InventoryItem>({
 		getFluidContainer: jest.fn(() => null)
 	});
-
-}
+};
 
 describe("FluidContainerApi", () => {
 	describe("hasContainer", () => {
