@@ -101,6 +101,24 @@ describe("ZWBFHealthTabPOC", () => {
 
 			expect((injector as any).panel).toBe(view);
 		});
+
+		it("builds the panel when the player already exists before the tab is created", () => {
+			const originalCreateChildren = jest.fn();
+			(globalThis as any).ISCharacterInfoWindow = { createChildren: originalCreateChildren };
+			const tabPanel = { addView: jest.fn(), getView: jest.fn().mockReturnValue(undefined) };
+			const view = makePanelMock();
+			const factory: ZWBFHealthTabViewFactory = { create: jest.fn().mockReturnValue(view) };
+
+			const injector = new ZWBFHealthTabInjector(makeProps(), factory);
+			(injector as any).player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+
+			injector.install();
+			(globalThis as any).ISCharacterInfoWindow.createChildren.call({ panel: tabPanel });
+
+			expect(view.addText).toHaveBeenCalled();
+			expect(view.saveLayout).toHaveBeenCalled();
+			expect((injector as any).hasBuiltPanel).toBe(true);
+		});
 	});
 
 	describe("onCreatePlayer", () => {
@@ -156,6 +174,7 @@ describe("ZWBFHealthTabPOC", () => {
 				pregnancy: mock<Pregnancy>({ pregnancy })
 			}));
 			(injector as any).panel = panel;
+			(injector as any).hasBuiltPanel = true;
 
 			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
 			(player.getCharacterTraits().get as any).mockReturnValue(false);
@@ -170,6 +189,24 @@ describe("ZWBFHealthTabPOC", () => {
 
 		it("does nothing when panel is not ready", () => {
 			const injector = new ZWBFHealthTabInjector(makeProps());
+			expect(() => (injector as any).onUpdateUI()).not.toThrow();
+		});
+
+		it("does nothing when the panel exists but named elements were not built yet", () => {
+			const injector = new ZWBFHealthTabInjector(makeProps());
+			(injector as any).panel = {
+				addText: jest.fn(),
+				addImage: jest.fn(),
+				addProgressBar: jest.fn(),
+				addButton: jest.fn(),
+				nextLine: jest.fn(),
+				saveLayout: jest.fn(),
+				setBorderToAllElements: jest.fn(),
+				setWidthPixel: jest.fn(),
+				yAct: 0,
+			} as any;
+			(injector as any).player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+
 			expect(() => (injector as any).onUpdateUI()).not.toThrow();
 		});
 

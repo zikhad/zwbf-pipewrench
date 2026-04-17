@@ -47,6 +47,7 @@ export class ZWBFHealthTabInjector {
 	private isInstalled = false;
 	private panel?: ZWBFSimplePanel;
 	private player?: IsoPlayer;
+	private hasBuiltPanel = false;
 
 	private readonly UIElements = {
 		lactation: {
@@ -114,6 +115,7 @@ export class ZWBFHealthTabInjector {
 
 			const view = factory.create(this);
 			injector.panel = view;
+			injector.buildPanelIfReady();
 			this.zwbfView = view;
 			this.panel.addView(TAB_TITLE, view);
 			this.__zwbfTabAdded = true;
@@ -128,7 +130,11 @@ export class ZWBFHealthTabInjector {
 
 	private onCreatePlayer(player: IsoPlayer): void {
 		this.player = player;
-		if (!this.panel || !this.player?.isFemale()) return;
+		this.buildPanelIfReady();
+	}
+
+	private buildPanelIfReady(): void {
+		if (this.hasBuiltPanel || !this.panel || !this.player?.isFemale()) return;
 
 		const panel = this.panel;
 
@@ -166,11 +172,27 @@ export class ZWBFHealthTabInjector {
 
 		panel.setBorderToAllElements(true);
 		panel.saveLayout();
+		this.hasBuiltPanel = true;
+	}
+
+	private hasRequiredElements(): boolean {
+		const panel = this.panel as (ZWBFSimplePanel & Record<string, unknown>) | undefined;
+		if (!panel) return false;
+
+		return Boolean(
+			panel[this.UIElements.lactation.image] &&
+			panel[this.UIElements.lactation.level] &&
+			panel[this.UIElements.womb.sperm.current.amount] &&
+			panel[this.UIElements.womb.sperm.total.amount] &&
+			panel[this.UIElements.womb.image] &&
+			panel[this.UIElements.womb.cycle.phase.value]
+		);
 	}
 
 	private onUpdateUI(): void {
 		if (!this.panel || !this.props.lactation || !this.props.womb || !this.props.pregnancy) return;
 		if (!this.player?.isFemale()) return;
+		if (!this.hasBuiltPanel || !this.hasRequiredElements()) return;
 
 		const panel = this.panel;
 
