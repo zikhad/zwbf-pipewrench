@@ -1,4 +1,4 @@
-import { getText, IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
+import { getText, IsoPlayer, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
@@ -193,6 +193,7 @@ export class ZWBFUI {
 	}
 
 	private onCreateUI() {
+		pipewrenchRequire("ZWBF/ZWBFSimpleUI");
 		this.UI = NewZWBFUI();
 
 		this.UI.setWidthPixel(200);
@@ -241,8 +242,6 @@ export class ZWBFUI {
 	}
 
 	public toggle() {
-		/* if (!this.UI) return;
-		this.UI.toggle(); */
 		this.UI!.toggle();
 	}
 }
