@@ -242,6 +242,7 @@ export class ZWBFUI {
 	}
 
 	public toggle() {
-		this.UI!.toggle();
+		if (!this.UI) return;
+		this.UI.toggle();
 	}
 }

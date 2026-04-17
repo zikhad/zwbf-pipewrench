@@ -2,6 +2,7 @@
 import { mock } from "jest-mock-extended";
 import { ZWBFUI } from "./ZWBFUI";
 import * as Events from "@asledgehammer/pipewrench-events";
+import * as Pipewrench from "@asledgehammer/pipewrench";
 import { Lactation } from "./Lactation";
 import { Womb } from "./Womb";
 import { Animation } from "@client/components/Animation";
@@ -29,6 +30,7 @@ describe("ZWBFUI", () => {
 	beforeEach(() => {
 		const defaultNewUI = NewZWBFUI();
 		addButton.mockClear();
+		(Pipewrench.require as jest.Mock).mockClear();
 
 		Object.defineProperty(global, "NewZWBFUI", {
 			writable: true,
@@ -130,6 +132,12 @@ describe("ZWBFUI", () => {
 			}
 		);
 
+		it("should require ZWBFSimpleUI before creating UI", () => {
+			(ui as any).onCreateUI();
+
+			expect(Pipewrench.require).toHaveBeenCalledWith("ZWBF/ZWBFSimpleUI");
+		});
+
 		it("Should call toggleLactationPanel properly", () => {
 			const player = mockedPlayer({
 				isFemale: () => true
@@ -206,6 +214,16 @@ describe("ZWBFUI", () => {
 		);
 	});
 	describe("Toggle UI", () => {
+		it("should not throw when toggling before UI is created", () => {
+			const ui = new ZWBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			expect(() => ui.toggle()).not.toThrow();
+		});
+
 		it("should toggle the UI", () => {
 			const ui = new ZWBFUI({
 				lactation: mock(),
