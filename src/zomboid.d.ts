@@ -54,6 +54,7 @@ declare global {
 	};
 
 	const CharacterTrait: {
+		register: (name: string) => void;
 		get: (this: void, id: unknown) => CharacterTraitRef | undefined;
 	};
 

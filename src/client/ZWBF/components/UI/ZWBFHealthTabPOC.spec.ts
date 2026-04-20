@@ -5,7 +5,7 @@ import {
 	ZWBFEmbeddedHealthTabViewFactory,
 	ZWBFHealthTabInjector,
 	ZWBFHealthTabViewFactory
-} from "./ZWBFHealthTabPOC";
+} from "./ZWBFHealthTab";
 import { Lactation } from "../Lactation";
 import { Womb } from "../Womb";
 import { Pregnancy } from "../Pregnancy";

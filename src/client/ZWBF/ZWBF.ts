@@ -6,20 +6,19 @@ import { Effects } from "@client/components/Effects";
 import { ContextMenu } from "@client/components/ContextMenu";
 import { getText } from "@asledgehammer/pipewrench";
 import { Animation } from "@client/components/Animation";
-import { ZWBFHealthTabInjector } from "@client/components/UI/ZWBFHealthTabPOC";
+import { ZWBFHealthTab } from "@client/components/UI/ZWBFHealthTab";
 
 export const lactation = new Lactation();
 export const womb = new Womb();
 export const pregnancy = new Pregnancy();
-export const effects = new Effects();
-export const animation = new Animation(womb);
-export const healthTabPOC = new ZWBFHealthTabInjector({ lactation, womb, pregnancy });
 
-export const UI = new ZWBFUI({
-	lactation,
-	pregnancy,
-	womb
-});
+export const effects = new Effects();
+
+export const animation = new Animation(womb);
+
+export const tabUI = new ZWBFHealthTab({ lactation, womb, pregnancy });
+
+export const UI = new ZWBFUI({ lactation, pregnancy, womb });
 
 export const contextMenu = new ContextMenu({
 	lactation,

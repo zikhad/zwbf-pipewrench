@@ -1,13 +1,11 @@
 import { getText, IsoPlayer, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
-import { Lactation } from "../Lactation";
-import { Pregnancy } from "../Pregnancy";
-import { Womb } from "../Womb";
-import { Player } from "../Player";
+import { Lactation } from "@client/components/Lactation";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Womb } from "@client/components/Womb";
+import { Player } from "@client/components/Player";
 import { Animation } from "@client/components/Animation";
-
-const TAB_TITLE = "ZWBF";
 
 type UIProps = {
 	lactation: Lactation;
@@ -44,12 +42,70 @@ export class ZWBFEmbeddedHealthTabViewFactory implements ZWBFHealthTabViewFactor
 	}
 }
 
-export class ZWBFHealthTabInjector {
+abstract class ZWBFHealthTabInjector {
 	private isInstalled = false;
-	private panel?: ZWBFSimplePanel;
-	private player?: IsoPlayer;
-	private hasBuiltPanel = false;
+	protected panel?: ZWBFSimplePanel;
+	protected player?: IsoPlayer;	
 
+	constructor(
+		protected readonly name: string,
+		private readonly viewFactory: ZWBFHealthTabViewFactory = new ZWBFEmbeddedHealthTabViewFactory()
+	) {
+		Events.onCreateUI.addListener(() => this.install());
+		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
+		Events.onPostRender.addListener(() => this.onUpdateUI());
+	}
+
+	private install(): void {
+		if (this.isInstalled) return;
+
+		const globals = globalThis as {
+			ISCharacterInfoWindow?: CharacterInfoWindowLike;
+		};
+		const characterInfoWindow = globals.ISCharacterInfoWindow;
+		if (!characterInfoWindow?.createChildren) return;
+
+		const originalCreateChildren = characterInfoWindow.createChildren;
+		const factory = this.viewFactory;
+		const injector = this;
+
+		characterInfoWindow.createChildren = function(this: CharacterInfoWindowLike, ...args: unknown[]) {
+			originalCreateChildren.call(this, ...args);
+			if (!this.panel?.addView || this.__zwbfTabAdded) return;
+			if (this.panel.getView?.(injector.name)) {
+				this.__zwbfTabAdded = true;
+				return;
+			}
+
+			const view = factory.create(this);
+			injector.panel = view;
+			injector.buildPanel();
+			this.zwbfView = view;
+			this.panel.addView(injector.name, view);
+			this.__zwbfTabAdded = true;
+		};
+
+		this.isInstalled = true;
+	}
+
+	/**
+	 * Method to call when player is created
+	 * @param player Player Object
+	 * */
+	private onCreatePlayer(player: IsoPlayer): void {
+		this.player = player;
+		this.buildPanel();
+	}
+
+	/** Method to create the Panel (after player is created) */
+	abstract buildPanel(): void;
+	
+	/** Method to be called on PostRender (update the UI) */
+	abstract onUpdateUI(): void;
+
+}
+
+export class ZWBFHealthTab extends ZWBFHealthTabInjector {
 	private readonly UIElements = {
 		lactation: {
 			image: "tab-lactation-image",
@@ -86,56 +142,16 @@ export class ZWBFHealthTabInjector {
 
 	constructor(
 		private readonly props: UIProps,
-		private readonly viewFactory: ZWBFHealthTabViewFactory = new ZWBFEmbeddedHealthTabViewFactory()
 	) {
-		Events.onCreateUI.addListener(() => this.install());
-		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
-		Events.onPostRender.addListener(() => this.onUpdateUI());
-	}
-
-	public install(): void {
-		if (this.isInstalled) return;
-
-		const globals = globalThis as {
-			ISCharacterInfoWindow?: CharacterInfoWindowLike;
-		};
-		const characterInfoWindow = globals.ISCharacterInfoWindow;
-		if (!characterInfoWindow?.createChildren) return;
-
-		const originalCreateChildren = characterInfoWindow.createChildren;
-		const factory = this.viewFactory;
-		const injector = this;
-
-		characterInfoWindow.createChildren = function(this: CharacterInfoWindowLike, ...args: unknown[]) {
-			originalCreateChildren.call(this, ...args);
-			if (!this.panel?.addView || this.__zwbfTabAdded) return;
-			if (this.panel.getView?.(TAB_TITLE)) {
-				this.__zwbfTabAdded = true;
-				return;
-			}
-
-			const view = factory.create(this);
-			injector.panel = view;
-			injector.buildPanelIfReady();
-			this.zwbfView = view;
-			this.panel.addView(TAB_TITLE, view);
-			this.__zwbfTabAdded = true;
-		};
-
-		this.isInstalled = true;
+		super(getText("IGUI_ZWBF_UI_Panel"));
 	}
 
 	private label(txt: string): string {
 		return `${getText(txt)}:`;
 	}
 
-	private onCreatePlayer(player: IsoPlayer): void {
-		this.player = player;
-		this.buildPanelIfReady();
-	}
-
-	private buildPanelIfReady(): void {
-		if (this.hasBuiltPanel || !this.panel || !this.player?.isFemale()) return;
+	buildPanel(): void {
+		if (!this.panel || !this.player?.isFemale()) return;
 
 		const panel = this.panel;
 
@@ -173,27 +189,11 @@ export class ZWBFHealthTabInjector {
 
 		panel.setBorderToAllElements(true);
 		panel.saveLayout();
-		this.hasBuiltPanel = true;
 	}
 
-	private hasRequiredElements(): boolean {
-		const panel = this.panel as (ZWBFSimplePanel & Record<string, unknown>) | undefined;
-		if (!panel) return false;
-
-		return Boolean(
-			panel[this.UIElements.lactation.image] &&
-			panel[this.UIElements.lactation.level] &&
-			panel[this.UIElements.womb.sperm.current.amount] &&
-			panel[this.UIElements.womb.sperm.total.amount] &&
-			panel[this.UIElements.womb.image] &&
-			panel[this.UIElements.womb.cycle.phase.value]
-		);
-	}
-
-	private onUpdateUI(): void {
-		if (!this.panel || !this.props.lactation || !this.props.womb || !this.props.pregnancy) return;
+	onUpdateUI(): void {
+		if (!this.panel) return;
 		if (!this.player?.isFemale()) return;
-		if (!this.hasBuiltPanel || !this.hasRequiredElements()) return;
 
 		const panel = this.panel;
 
