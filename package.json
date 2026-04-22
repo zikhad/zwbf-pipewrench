@@ -1,6 +1,6 @@
 {
 	"name": "zwbf-pipewrench",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"scripts": {
 		"prebuild": "npm run clean",
 		"build": "tstl -p ./tsconfig.build.json",
