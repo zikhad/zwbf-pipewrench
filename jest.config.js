@@ -16,7 +16,7 @@ module.exports = {
 	collectCoverageFrom: ["**/*.(t|j)s"],
 	coverageDirectory: "../coverage",
 	coverageReporters: ["text", "lcov"],
-	coveragePathIgnorePatterns: ["index.(t|j)s"],
+	coveragePathIgnorePatterns: ["index.(t|j)s", ".*\\.d\\.ts$"],
 	moduleFileExtensions: ["js", "json", "ts", "d.ts", "node"],
 	testRegex: ".*\\.spec\\.ts$",
 	transformIgnorePatterns: ["/node_modules/(?!<module-name>).+\\.js$"]

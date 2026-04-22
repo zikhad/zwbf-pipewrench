@@ -1,0 +1,59 @@
+<animNode x_overrides="true" x_extends="">
+  <m_Name x_overrides="true">babyright</m_Name>
+  <m_AnimName>Bob_BabyRight</m_AnimName>
+  <m_Priority>10</m_Priority>
+  <m_deferredBoneAxis>Y</m_deferredBoneAxis>
+  <m_SpeedScale>0.00</m_SpeedScale>
+  <m_BlendTime>0.20</m_BlendTime>
+  <m_Conditions x_overrides="true">
+    <m_Name>RightHandMask</m_Name>
+    <m_Type>STRING</m_Type>
+    <m_StringValue>babyright</m_StringValue>
+  </m_Conditions>
+
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Clavicle</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_UpperArm</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Forearm</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Hand</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Finger0</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Finger0Nub</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Finger1</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_R_Finger1Nub</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_Prop1</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01_Prop2</boneName>
+		<includeDescendants>false</includeDescendants>
+	</m_SubStateBoneWeights>
+	
+	
+</animNode>
+  
+	
+	
