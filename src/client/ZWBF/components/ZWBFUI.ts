@@ -1,18 +1,18 @@
-/** @noSelfInFile */
-import { getText, IsoPlayer } from "@asledgehammer/pipewrench";
+import { getText, IsoPlayer, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFTraitsEnum } from "@constants";
-import { ZWBFTabManager } from "./UI/ZWBFTabManager";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Lactation } from "./Lactation";
 import { Pregnancy } from "./Pregnancy";
 import { Womb } from "./Womb";
+import { Player } from "./Player";
+import { Animation } from "@client/components/Animation";
+// import { ZWBFTabManager } from "@client/components/UI/ZWBFTabManager";
 
-type ZWBFUIProps = {
-	// player. IsoPlayer;
+type UIProps = {
 	lactation: Lactation;
 	pregnancy: Pregnancy;
 	womb: Womb;
-	tabManager?: ZWBFTabManager;
+	// tabManager?: ZWBFTabManager;
 };
 export class ZWBFUI {
 	private readonly UIElements = {
@@ -50,13 +50,13 @@ export class ZWBFUI {
 	};
 
 	private player?: IsoPlayer;
-	private lactation?: Lactation;
-	private pregnancy?: Pregnancy;
-	private womb?: Womb;
+	private readonly lactation?: Lactation;
+	private readonly pregnancy?: Pregnancy;
+	private readonly womb?: Womb;
 
-	private UI?: SimpleUI;
+	private UI?: ZWBFSimpleUI;
 
-	private readonly tabManager: ZWBFTabManager;
+	// private readonly tabManager: ZWBFTabManager;
 
 	private activePanels = {
 		lactation: true,
@@ -67,41 +67,42 @@ export class ZWBFUI {
 		womb: 0
 	};
 
-	constructor(props: ZWBFUIProps) {
+	constructor(props: UIProps) {
 		this.lactation = props.lactation;
 		this.pregnancy = props.pregnancy;
 		this.womb = props.womb;
-		this.tabManager = props.tabManager || new ZWBFTabManager();
-		Events.onCreateUI.addListener(() => this.onCreateUI());
-		Events.onPostRender.addListener(() => this.onUpdateUI());
-		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
+		// this.tabManager = props.tabManager || ZWBFTabManager.new();
+		Events.onCreateUI
+			.addListener(() => this.onCreateUI());
+		Events.onCreatePlayer
+			.addListener((_, player) => this.onCreatePlayer(player));
+		Events.onPostRender
+			.addListener(() => this.onUpdateUI());
 	}
 
 	private label(txt: string): string {
 		return `${getText(txt)}:`;
 	}
+	
 	private toggleLactationPanel() {
-		if (!this.UI) return;
+		// if (!this.UI) return;
 		this.activePanels.lactation = !this.activePanels.lactation;
 		for (const element of Object.values(this.UIElements.lactation)) {
-			if (this.UI[element]) {
-				this.UI[element].setVisible(this.activePanels.lactation);
+			if (this.UI![element]) {
+				this.UI![element].setVisible(this.activePanels.lactation);
 			}
 		}
 		if (this.activePanels.lactation) {
-			this.UI.setHeight(this.heights.lactation);
+			this.UI!.setHeight(this.heights.lactation);
 		} else {
-			this.UI.setHeight(this.heights.womb);
+			this.UI!.setHeight(this.heights.womb);
 		}
 	}
-	onCreatePlayer(player: IsoPlayer) {
+	
+	private onCreatePlayer(player: IsoPlayer) {
 		this.player = player;
-	}
-	onCreateUI() {
+		if (!this.UI) return;
 		if (!this.player?.isFemale()) return;
-		this.UI = NewUI();
-		this.UI.setWidthPixel(200);
-		this.UI.setTitle(getText("IGUI_ZWBF_UI_Panel"));
 
 		// === Womb ===
 		this.UI.addText(
@@ -145,7 +146,7 @@ export class ZWBFUI {
 		this.UI.addText(this.UIElements.womb.cycle.phase.value, "", undefined, "Center");
 		this.UI.nextLine();
 
-		if (!this.player.HasTrait(ZWBFTraitsEnum.INFERTILE)) {
+		if (!Player.hasTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
 			this.UI.addText(
 				this.UIElements.womb.fertility.title,
 				this.label("IGUI_ZWBF_UI_Fertility"),
@@ -189,44 +190,59 @@ export class ZWBFUI {
 
 		this.UI.setBorderToAllElements(true);
 		this.UI.saveLayout();
-
-		this.tabManager.addTab("HPanel", this.UI);
 	}
-	onUpdateUI() {
+
+	private onCreateUI() {
+		pipewrenchRequire("ZWBF/ZWBFSimpleUI");
+		this.UI = NewZWBFUI();
+
+		this.UI.setWidthPixel(200);
+		this.UI.setTitle(getText("IGUI_ZWBF_UI_Panel"));
+		this.UI.close();
+		// this.tabManager.addTab("HPanel", this.UI);
+	}
+
+	private onUpdateUI() {
 		// Update UI elements here
 		if (
-			!this.womb ||
+			!this.UI?.isUIVisible ||
 			!this.lactation ||
-			!this.pregnancy ||
-			!this.UI ||
-			!this.UI.isUIVisible ||
-			!this.player ||
-			!this.player.isFemale()
-		)
-			return;
+			!this.womb ||
+			!this.pregnancy
+		) return;
+
 		// lactation
 		if (this.activePanels.lactation) {
 			const { breasts, level } = this.lactation.images;
 			this.UI[this.UIElements.lactation.image].setPath(breasts);
 			this.UI[this.UIElements.lactation.level].setPath(level);
 		}
+
 		// Womb
-		const { image, phaseTranslation, fertility, amount, total } = this.womb;
+		const { phaseTranslation, fertility, amount, total } = this.womb;
 		const { pregnancy } = this.pregnancy;
-		this.UI[this.UIElements.womb.sperm.current.amount].setText(string.format("%s ml", amount));
-		this.UI[this.UIElements.womb.sperm.total.amount].setText(string.format("%s ml", total));
-		this.UI[this.UIElements.womb.image].setPath(image);
+		const amountInMilliliters = Math.round(amount * 1000);
+		const totalInMilliliters = Math.round(total * 1000);
+
+		triggerEvent(ZWBFEventsEnum.IMAGE);
+
+		this.UI[this.UIElements.womb.sperm.current.amount].setText(`${amountInMilliliters} ml`);
+		this.UI[this.UIElements.womb.sperm.total.amount].setText(`${totalInMilliliters} ml`);
+		this.UI[this.UIElements.womb.image].setPath(Animation.wombImage);
 		this.UI[this.UIElements.womb.cycle.phase.value].setText(getText(phaseTranslation));
-		if (!this.player.HasTrait("Infertile")) {
-			this.UI[this.UIElements.womb.fertility.title].setText(
-				getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`)
-			);
-			this.UI[this.UIElements.womb.fertility.bar].setValue(
-				pregnancy ? pregnancy.progress : fertility
-			);
-			this.UI[this.UIElements.womb.fertility.value].setText(
-				`${math.floor(fertility * 100)}%`
-			);
+
+		if (!Player.hasTrait(this.player, ZWBFTraitsEnum.INFERTILE)) {
+			const title = getText(`IGUI_ZWBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
+			const progress = pregnancy ? pregnancy.progress : fertility;
+
+			this.UI[this.UIElements.womb.fertility.title].setText(title);
+			this.UI[this.UIElements.womb.fertility.bar].setValue(progress);
+			this.UI[this.UIElements.womb.fertility.value].setText(`${Math.floor(progress * 100)}%`);
 		}
+	}
+
+	public toggle() {
+		if (!this.UI) return;
+		this.UI.toggle();
 	}
 }

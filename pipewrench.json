@@ -2,10 +2,11 @@
 	"modInfo": {
 		"id": "ZWBF",
 		"name": "Zombowin Being Female",
+		"author": "Zikhad",
 		"description": "ZomboWin Being Female by Zikhad. <br>This mod introduces More Female Roleplay to Project Zomboid. <br>Menstrual cycle, Pregnancy, Lactation and more",
 		"url": "https://github.com/zikhad/zwbf-pipewrench",
 		"poster": "./poster.png",
-		"require": ["ZomboWin", "UIAPI", "Babies"]
+		"require": []
 	},
 	"modelsDir": "./src/models",
 	"texturesDir": "./src/textures",

@@ -1,28 +1,29 @@
-import { getActivatedMods, IsoPlayer } from "@asledgehammer/pipewrench";
+import { getActivatedMods, getPlayer, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { ZWBFEvents } from "@constants";
+import { MODS, ZWBFEventsEnum } from "@constants";
 import { WombData } from "@types";
 import { percentageToNumber } from "@utils";
+import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
 export class Effects {
 	constructor() {
-		if (!getActivatedMods().contains("ZomboWinDefeatStrip")) return;
+		if (!getActivatedMods().contains(MODS.ZOMBOWIN_DEFEAT)) return;
 
-		new Events.EventEmitter<(player: IsoPlayer, data: WombData, capacity: number) => void>(
-			ZWBFEvents.WOMB_HOURLY_UPDATE
-		).addListener((player, data, capacity) => {
-			this.ZWUnblessing(player, data);
-			this.ZWSuccubus(player, data, capacity);
+		new Events.EventEmitter<( data: WombData ) => void>(
+			ZWBFEventsEnum.WOMB_UPDATE
+		).addListener(({ amount,  capacity }) => {
+			const player = getPlayer();
+			this.ZWUnblessing(player, amount);
+			this.ZWSuccubus(player, amount, capacity);
 		});
 	}
 
 	/**
 	 * Sexperiment trait, make infection 0 8 when sperm is present in the womb
 	 */
-	private ZWUnblessing(player: IsoPlayer, data: WombData) {
-		if (player.HasTrait("unblessing") && data.amount > 0) {
-			player.getBodyDamage().setInfectionLevel(0);
-		}
+	private ZWUnblessing(player: IsoPlayer, amount: number) {
+		if (!CharacterTraitApi.hasTrait(player, "unblessing") || amount <= 0) return;
+		player.getBodyDamage().setInfectionLevel(0);
 	}
 
 	/**
@@ -34,14 +35,17 @@ export class Effects {
 	 *
 	 * The more full, more the buff (max 0.3)
 	 */
-	private ZWSuccubus(player: IsoPlayer, data: WombData, capacity: number) {
-		if (!player.HasTrait("succubus") || data.amount <= 0) return;
+	private ZWSuccubus(player: IsoPlayer, amount: number, capacity: number) {
+		if (!CharacterTraitApi.hasTrait(player, "succubus") || amount <= 0) return;
 		const stats = player.getStats();
-		const fullness = data.amount / capacity;
+		const fullness = amount / capacity;
 		const modifier = percentageToNumber(fullness * 100, 0.3);
 
-		stats.setHunger(Math.max(0, stats.getHunger() - modifier));
-		stats.setFatigue(Math.max(0, stats.getFatigue() - modifier));
-		stats.setEndurance(Math.max(1, stats.getEndurance() + modifier));
+		stats.set(CharacterStat.HUNGER, Math.max(0, stats.get(CharacterStat.HUNGER) - modifier));
+		stats.set(CharacterStat.FATIGUE, Math.max(0, stats.get(CharacterStat.FATIGUE) - modifier));
+		stats.set(
+			CharacterStat.ENDURANCE,
+			Math.max(1, stats.get(CharacterStat.ENDURANCE) + modifier)
+		);
 	}
 }

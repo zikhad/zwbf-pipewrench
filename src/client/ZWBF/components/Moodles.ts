@@ -5,9 +5,8 @@ import {
 	IsoPlayer,
 	require as pipeWrenchRequire
 } from "@asledgehammer/pipewrench";
-// import module from "MF_ISMoodle";
+import { MODS } from "@constants";
 
-// type moodleValues =
 type MoodleProps = {
 	player: IsoPlayer;
 	name: string;
@@ -30,17 +29,10 @@ export class Moodle {
 		this.type = type;
 		this.texture = texture;
 		this.tresholds = tresholds;
-		if (getActivatedMods().contains("MoodleFramework")) {
+		if (getActivatedMods().contains(MODS.MOODLE_FRAMEWORK)) {
 			this.isMF = true;
-			// require("MF_ISMoodle")
 			pipeWrenchRequire("MF_ISMoodle");
 			MF.createMoodle(this.name);
-			/* const moodle = MF.getMoodle(name); 
-            moodle.setPicture(
-                moodle.getGoodBadNeutral(),
-                moodle.getLevel(),
-                texture
-            )*/
 		}
 	}
 
@@ -59,15 +51,12 @@ export class Moodle {
 		]).get(+level.toFixed(1));
 
 		if (mapped) {
-			const color =
-				this.type === "Good"
-					? HaloTextHelper.getColorGreen()
-					: HaloTextHelper.getColorRed();
-			HaloTextHelper.addText(
-				this.player,
-				getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`),
-				color
-			);
+			const text = getText(`Moodles_${this.name}_${this.type}_desc_${mapped}`);
+			if (this.type === "Good") {
+				HaloTextHelper.addGoodText(this.player, text);
+				return;
+			}
+			HaloTextHelper.addBadText(this.player, text);
 		}
 	}
 

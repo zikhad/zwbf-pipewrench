@@ -2,6 +2,7 @@
 <animNode>
 	<m_Name>blabla_Birthing</m_Name>
 	<m_AnimName>blabla_Birthing</m_AnimName>
+	<m_Looped>false</m_Looped>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
 	<m_SpeedScale>1.0</m_SpeedScale>
@@ -9,7 +10,7 @@
 	<m_Conditions>
 		<m_Name>PerformingAction</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_StringValue>blabla_Birthing</m_StringValue>
+		<m_Value>ZWBF.Birth</m_Value>
 	</m_Conditions>
 	<m_SubStateBoneWeights>
 		<boneName>Dummy01</boneName>

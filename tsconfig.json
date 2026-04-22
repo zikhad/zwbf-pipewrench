@@ -20,23 +20,12 @@
 			"@shared/components/*": ["shared/components/*"],
 			"@server/components/*": ["server/components/*"],
 			"@client/components/*": ["client/ZWBF/components/*"],
+			"@client/*": ["client/ZWBF/*"],
 			"@actions/*": ["client/ZWBF/Actions/*"],
 			"@test/*": ["test/*"],
 			"@types": ["types.d.ts"],
 			"@utils": ["client/ZWBF/Utils.ts"],
-			"@constants": ["constants.ts"]
+			"@constants": ["shared/constants.ts"]
 		}
-	},
-	"tstl": {
-		"luaLibImport": "require",
-		"noHeader": true,
-		"tstlVerbose": false,
-		"luaPlugins": [
-			{
-				"name": "@asledgehammer/tstl-pipewrench"
-			}
-		]
-	},
-	"include": ["src"],
-	"exclude": ["**/*.spec.*", "**/__mocks__/**/*.ts", "src/test/**/*.ts", "src/root/"]
+	}
 }

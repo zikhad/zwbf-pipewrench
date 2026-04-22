@@ -1,6 +1,6 @@
 import { mock } from "jest-mock-extended";
 import { ZWBFActionBirth } from "./ZWBFBirth";
-import { Pregnancy } from "../components/Pregnancy";
+import { Pregnancy } from "@client/components/Pregnancy";
 import { ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 

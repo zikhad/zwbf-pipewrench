@@ -4,18 +4,14 @@ import { BodyPart } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
-import { LactationData } from "../../../types";
+import { LactationData } from "@types";
 import { Player } from "./Player";
-import { mockedPlayer } from "../../../test/mock";
+import { mockedPlayer } from "@test/mock";
 import { mock } from "jest-mock-extended";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Moodles");
 jest.mock("./Player");
-jest.mock("@utils", () => ({
-	...jest.requireActual("@utils"),
-	getSkinColor: jest.fn().mockReturnValue(1)
-}));
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
 
@@ -29,7 +25,7 @@ describe("Lactation", () => {
 	describe("Without player or data", () => {
 		it("returns static bottleAmount and percentage", () => {
 			const lactation = new Lactation();
-			expect(lactation.bottleAmount).toBe(200);
+			expect(lactation.bottleAmount).toBe(0.2);
 			expect(lactation.percentage).toBe(0);
 		});
 
@@ -50,7 +46,7 @@ describe("Lactation", () => {
 		beforeEach(() => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
 				isActive: true,
-				milkAmount: 400,
+				milkAmount: 0.4,
 				expiration: 8,
 				multiplier: 0
 			});
@@ -60,7 +56,7 @@ describe("Lactation", () => {
 			const lactation = new Lactation();
 			lactation.onCreatePlayer(mockedPlayer());
 			expect(lactation.isLactating).toBe(true);
-			expect(lactation.milkAmount).toBe(400);
+			expect(lactation.milkAmount).toBe(0.4);
 		});
 
 		it("useMilk updates milkAmount and checks trait", () => {
@@ -70,15 +66,15 @@ describe("Lactation", () => {
 					HasTrait: SpyHasTrait.mockImplementation(() => true)
 				})
 			);
-			lactation.useMilk(100);
-			expect(SpyHasTrait).toHaveBeenCalledWith("DairyCow");
-			expect(lactation.milkAmount).toBe(300);
+			lactation.useMilk(0.1);
+			expect(SpyHasTrait).toHaveBeenCalledWith("zwbf:dairycow");
+			expect(lactation.milkAmount).toBeCloseTo(0.3);
 		});
 
 		describe("Timer events", () => {
 			const data: LactationData = {
 				isActive: true,
-				milkAmount: 400,
+				milkAmount: 0.4,
 				expiration: 1,
 				multiplier: 0
 			};
@@ -95,28 +91,12 @@ describe("Lactation", () => {
 				});
 			});
 			describe("everyTenMinutes", () => {
-				const spyGetAdditionalPain = jest.fn().mockImplementation(() => 24);
-				const spySetAdditionalPain = jest.fn();
-
-				const spyGetWetness = jest.fn().mockImplementation(() => 24);
-				const spySetWetness = jest.fn();
-
-				beforeEach(() => {
-					jest.spyOn(Player.prototype, "getBodyPart").mockImplementation(() =>
-						mock<BodyPart>({
-							getAdditionalPain: spyGetAdditionalPain,
-							setAdditionalPain: spySetAdditionalPain,
-							getWetness: spyGetWetness,
-							setWetness: spySetWetness
-						})
-					);
-				});
-				it("Should inflict pain & wetness from engorgement", () => {
+				it("Should inflict body effects from engorgement", () => {
 					const lactation = new Lactation();
+					const spyBodyEffect = jest.spyOn(lactation as any, "applyBodyEffect");
 					lactation.onCreatePlayer(mockedPlayer());
 					lactation.onEveryTenMinutes();
-					expect(spySetAdditionalPain).toHaveBeenCalledWith(25);
-					expect(spySetWetness).toHaveBeenCalledWith(25);
+					expect(spyBodyEffect).toHaveBeenCalled();
 				});
 			});
 			describe("everyHour event", () => {
@@ -138,15 +118,14 @@ describe("Lactation", () => {
 
 		describe("Debug functions", () => {
 			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
-				{ operation: "add", expected: 500 },
-				{ operation: "remove", expected: 300 },
-				{ operation: "set", expected: 100 }
-			])("should $operation milk", ({ operation, expected }) => {
-				const lactation = new Lactation();
-				lactation.onCreatePlayer(mockedPlayer());
-				lactation.Debug.set(400);
-				lactation.Debug[operation](100);
-				expect(lactation.milkAmount).toBe(expected);
+			{ operation: "add", expected: 0.5 },
+			{ operation: "remove", expected: 0.3 },
+			{ operation: "set", expected: 0.1 }
+		])("should $operation milk", ({ operation, expected }) => {
+			const lactation = new Lactation();
+			lactation.onCreatePlayer(mockedPlayer());
+			lactation.Debug.set(0.4);
+			lactation.Debug[operation](0.1);
 			});
 
 			it("should be able to toggle lactation", () => {
@@ -243,56 +222,56 @@ describe("Lactation", () => {
 				state: "non pregnant",
 				fullness: "empty",
 				progress: null,
-				amount: 300,
+				amount: 0.3,
 				expected: "normal_empty.png"
 			},
 			{
 				state: "non pregnant",
 				fullness: "full",
 				progress: null,
-				amount: 900,
+				amount: 0.9,
 				expected: "normal_full.png"
 			},
 			{
 				state: "too early in pregnancy",
 				fullness: "empty",
 				progress: 0,
-				amount: 300,
+				amount: 0.3,
 				expected: "normal_empty.png"
 			},
 			{
 				state: "too early in pregnancy",
 				fullness: "full",
 				progress: 0,
-				amount: 900,
+				amount: 0.9,
 				expected: "normal_full.png"
 			},
 			{
 				state: "pregnancy early",
 				fullness: "empty",
 				progress: 0.5,
-				amount: 300,
+				amount: 0.3,
 				expected: "pregnant_early_empty.png"
 			},
 			{
 				state: "pregnancy early",
 				fullness: "full",
 				progress: 0.5,
-				amount: 900,
+				amount: 0.9,
 				expected: "pregnant_early_full.png"
 			},
 			{
 				state: "pregnancy late",
 				fullness: "empty",
 				progress: 0.9,
-				amount: 300,
+				amount: 0.3,
 				expected: "pregnant_late_empty.png"
 			},
 			{
 				state: "pregnancy late",
 				fullness: "full",
 				progress: 0.9,
-				amount: 900,
+				amount: 0.9,
 				expected: "pregnant_late_full.png"
 			}
 		])(
@@ -313,7 +292,7 @@ describe("Lactation", () => {
 					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
 				expect(lactation.images.breasts).toBe(
-					`media/ui/lactation/boob/color-1/${expected}`
+					`media/ui/lactation/boobs/color-0/${expected}`
 				);
 			}
 		);

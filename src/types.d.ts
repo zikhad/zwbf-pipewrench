@@ -9,22 +9,6 @@ type ModDataProps<T> = {
 	defaultData?: T;
 };
 
-type ZWBFTraits =
-	| "Infertile"
-	| "Fertile"
-	| "Hyperfertile"
-	| "Pregnancy"
-	| "DairyCow"
-	| "StrongMenstrualCramps"
-	| "NoMenstrualCramps";
-
-type TraitType = {
-	id: ZWBFTraits;
-	cost: number;
-	profession?: boolean;
-	exclusives?: ZWBFTraits[];
-};
-
 type LactationData = {
 	isActive: boolean;
 	milkAmount: number;
@@ -40,26 +24,24 @@ type LactationImage = {
 type PregnancyData = {
 	progress: number;
 	current?: number;
-	// duration: number;
 	isInLabor?: boolean;
 };
 
-type CyclePhase = "Recovery" | "Menstruation" | "Follicular" | "Ovulation" | "Luteal" | "Pregnant";
+/** The different menstrual cycle names */
+type CyclePhase =
+	"Recovery"
+	| "Menstruation"
+	| "Follicular"
+	| "Ovulation"
+	| "Luteal"
+	| "Pregnant";
 
 type WombData = {
 	amount: number;
+	capacity: number;
 	total: number;
 	cycleDay: number;
 	fertility: number;
 	onContraceptive: boolean;
-	chances: Map<CyclePhase, number>;
-};
-
-/**
- * Describes animation status including whether it's active and the time progress.
- */
-type AnimationStatus = {
-	isActive: boolean;
-	delta?: number;
-	duration?: number;
+	chances: Record<CyclePhase, number>;
 };

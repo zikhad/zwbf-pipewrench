@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { mock } from "jest-mock-extended";
-import { BodyPart } from "@asledgehammer/pipewrench";
+import { BodyPartType } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
-import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
-import { CyclePhase, WombData } from "../../../types";
+import { CyclePhase, WombData } from "@types";
 import { Womb } from "./Womb";
-import { CyclePhaseEnum, ZWBFEvents, ZWBFTraitsEnum } from "../../../constants";
+import { CyclePhaseEnum, ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { mockedPlayer } from "../../../test/mock";
+import { mockedPlayer } from "@test/mock";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
@@ -17,18 +15,20 @@ jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
 
 const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
-	amount: 200,
-	total: 400,
+	capacity: 1,
+	amount: 0.2,
+	total: 0.4,
 	cycleDay: 1,
 	fertility: 0,
 	onContraceptive: true,
-	chances: new Map([
-		[CyclePhaseEnum.RECOVERY, 0],
-		[CyclePhaseEnum.MENSTRUATION, 0.2],
-		[CyclePhaseEnum.FOLLICULAR, 0.3],
-		[CyclePhaseEnum.OVULATION, 0.85],
-		[CyclePhaseEnum.LUTEAL, 0.2]
-	]),
+	chances: {
+		[CyclePhaseEnum.PREGNANT]: 0,
+		[CyclePhaseEnum.RECOVERY]: 0,
+		[CyclePhaseEnum.MENSTRUATION]: 0.2,
+		[CyclePhaseEnum.FOLLICULAR]: 0.3,
+		[CyclePhaseEnum.OVULATION]: 0.85,
+		[CyclePhaseEnum.LUTEAL]: 0.2
+	},
 	...overrides
 });
 
@@ -48,27 +48,6 @@ describe("Womb", () => {
 		jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(null);
 		jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
 
-		// getTimedActionQueue should always return an valid value
-		ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() => ({
-			queue: [{ animation: "allowed" }]
-		}));
-
-		// should mock ZomboWin animation data
-		const ZomboWinAnimationData = [
-			{
-				prefix: "mocked",
-				id: "mocked",
-				tags: ["allowed"],
-				actors: [
-					{ gender: "Female", stages: [{ perform: "allowed", duration: 1000 }] },
-					{ gender: "Male", stages: [{ perform: "allowed", duration: 1000 }] }
-				]
-			}
-		];
-		Object.defineProperty(global, "ZomboWinAnimationData", {
-			value: ZomboWinAnimationData,
-			writable: true
-		});
 	});
 
 	// === Basic Instantiation Tests ===
@@ -83,9 +62,8 @@ describe("Womb", () => {
 				expect(womb.total).toBe(0);
 				expect(womb.cycleDay).toBe(0);
 				expect(womb.fertility).toBe(0);
-				expect(womb.onContraceptive).toBe(false);
+				expect(womb.contraceptive).toBe(false);
 				expect(womb.phase).toBe("Recovery");
-				expect(womb.image).toBe("");
 			});
 		});
 
@@ -96,12 +74,13 @@ describe("Womb", () => {
 
 			it("should instantiate with provided data", () => {
 				const womb = new Womb();
+				womb.onCreatePlayer(mockedPlayer());
 
-				expect(womb.amount).toBe(200);
-				expect(womb.total).toBe(400);
+				expect(womb.amount).toBe(0.2);
+				expect(womb.total).toBe(0.4);
 				expect(womb.cycleDay).toBe(1);
 				expect(womb.fertility).toBe(0);
-				expect(womb.onContraceptive).toBe(true);
+				expect(womb.contraceptive).toBe(true);
 				expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
 			});
 		});
@@ -109,11 +88,13 @@ describe("Womb", () => {
 
 	// === Event System Tests ===
 	describe("Event System", () => {
+		beforeEach(() => {
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
+		});
 		describe("Timer events", () => {
 			describe.each([
 				{ event: "everyOneMinute", handler: "onEveryMinute" },
 				{ event: "everyTenMinutes", handler: "onEveryTenMinutes" },
-				{ event: "everyHours", handler: "onEveryHour" },
 				{ event: "everyDays", handler: "onEveryDay" }
 			])("For $event", ({ event, handler }) => {
 				const mockEventListener = jest.fn();
@@ -140,13 +121,18 @@ describe("Womb", () => {
 			});
 			it("Should remove sperm periodically", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-					mockedModData({ amount: 100 })
+					mockedModData({ amount: 0.1 })
 				);
-				jest.spyOn(Player.prototype, "getBodyPart").mockReturnValue(mock<BodyPart>());
+				jest.spyOn(SpyPipeWrench, "ZombRand")
+					.mockReturnValue(10);
+
 				const womb = new Womb();
-				// womb.onCreatePlayer(mockedPlayer());
+				womb.onCreatePlayer(mockedPlayer());
+
 				(womb as any).onEveryTenMinutes();
-				expect(womb.amount).toBe(90);
+				(womb as any).onEveryMinute();
+
+				expect(womb.amount).toBeCloseTo(0.09);
 			});
 			it("should not apply wetness if there is no sperm left", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
@@ -171,26 +157,13 @@ describe("Womb", () => {
 					addListener: mockAddListener
 				}));
 			});
-			describe("Animation", () => {
-				it("should setup animation update event listener on player creation", () => {
-					const womb = new Womb();
-					womb.onCreatePlayer(mockedPlayer());
-
-					const [listenerFn] = mockAddListener.mock.calls[0];
-					const testAnimationData = { isActive: true, delta: 0.5, duration: 1000 };
-
-					listenerFn(testAnimationData);
-					expect(womb.animation).toEqual(testAnimationData);
-				});
-			});
-
 			describe("Intercourse", () => {
 				it("should call intercourse via event Listener", () => {
 					const womb = new Womb();
 					womb.onCreatePlayer(mockedPlayer());
 
-					// The intercourse is the second call of the Event.Emitter
-					const [listenerFn] = mockAddListener.mock.calls[1];
+					// The intercourse is the first EventEmitter call
+					const [listenerFn] = mockAddListener.mock.calls[0];
 					const spyIntercourse = jest.spyOn(womb as any, "intercourse");
 
 					listenerFn();
@@ -200,7 +173,7 @@ describe("Womb", () => {
 					{ condom: true, impregnate: false },
 					{ condom: false, impregnate: true }
 				])(
-					"when player has condom is $condom should impregnate should be $impregnate",
+					"when player has condom: $condom impregnate should be called: $impregnate",
 					({ condom, impregnate }) => {
 						jest.spyOn(Player.prototype, "hasItem").mockReturnValue(condom);
 						const player = mockedPlayer({
@@ -227,12 +200,12 @@ describe("Womb", () => {
 
 	// === Impregnation mechanics ==
 	describe("Impregnate", () => {
-		test("should start pregnancy when the random is greater than fertility", () => {
-			const womb = new Womb();
-			jest.spyOn(womb as any, "getFertility").mockReturnValue(1);
-			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(1);
+	it("should start pregnancy when the random is greater than fertility", () => {
+		const womb = new Womb();
+		jest.spyOn(womb, "fertility", "get").mockReturnValue(1);
+		jest.spyOn(SpyPipeWrench, "ZombRandFloat").mockReturnValue(1);
 			(womb as any).impregnate();
-			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEvents.PREGNANCY_START);
+			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZWBFEventsEnum.PREGNANCY_START);
 		});
 	});
 
@@ -275,18 +248,19 @@ describe("Womb", () => {
 
 	// === Timer Events Tests ===
 	describe("Timer Events", () => {
-		describe("onEveryHour", () => {
-			let mockChances: Map<CyclePhase, number>;
+		describe("onEveryDay", () => {
+			let mockChances: Record<CyclePhase, number>;
 			let chancesSpy: jest.SpyInstance;
 
 			beforeEach(() => {
-				mockChances = new Map([
-					["Recovery", 0],
-					["Menstruation", 0.2],
-					["Follicular", 0.3],
-					["Ovulation", 0.9],
-					["Luteal", 0.2]
-				]);
+				mockChances = {
+					"Pregnant": 0,
+					"Recovery": 0,
+					"Menstruation": 0.2,
+					"Follicular": 0.3,
+					"Ovulation": 0.85,
+					"Luteal": 0.2
+				};
 				chancesSpy = jest.spyOn(Womb, "chances", "get").mockReturnValue(mockChances);
 			});
 
@@ -294,17 +268,57 @@ describe("Womb", () => {
 				chancesSpy.mockRestore();
 			});
 
-			it("should update chances when data exists", () => {
+			it("should update chances DAILY when data exists", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 
 				const womb = new Womb();
 				chancesSpy.mockClear();
 
-				womb.onEveryHour();
+				womb.onCreatePlayer(mockedPlayer());
+				(womb as any).menstruationEffects = jest.fn();
+				womb.onEveryDay();
 
 				expect(chancesSpy).toHaveBeenCalledTimes(1);
-				expect(womb.data!.chances).toBe(mockChances);
+
+				expect(womb.data?.chances).toEqual(mockChances);
 			});
+		});
+		describe("onEveryMinute", () => {
+			it("should update minute data and trigger WOMB_UPDATE with full data including capacity", () => {
+				const data = mockedModData({ cycleDay: 15, onContraceptive: false });
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(data);
+				const womb = new Womb();
+				womb.onCreatePlayer(mockedPlayer());
+				womb.onEveryMinute();
+				expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(
+					ZWBFEventsEnum.WOMB_UPDATE,
+					expect.objectContaining({
+						capacity: expect.any(Number),
+						amount: expect.any(Number),
+						total: expect.any(Number),
+					})
+				);
+			});
+		});
+	});
+
+	// === Capacity Tests ===
+	describe("Capacity", () => {
+		it("should return data.capacity if it exists", () => {
+			const customCapacity = 5;
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
+				mockedModData({ capacity: customCapacity })
+			);
+			const womb = new Womb();
+			womb.onCreatePlayer(mockedPlayer());
+			expect(womb.capacity).toBe(customCapacity);
+		});
+
+		it("should return options.capacity as fallback when data is null", () => {
+			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
+			const womb = new Womb();
+			// capacity should fall back to options.capacity since data is null
+			expect(womb.capacity).toBeGreaterThan(0);
 		});
 	});
 
@@ -363,7 +377,8 @@ describe("Womb", () => {
 			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress: 0.6 });
 
 			const womb = new Womb();
-			expect(womb.amount).toBe(200);
+			womb.onCreatePlayer(mockedPlayer());
+			expect(womb.amount).toBe(0.2);
 
 			womb.onPregnancyUpdate({ progress: 0.6 });
 			expect(womb.amount).toBe(0);
@@ -372,33 +387,24 @@ describe("Womb", () => {
 
 	// === Menstruation ===
 	describe("Menstruation", () => {
-		const spySetAdditionalPain = jest.fn();
 		beforeEach(() => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
 
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 				mockedModData({ cycleDay: 1 })
 			);
-
-			const mockBodyPart = mock<BodyPart>({
-				getAdditionalPain: jest.fn().mockReturnValue(0),
-				setBleedingTime: jest.fn().mockReturnValue(0),
-				setAdditionalPain: spySetAdditionalPain
-			});
-
-			jest.spyOn(Player.prototype, "getBodyPart").mockReturnValue(mockBodyPart);
 		});
 
 		it.each([
-			{ trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 50 },
-			{ trait: ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS, expectedPain: 0 },
-			{ trait: null, expectedPain: 25 }
+			{ trait: ZWBFTraitsEnum.STRONG_MENSTRUAL_CRAMPS, expectedPain: 10 },
+			{ trait: ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS, expectedPain: 0 },
+			{ trait: null, expectedPain: 5 }
 		])(
-			"should apply pain of $expectedPain when player has trait of $trait",
+			"should call apply damage with pain of $expectedPain when player has trait of $trait",
 			({ trait, expectedPain }) => {
 				const womb = new Womb();
 
-				const menstruationEffectsSpy = jest.spyOn(womb as any, "menstruationEffects");
+				const spyApplyDamage = jest.spyOn(womb as any, "applyBodyEffect");
 
 				womb.onCreatePlayer(
 					mockedPlayer({
@@ -409,22 +415,14 @@ describe("Womb", () => {
 
 				expect(womb.phase).toBe(CyclePhaseEnum.MENSTRUATION);
 
-				if (trait === ZWBFTraitsEnum.NO_MENSNTRUAL_CRAMPS) {
-					expect(menstruationEffectsSpy).not.toHaveBeenCalled();
+				if (trait === ZWBFTraitsEnum.NO_MENSTRUAL_CRAMPS) {
+					expect(spyApplyDamage).not.toHaveBeenCalled();
 				} else {
-					expect(menstruationEffectsSpy).toHaveBeenCalled();
-					expect(spySetAdditionalPain).toHaveBeenCalledWith(expectedPain);
+					expect(spyApplyDamage).toHaveBeenCalledWith(BodyPartType.Groin, expect.objectContaining({ pain: expectedPain }));
 				}
 			}
 		);
 
-		it("Should not apply menstruation effects depending on chance", () => {
-			jest.spyOn(SpyPipeWrench, "ZombRand").mockReturnValue(0);
-			const womb = new Womb();
-			const spy = jest.spyOn(womb as any, "applyBleeding");
-			(womb as any).menstruationEffects();
-			expect(spy).not.toHaveBeenCalled();
-		});
 		it("should not apply menstruation effects outside menstruation phase", () => {
 			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 				mockedModData({ cycleDay: 5 })
@@ -439,150 +437,6 @@ describe("Womb", () => {
 		});
 	});
 
-	// === Image Rendering Tests ===
-	describe("Image Rendering", () => {
-		beforeEach(() => {
-			jest.spyOn(Player.prototype, "data", "get").mockReturnValue(mockedModData());
-		});
-
-		describe("still images", () => {
-			it.each([
-				{ amount: 0, expected: "womb_normal_0.png" },
-				{ amount: 1, expected: "womb_normal_1.png" },
-				{ amount: 1000, expected: "womb_normal_17.png" }
-			])("should return $expected when amount is $amount", ({ amount, expected }) => {
-				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-					mockedModData({ amount })
-				);
-
-				const womb = new Womb();
-				expect(womb.image).toBe(`media/ui/womb/normal/${expected}`);
-			});
-
-			it.each([
-				{ progress: 0, amount: 0, expected: "conception/womb_conception_0.png" },
-				{ progress: 0, amount: 1000, expected: "conception/womb_conception_17.png" },
-				{ progress: 0.8, amount: 1000, expected: "pregnant/womb_pregnant_4.png" },
-				{ progress: 0.95, amount: 1000, expected: "pregnant/womb_pregnant_6.png" }
-			])(
-				"should return $expected when pregnant with progress $progress and amount $amount",
-				({ progress, amount, expected }) => {
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress });
-					jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-						mockedModData({ amount })
-					);
-
-					const womb = new Womb();
-					womb.onPregnancyUpdate({ progress });
-
-					expect(womb.image).toBe(`media/ui/womb/${expected}`);
-				}
-			);
-		});
-
-		describe("scene images", () => {
-			const sceneTestCases = [
-				{
-					amount: 0,
-					isPregnant: false,
-					condom: false,
-					expected: "media/ui/animation/normal/empty/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: false,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: false,
-					condom: false,
-					expected: "media/ui/animation/normal/full/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: false,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: true,
-					condom: false,
-					expected: "media/ui/animation/pregnant/0.png"
-				},
-				{
-					amount: 0,
-					isPregnant: true,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: true,
-					condom: false,
-					expected: "media/ui/animation/pregnant/0.png"
-				},
-				{
-					amount: 900,
-					isPregnant: true,
-					condom: true,
-					expected: "media/ui/animation/condom/0.png"
-				}
-			];
-
-			it.each(sceneTestCases)(
-				"should return $expected when pregnant: $isPregnant, condom: $condom, amount: $amount",
-				({ isPregnant, condom, amount, expected }) => {
-					jest.spyOn(Player.prototype, "hasItem").mockReturnValue(condom);
-					jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
-						mockedModData({ amount })
-					);
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
-						isPregnant ? { progress: 0.6 } : null
-					);
-
-					const womb = new Womb();
-					womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-
-					expect(womb.image).toBe(expected);
-				}
-			);
-
-			it("should return labor animation", () => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({
-					progress: 1,
-					isInLabor: true
-				});
-
-				const womb = new Womb();
-				womb.onAnimationUpdate({ isActive: true });
-
-				expect(womb.image).toBe("media/ui/animation/birth/0.png");
-			});
-
-			it("should not animate when animation is not queued", () => {
-				ISTimedActionQueue.getTimedActionQueue = jest.fn().mockImplementation(() => ({
-					queue: []
-				}));
-				const womb = new Womb();
-				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-				expect(womb.animation.isActive).toBe(false);
-			});
-
-			it("should not animate when ZomboWin animation data is not present", () => {
-				Object.defineProperty(global, "ZomboWinAnimationData", {
-					value: [],
-					writable: true
-				});
-				const womb = new Womb();
-				womb.onAnimationUpdate({ isActive: true, delta: 500, duration: 1000 });
-				expect(womb.animation.isActive).toBe(false);
-			});
-		});
-	});
-
 	// === External getters & setters ===
 	describe("External getters & setters", () => {
 		beforeEach(() => {
@@ -592,12 +446,14 @@ describe("Womb", () => {
 		});
 		it("should be able to set contraceptive externally", () => {
 			const womb = new Womb();
-			expect(womb.onContraceptive).toBe(false);
+			womb.onCreatePlayer(mockedPlayer());
+			expect(womb.contraceptive).toBe(false);
 			womb.contraceptive = true;
-			expect(womb.onContraceptive).toBe(true);
+			expect(womb.contraceptive).toBe(true);
 		});
 		it("Should be able to retrieve phaseTranslation", () => {
 			const womb = new Womb();
+			womb.onCreatePlayer(mockedPlayer());
 			expect(womb.phaseTranslation).toBe("IGUI_ZWBF_UI_Menstruation");
 		});
 	});
@@ -614,19 +470,19 @@ describe("Womb", () => {
 		});
 		describe("sperm", () => {
 			it.each<{ method: "add" | "set" | "remove"; expected: number }>([
-				{ method: "add", expected: 10 },
-				{ method: "set", expected: 10 },
+				{ method: "add", expected: 0.01 },
+				{ method: "set", expected: 0.01 },
 				{ method: "remove", expected: 0 }
 			])(
 				"when method $method is called, the expected amount should be $expected",
 				({ method, expected }) => {
-					womb.Debug.sperm[method](10);
-					expect(womb.amount).toBe(expected);
+					womb.Debug.sperm[method](0.01);
+					expect(womb.amount).toBeCloseTo(expected);
 				}
 			);
 			it("when method setTotal is called, the total should be set", () => {
-				womb.Debug.sperm.setTotal(10);
-				expect(womb.total).toBe(10);
+				womb.Debug.sperm.setTotal(0.01);
+				expect(womb.total).toBeCloseTo(0.01);
 			});
 		});
 		describe("cycle", () => {

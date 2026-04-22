@@ -1,9 +1,9 @@
 import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
-import { getSkinColor, percentageToNumber } from "@utils";
-import { LuaEventManager } from "@asledgehammer/pipewrench";
-import { ZWBFEvents, ZWBFTraitsEnum } from "@constants";
+import { percentageToNumber } from "@utils";
+import { ZWBFEventsEnum, ZWBFTraitsEnum } from "@constants";
+import { LactationOptions } from "@client/SandboxOptions";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
 
@@ -13,21 +13,22 @@ import { Moodle } from "./Moodles";
  * and visual image resolution based on state.
  */
 export class Lactation extends Player<LactationData> implements TimedEvents {
-	private readonly _capacity: number;
-	private readonly _bottleAmount;
+	private readonly _bottleAmount  = 0.2;
 
 	private moodle?: Moodle;
 
 	private readonly CONSTANTS = {
 		MAX_LEVEL: 5,
 		AMOUNTS: {
-			MIN: 20,
-			MAX: 100
+			MIN: 0.02,
+			MAX: 0.1
 		}
 	};
 
-	// TODO: Replace with configurable SandBoxVars
-	private readonly options: Record<string, number>;
+	private readonly options = {
+		expiration: LactationOptions.expiration,
+		capacity: LactationOptions.capacity
+	}
 
 	/**
 	 * Debug utilities to modify internal milk data
@@ -39,26 +40,19 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		toggle: (status: boolean) => this.toggle(status)
 	};
 
+	defaultData = {
+		isActive: false,
+		milkAmount: 0,
+		expiration: this.options.expiration,
+		multiplier: 0
+	};
+
 	constructor() {
 		super("ZWBFLactation");
-		this.options = {
-			expiration: 7,
-			capacity: 1000
-		};
-		this._capacity = this.options.capacity;
-		this._bottleAmount = 200;
 	}
 
 	onCreatePlayer(player: IsoPlayer): void {
 		super.onCreatePlayer(player);
-		this.defaultData = {
-			isActive: false,
-			milkAmount: 0,
-			// TODO: Get options from SandboxVars
-			expiration: 7,
-			multiplier: 0
-		};
-
 		this.moodle = new Moodle({
 			player,
 			name: "Engorgement",
@@ -70,40 +64,32 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
-
-		LuaEventManager.AddEvent(ZWBFEvents.LACTATION_UPDATE);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
 		super.onPregnancyUpdate(data);
+		if (!this.pregnancy) return;
 
-		const progress = this.pregnancy?.progress ?? 0;
+		const { progress } = this.pregnancy;
 		if (progress < 0.5) return;
 		this.toggle(true);
 		this.useMilk(0, progress);
 	}
 
 	onEveryMinute() {
-		triggerEvent(ZWBFEvents.LACTATION_UPDATE, this.data);
+		triggerEvent(ZWBFEventsEnum.LACTATION_UPDATE, this.data);
 	}
 
 	onEveryTenMinutes() {
 		if (!this.isLactating) return;
-		const torso = this.getBodyPart(BodyPartType.Torso_Upper)!;
 
 		const modifier = percentageToNumber(this.percentage, 25);
-
-		// Apply engorgement pain
-		const currentPain = torso.getAdditionalPain();
-		if (currentPain < 25) {
-			torso.setAdditionalPain(Math.min(25, currentPain + modifier));
-		}
-
-		// Apply wetness
-		const currentWetness = torso.getWetness();
-		if (currentWetness < 25) {
-			torso.setWetness(Math.min(25, currentWetness + modifier));
-		}
+		
+		this.applyBodyEffect(BodyPartType.Torso_Upper, {
+			pain: modifier,
+			maxPain: 10,
+			wetness: modifier
+		});
 
 		// Apply moodle
 		this.moodle?.moodle(this.percentage);
@@ -125,12 +111,13 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	/**
 	 * Toggles lactation on or off and resets data if needed
 	 */
-	private toggle(status: boolean) {
-		this.data!.isActive = status;
+	public toggle(status: boolean) {
+		this.isLactating = status;
+		this.expiration = this.options.expiration;
 		if (!status) {
 			this.data = {
 				isActive: false,
-				expiration: 0,
+				expiration: this.options.expiration,
 				milkAmount: 0,
 				multiplier: 0
 			};
@@ -143,14 +130,14 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	 * @param multiplier - additional production multiplier
 	 * @param expiration - override expiration value
 	 */
-	public useMilk(amount: number, multiplier?: number, expiration?: number) {
+	public useMilk(amount: number, multiplier?: number) {
 		if (!this.data) return;
 
 		amount = Math.min(amount, this.milkAmount);
 		this.multiplier = Math.max(0, multiplier || 0);
-		this.expiration = 24 * (expiration || this.expiration);
+		this.expiration = this.options.expiration;
 
-		if (this.player?.HasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+		if (this.hasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
 			this.multiplier *= 1.25;
 			this.expiration *= 1.25;
 		}
@@ -175,13 +162,12 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 			return `pregnant_${progress < 0.7 ? "early" : "late"}`;
 		};
 
-		const skinColor = getSkinColor(this.player!);
 		const state = getState();
 		const fullness = this.milkAmount > this.capacity / 2 ? "full" : "empty";
 		const level = percentageToNumber(this.percentage, this.CONSTANTS.MAX_LEVEL);
 
 		return {
-			breasts: `media/ui/lactation/boob/color-${skinColor}/${state}_${fullness}.png`,
+			breasts: `media/ui/lactation/boobs/color-${this.skinColorIndex}/${state}_${fullness}.png`,
 			level: `media/ui/lactation/level/milk_level_${level}.png`
 		};
 	}
@@ -191,6 +177,9 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		return (this.milkAmount / this.capacity) * 100;
 	}
 
+	set isLactating(value: boolean) {
+		this.data!.isActive = value;
+	}
 	/** Is the player currently lactating? */
 	get isLactating() {
 		return this.data?.isActive ?? false;
@@ -198,7 +187,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	/** Maximum milk capacity */
 	private get capacity() {
-		return this._capacity;
+		return this.options.capacity;
 	}
 
 	/** Bottleable milk amount */
@@ -224,6 +213,9 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	/** Time until spoilage in hours */
 	private set expiration(value: number) {
+		if (this.hasTrait(ZWBFTraitsEnum.DAIRY_COW)) {
+			this.data!.expiration = value * 1.25;
+		}
 		this.data!.expiration = value;
 	}
 	private get expiration() {

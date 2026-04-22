@@ -29,6 +29,9 @@ export const onCreatePlayer = {
 export const onGameBoot = {
 	addListener: jest.fn()
 };
+export const onCreateLivingCharacter = {
+	addListener: jest.fn()
+};
 
 export const onPreDistributionMerge = {
 	addListener: jest.fn()
@@ -45,7 +48,6 @@ export const onPostRender = {
 export const onFillWorldObjectContextMenu = {
 	addListener: jest.fn()
 };
-
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class EventEmitter<T> {
