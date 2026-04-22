@@ -19,6 +19,9 @@ export const getText = jest.fn().mockImplementation((...args: string[]) => args.
 
 export const triggerEvent = jest.fn();
 
+const pipewrenchRequireMock = jest.fn().mockReturnValue({});
+export { pipewrenchRequireMock as require };
+
 export const getActivatedMods = jest.fn();
 
 export class TraitFactory {

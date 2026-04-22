@@ -172,12 +172,10 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 1. Download the mod from the [releases page](https://github.com/zikhad/zwbf-pipewrench/releases)
 2. Extract to your Project Zomboid mods directory
 3. Enable "Zombowin Being Female" in the mod menu
-4. Ensure "42UIAPI" is also enabled (required dependency)
 
 ## Requirements
 
 - **Project Zomboid**: Build 41.78 or later
-- **42UIAPI**: Required for UI functionality
 
 ## Configuration
 
