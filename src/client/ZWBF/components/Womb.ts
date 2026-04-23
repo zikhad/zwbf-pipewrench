@@ -173,6 +173,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	private intercourse() {
 		if (!this.player) return;
+		if (this.pregnancy) return;
 		const amountInMilliliters = ZombRand(10, 50);
 		const amount = amountInMilliliters / 1000;
 		this.haloText({
