@@ -1,4 +1,4 @@
-# Zombowin Being Female
+# ZomboLust Being Female
 
 <center>
   <img alt="poster" style="width: 300px;border: 5px solid" src="./src/root/poster.png">
@@ -8,7 +8,7 @@
 
 ## Overview
 
-**ZomboWin Being Female** is a comprehensive female roleplay enhancement mod for Project Zomboid. This mod introduces realistic female biological systems including menstrual cycles, pregnancy, lactation, and related gameplay mechanics. It provides an immersive experience for players seeking deeper roleplaying opportunities in the zombie apocalypse.
+**ZomboLust Being Female** is a comprehensive female roleplay enhancement mod for Project Zomboid. This mod introduces realistic female biological systems including menstrual cycles, pregnancy, lactation, and related gameplay mechanics. It provides an immersive experience for players seeking deeper roleplaying opportunities in the zombie apocalypse.
 
 The mod features a complete reproductive system simulation with visual indicators, trait-based modifiers, and extensive UI integration. All systems are designed to be balanced and configurable through sandbox options.
 
@@ -171,7 +171,7 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 
 1. Download the mod from the [releases page](https://github.com/zikhad/zwbf-pipewrench/releases)
 2. Extract to your Project Zomboid mods directory
-3. Enable "Zombowin Being Female" in the mod menu
+3. Enable "ZomboLust Being Female" in the mod menu
 
 ## Requirements
 
