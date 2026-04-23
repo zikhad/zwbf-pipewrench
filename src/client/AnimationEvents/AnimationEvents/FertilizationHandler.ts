@@ -21,7 +21,6 @@ const hasTag = (tag: string, tags: Record<string, string>) => {
     return false
 }
 export function onAnimationEvent(actionInstance: ActionInstanceType, _eventName?: string, _parameter?: string) {
-    print("[ZWBF] onAnimationEvent - fertilization called?");
     if (!getActivatedMods().contains(MODS.ZOMBOLUST)) return;
     const { character, stageConfig } = actionInstance;
     if (character.isZombie() || !character.isFemale()) return;

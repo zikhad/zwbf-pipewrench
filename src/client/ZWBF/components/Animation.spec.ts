@@ -129,6 +129,22 @@ describe("Animation", () => {
 
 				expect(Animation.wombImage).toMatch(/^media\/ui\/animation\/intercourse\/\d+\.png$/);
 			});
+
+			it("should keep womb context when calling hasItem", () => {
+				const womb = {
+					amount: 0,
+					capacity: 1,
+					pregnancy: null,
+					player: {},
+					hasItem(this: { player?: unknown }, item: string) {
+						return !!this.player && item === ITEMS.CONDOM;
+					}
+				} as unknown as Womb;
+				const animation = new Animation(womb);
+
+				expect(() => animation.onAnimation(intercourseStart())).not.toThrow();
+				expect(Animation.wombImage).toMatch(/^media\/ui\/animation\/intercourse\/\d+\.png$/);
+			});
 		});
 
 		describe("pregnant animation (pregnancy.progress > 0.5)", () => {

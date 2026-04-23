@@ -109,8 +109,8 @@ export class Animation {
         if(key === ANIMATIONS.BIRTH) {
             return ANIMATION_KEY.BIRTH;
         }
-        const { hasItem, pregnancy } = this.womb;
-        if (hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
+        const { pregnancy } = this.womb;
+        if (this.womb.hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
         if (pregnancy && pregnancy.progress > 0.5) return ANIMATION_KEY.PREGNANT;
         return ANIMATION_KEY.NORMAL;
     }
