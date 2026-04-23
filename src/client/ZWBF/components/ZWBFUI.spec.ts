@@ -239,5 +239,27 @@ describe("ZWBFUI", () => {
 			expect(toggleSpy).toHaveBeenCalled();
 
 		});
+
+		it("should return false visibility when UI is not created", () => {
+			const ui = new ZWBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			expect(ui.isVisible()).toBe(false);
+		});
+
+		it("should return the underlying UI visibility", () => {
+			const ui = new ZWBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			(ui as any).UI = { isUIVisible: true };
+
+			expect(ui.isVisible()).toBe(true);
+		});
 	});
 });

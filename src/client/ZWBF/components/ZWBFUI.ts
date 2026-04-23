@@ -245,4 +245,12 @@ export class ZWBFUI {
 		if (!this.UI) return;
 		this.UI.toggle();
 	}
+
+	public isVisible(): boolean {
+		if (!this.UI) {
+			return false;
+		}
+
+		return this.UI.isUIVisible;
+	}
 }

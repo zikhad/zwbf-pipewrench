@@ -4,7 +4,6 @@ import { ZWBFUI } from "@client/components/ZWBFUI";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { Effects } from "@client/components/Effects";
 import { ContextMenu } from "@client/components/ContextMenu";
-import { getText } from "@asledgehammer/pipewrench";
 import { Animation } from "@client/components/Animation";
 
 export const lactation = new Lactation();
@@ -23,11 +22,5 @@ export const contextMenu = new ContextMenu({
 	lactation,
 	pregnancy,
 	womb,
-	options: [
-		{
-			title: getText("ContextMenu_ZWBF_Being_Female_Title"),
-			description: getText("ContextMenu_ZWBF_Being_Female_Description"),
-			fn: () => UI.toggle()
-		}
-	]
+	options: []
 });
