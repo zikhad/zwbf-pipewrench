@@ -188,6 +188,47 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 2. Extract to your Project Zomboid mods directory
 3. Enable "ZomboLust Being Female" in the mod menu
 
+## Building And Running The Mod
+
+If you are not familiar with Node.js, the short version is:
+
+1. Install [Node.js](https://nodejs.org/)
+2. Open a terminal in this repository
+3. Run `npm install` once to download the development tools
+4. Run `npm run build` to compile the TypeScript source into the mod output
+5. Start Project Zomboid and enable the built mod from your mods folder
+
+### What The Build Does
+
+- `npm run build` transpiles the TypeScript code in `src/` into Lua using `typescript-to-lua`
+- After transpiling, `scripts/postbuild.js` copies media and root files, generates Build 42 translations, and prepares the final mod folder inside `dist/`
+- The final packaged mod is written to `dist/ZomboLust Being Female/`
+
+### Typical Development Workflow
+
+1. Run `npm install`
+2. Make changes in `src/`
+3. Run `npm test` to execute the Jest test suite
+4. Run `npm run build` to verify the mod transpiles and packages correctly
+5. Copy or sync the built mod to your Project Zomboid mods directory if you are not already doing that through your own workflow
+6. Launch the game and test the feature in Project Zomboid
+
+### Useful Commands
+
+- `npm install`: installs project dependencies
+- `npm test`: runs the Jest test suite
+- `npm run coverage`: runs tests with coverage output
+- `npm run build`: transpiles TypeScript to Lua and prepares the final mod package in `dist/`
+- `npm run check`: checks formatting and lint rules
+- `npm run lint`: rewrites formatting and runs eslint
+- `npm run watch:build`: rebuilds on file changes and writes output to `~/Zomboid/mods`
+
+### Important Notes
+
+- Edit files in `src/`, not generated Lua files in `dist/`
+- The mod code does not run directly with Node.js; Node is only used for building, testing, and packaging tools
+- The actual gameplay code runs inside Project Zomboid after it has been transpiled to Lua
+
 ## Requirements
 
 - **Project Zomboid**: Build 41.78 or later
