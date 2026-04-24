@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.0.2...v1.1.0) (2026-04-24)
+
+
+### Features
+
+* **animation:** create a fertilization handler for zombolust integration ([504cc1e](https://github.com/zikhad/zwbf-pipewrench/commit/504cc1eaf290eca8f725c00d6d436349f49442f2))
+* **animation:** improving animations settings ([8a6b1e2](https://github.com/zikhad/zwbf-pipewrench/commit/8a6b1e2b66f2c90e8f67d3830b2945d3622b2211))
+* **integrations:** integrated with zombolust mod ([bcbfd2f](https://github.com/zikhad/zwbf-pipewrench/commit/bcbfd2fd70c7c94242d7ba481f9c3ecd9f77ce16))
+* **system:** removing zombolust as hard dependency ([4618957](https://github.com/zikhad/zwbf-pipewrench/commit/46189579894a453727b6529d58b4093efa37192e))
+* **system:** removing zombowin effects ([020f3ba](https://github.com/zikhad/zwbf-pipewrench/commit/020f3ba42b169ad200c7b7a55dafdc10fddcf78f))
+* **system:** renamed code from zwbf to zlbf ([a1704e9](https://github.com/zikhad/zwbf-pipewrench/commit/a1704e91b019f99e4e9b05403ab95013caf4eb46))
+* **ui:** adding loading tips and jokes ([75323e7](https://github.com/zikhad/zwbf-pipewrench/commit/75323e76e2bc57d337599e89279ec1374b948336))
+* **ui:** adding sidebar for Being Female ([2e4cf83](https://github.com/zikhad/zwbf-pipewrench/commit/2e4cf83b3ca8ee17f64c241812ee72eb3d4d3daa))
+
+
+### Bug Fixes
+
+* **ui:** fixing moodle framework integration ([92fec9c](https://github.com/zikhad/zwbf-pipewrench/commit/92fec9c81df79944cda45585119b3d05c61b3fc8))
+
 ### [1.0.2](https://github.com/zikhad/zwbf-pipewrench/compare/v1.0.1...v1.0.2) (2026-04-22)
 
 ### [1.0.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.0.0...v1.0.1) (2026-04-22)
