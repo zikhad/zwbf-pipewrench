@@ -97,6 +97,7 @@ const copyAndOptimizeRecursive = async (srcDir, destDir, progressBar) => {
  * @param {string} destPath Path to copy to
  */
 const copyFolder = async (srcPath, destPath) => {
+	console.log(`📁 Starting copy from ${srcPath} to ${destPath}...`);
 	if (!fs.existsSync(srcPath)) {
 		console.log(`📁 No files to copy from ${srcPath}...`);
 	} else {

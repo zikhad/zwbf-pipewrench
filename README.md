@@ -1,4 +1,4 @@
-# Zombowin Being Female
+# ZomboLust Being Female
 
 <center>
   <img alt="poster" style="width: 300px;border: 5px solid" src="./src/root/poster.png">
@@ -8,7 +8,7 @@
 
 ## Overview
 
-**ZomboWin Being Female** is a comprehensive female roleplay enhancement mod for Project Zomboid. This mod introduces realistic female biological systems including menstrual cycles, pregnancy, lactation, and related gameplay mechanics. It provides an immersive experience for players seeking deeper roleplaying opportunities in the zombie apocalypse.
+**ZomboLust Being Female** is a comprehensive female roleplay enhancement mod for Project Zomboid. This mod introduces realistic female biological systems including menstrual cycles, pregnancy, lactation, and related gameplay mechanics. It provides an immersive experience for players seeking deeper roleplaying opportunities in the zombie apocalypse.
 
 The mod features a complete reproductive system simulation with visual indicators, trait-based modifiers, and extensive UI integration. All systems are designed to be balanced and configurable through sandbox options.
 
@@ -52,7 +52,7 @@ The mod adds several female-specific traits that modify gameplay:
 - **No Menstrual Cramps**: No menstrual pain effects
 
 ### 🎨 User Interface
-- **ZWBF Panel**: Dedicated UI panel accessible from the character info screen
+- **ZLBF Panel**: Dedicated UI panel accessible from the character info screen
 - **Real-time Monitoring**:
   - Womb status (sperm levels, cycle phase, fertility)
   - Lactation status (milk amount)
@@ -79,9 +79,9 @@ Built-in debugging utilities for testing and development:
 This mod provides extensive event hooks for other mods to integrate with:
 
 ### Events
-#### `ZWBFPregnancyUpdate`: Fired when pregnancy data changes
+#### `ZLBFPregnancyUpdate`: Fired when pregnancy data changes
 ```lua
-Events.ZWBFPregnancyUpdate.Add(function ({
+Events.ZLBFPregnancyUpdate.Add(function ({
   progress --[[ number ]],
   current --[[ number ]],
   isInLabor --[[ boolean ]]
@@ -89,9 +89,9 @@ Events.ZWBFPregnancyUpdate.Add(function ({
   -- called every minute during pregnancy
 });
 ```
-#### `ZWBFLactationUpdate`: Fired every minute with lactation data
+#### `ZLBFLactationUpdate`: Fired every minute with lactation data
 ```lua
-Events.ZWBFLactationUpdate.Add(function ({
+Events.ZLBFLactationUpdate.Add(function ({
   isActive --[[ boolean ]],
   milkAmount --[[ number ]],
   multiplier --[[ number ]],
@@ -100,9 +100,9 @@ Events.ZWBFLactationUpdate.Add(function ({
   -- called every minute
 });
 ```
-#### `ZWBFWombUpdate`: Fired every minute with womb data
+#### `ZLBFWombUpdate`: Fired every minute with womb data
 ```lua
-Events.ZWBFLactationUpdate.Add(function ({
+Events.ZLBFLactationUpdate.Add(function ({
   amount --[[ number ]],
 	capacity --[[ number ]],
 	total --[[ number ]],
@@ -125,44 +125,44 @@ Events.ZWBFLactationUpdate.Add(function ({
   ]]
 });
 ```
-#### `ZWBFPregnancyLabor`: Fired during labor
+#### `ZLBFPregnancyLabor`: Fired during labor
 ```lua
-  Events.ZWBFPregnancyLabor.Add(function (delta --[[ number ]]) {
+  Events.ZLBFPregnancyLabor.Add(function (delta --[[ number ]]) {
     -- delta is a number between 0-1 that represents how far along the labor is
   });
 ```
 ### Triggers
-#### `ZWBFIntercourse`: Trigger for intercourse event
+#### `ZLBFIntercourse`: Trigger for intercourse event
 This will check for condoms and handle intercourse based on current conditions
 ```lua
-  triggerEvent("ZWBFIntercourse");
+  triggerEvent("ZLBFIntercourse");
 ```
-#### `ZWBFMenstrualEffects`: Trigger for menstruation effects
+#### `ZLBFMenstrualEffects`: Trigger for menstruation effects
 ```lua
-  triggerEvent("ZWBFMenstrualEffects");
+  triggerEvent("ZLBFMenstrualEffects");
 ```
-#### `ZWBFPregnancyStart`: Trigge to start pregnancy
+#### `ZLBFPregnancyStart`: Trigge to start pregnancy
 ```lua
-  triggerEvent("ZWBFPregnancyStart");
+  triggerEvent("ZLBFPregnancyStart");
 ```
-#### `ZWBFWombAnimation`: Triggers a womb animation
+#### `ZLBFWombAnimation`: Triggers a womb animation
 Usually triggered inside a Update of a **Custom Animation**
 ```lua
-  triggerEvent("ZWBFWombAnimation", {
+  triggerEvent("ZLBFWombAnimation", {
     animation = "intercourse" --[[ A valid womb animation ]],
     delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
     duration: 1 --[[ number - usualy the action.duration ]]
   });
 ```
-#### `ZWBFWombAnimationStop`: Clear the womb animation state
+#### `ZLBFWombAnimationStop`: Clear the womb animation state
 usually is called at Perform / Stop of a custom animation. ensure the `Animation.wombImage` can show the still image again
 ```lua
-  triggerEvent("ZWBFWombAnimationStop");
+  triggerEvent("ZLBFWombAnimationStop");
 ```
-#### `ZWBFWombImage`: Updates the womb image for the current static image
+#### `ZLBFWombImage`: Updates the womb image for the current static image
 This will update the `Animation.wombImage` based on current womb / pregnancy state
 ```lua
-  triggerEvent("ZWBFWombImage");
+  triggerEvent("ZLBFWombImage");
 ```
 
 ---
@@ -171,7 +171,7 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 
 1. Download the mod from the [releases page](https://github.com/zikhad/zwbf-pipewrench/releases)
 2. Extract to your Project Zomboid mods directory
-3. Enable "Zombowin Being Female" in the mod menu
+3. Enable "ZomboLust Being Female" in the mod menu
 
 ## Requirements
 

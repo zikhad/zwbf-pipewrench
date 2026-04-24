@@ -4,7 +4,7 @@ import { mock } from "jest-mock-extended";
 
 globalThis.print = jest.fn();
 
-(globalThis as any).NewZWBFUI = () => ({
+(globalThis as any).NewZLBFUI = () => ({
 	setWidthPixel: jest.fn(),
 	setHeight: jest.fn(),
 	setVisible: jest.fn(),
@@ -26,7 +26,7 @@ globalThis.print = jest.fn();
 	open: jest.fn(),
 });
 
-(globalThis as any).ZWBFRecipes = {};
+(globalThis as any).ZLBFRecipes = {};
 
 (globalThis as any).CharacterStat = {
 	HUNGER: "HUNGER",
