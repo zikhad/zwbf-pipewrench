@@ -22,6 +22,8 @@ const hasTag = (tag: string, tags: Record<string, string>) => {
 }
 export function onAnimationEvent(actionInstance: ActionInstanceType, _eventName?: string, _parameter?: string) {
     if (!getActivatedMods().contains(MODS.ZOMBOLUST)) return;
+    if (!ZomboDesire || !ZomboDesire.AnimationConfigs) return;
+
     const { character, stageConfig } = actionInstance;
     if (character.isZombie() || !character.isFemale()) return;
 

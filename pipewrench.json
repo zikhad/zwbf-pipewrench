@@ -7,9 +7,6 @@
 		"url": "https://github.com/zikhad/zwbf-pipewrench",
 		"poster": "./poster.png",
 		"icon": "./logo.png",
-		"require": [
-			"ZomboLust"
-		],
 		"pzversion": "42"
 	},
 	"modelsDir": "./src/models",
