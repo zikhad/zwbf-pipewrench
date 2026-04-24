@@ -5,7 +5,7 @@ describe("SandboxOptions", () => {
 		delete (globalThis as { SandboxVars?: unknown }).SandboxVars;
 	});
 
-	it("falls back to defaults when SandboxVars.ZWBF is unavailable", () => {
+	it("falls back to defaults when SandboxVars.ZLBF is unavailable", () => {
 		expect(PregnancyOptions.duration).toBe(14 * 24 * 60);
 		expect(PregnancyOptions.recovery).toBe(7);
 		expect(WombOptions.capacity).toBe(1);
@@ -14,7 +14,7 @@ describe("SandboxOptions", () => {
 		expect(LactationOptions.expiration).toBe(168);
 	});
 
-	it("reads nested values from SandboxVars.ZWBF", () => {
+	it("reads nested values from SandboxVars.ZLBF", () => {
 		(globalThis as { SandboxVars?: { ZLBF?: ZLBFSandboxOptions } }).SandboxVars = {
 			ZLBF: {
 				PregnancyDuration: 21,

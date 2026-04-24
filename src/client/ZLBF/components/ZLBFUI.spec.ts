@@ -135,7 +135,7 @@ describe("ZLBFUI", () => {
 		it("should require ZLBFSimpleUI before creating UI", () => {
 			(ui as any).onCreateUI();
 
-			expect(Pipewrench.require "ZLBF/ZLBFSimpleUI");
+			expect(Pipewrench.require("ZLBF/ZLBFSimpleUI"));
 		});
 
 		it("Should call toggleLactationPanel properly", () => {

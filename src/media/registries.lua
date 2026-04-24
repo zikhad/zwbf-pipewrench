@@ -1,9 +1,9 @@
 if CharacterTrait and CharacterTrait.register then
-    CharacterTrait.register("zwbf:infertile")
-    CharacterTrait.register("zwbf:fertile")
-    CharacterTrait.register("zwbf:hyperfertile")
-    CharacterTrait.register("zwbf:pregnancy")
-    CharacterTrait.register("zwbf:dairycow")
-    CharacterTrait.register("zwbf:strongmenstrualcramps")
-    CharacterTrait.register("zwbf:nomenstrualcramps")
+    CharacterTrait.register("zlbf:infertile")
+    CharacterTrait.register("zlbf:fertile")
+    CharacterTrait.register("zlbf:hyperfertile")
+    CharacterTrait.register("zlbf:pregnancy")
+    CharacterTrait.register("zlbf:dairycow")
+    CharacterTrait.register("zlbf:strongmenstrualcramps")
+    CharacterTrait.register("zlbf:nomenstrualcramps")
 end

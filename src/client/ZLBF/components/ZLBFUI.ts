@@ -193,7 +193,7 @@ export class ZLBFUI {
 	}
 
 	private onCreateUI() {
-		pipewrenchRequire("ZWBF/ZLBFSimpleUI");
+		pipewrenchRequire("ZLBF/ZLBFSimpleUI");
 		this.UI = NewZLBFUI();
 
 		this.UI.setWidthPixel(200);

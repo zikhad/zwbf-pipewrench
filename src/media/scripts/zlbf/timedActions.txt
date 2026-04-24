@@ -1,4 +1,4 @@
-module ZWBF
+module ZLBF
 {
     import {
         Base
@@ -14,20 +14,20 @@ module ZWBF
     timedAction PumpMilk
     {
         metabolics  = LightDomestic,
-        actionAnim  = ZWBF.PumpMilk,
+        actionAnim  = ZLBF.PumpMilk,
     }
 
     timedAction CleanSelf
     {
         metabolics  = LightDomestic,
-        actionAnim  = ZWBF.CleanSelf,
-        sound       = ZWBF.CleanSelf,
+        actionAnim  = ZLBF.CleanSelf,
+        sound       = ZLBF.CleanSelf,
     }
 
     timedAction Birth
     {
         metabolics = HeavyWork,
-        actionAnim = ZWBF.Birth,
+        actionAnim = ZLBF.Birth,
         muscleStrainFactor = 1,
         muscleStrainSkill = Strength,
         muscleStrainParts = Groin,
@@ -36,8 +36,8 @@ module ZWBF
     timedAction FeedBaby
     {
         metabolics  = LightDomestic,
-        actionAnim  = ZWBF.FeedBaby,
-        sound       = ZWBF.FeedBaby,
-        prop1       = ZWBF.Baby
+        actionAnim  = ZLBF.FeedBaby,
+        sound       = ZLBF.FeedBaby,
+        prop1       = ZLBF.Baby
     }
 }

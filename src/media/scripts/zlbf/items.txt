@@ -1,4 +1,4 @@
-module ZWBF {
+module ZLBF {
 	imports {
 		Base
 	}
@@ -51,8 +51,8 @@ module ZWBF {
 		ItemType			= base:normal,
 		DisplayName			= Breast Pump,
 		Icon				= breastpump,
-		StaticModel			= ZWBF.BreastPump,
-		WorldStaticModel	= ZWBF.BreastPump,
+		StaticModel			= ZLBF.BreastPump,
+		WorldStaticModel	= ZLBF.BreastPump,
 		Tooltip				= Tooltip_BreastPump,
 	}
 
@@ -64,8 +64,8 @@ module ZWBF {
 		DisplayName			= Vaginal Douche,
 		Icon				= vaginal_douche,
 		Tooltip 			= Tooltip_VaginalDouche,
-		StaticModel 		= ZWBF.VaginalDouche,
-		WorldStaticModel 	= ZWBF.VaginalDouche,
+		StaticModel 		= ZLBF.VaginalDouche,
+		WorldStaticModel 	= ZLBF.VaginalDouche,
 		component FluidContainer
 		{
 			ContainerName = VaginalDouche,

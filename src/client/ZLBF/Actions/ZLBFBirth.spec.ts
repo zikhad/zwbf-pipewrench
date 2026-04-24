@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { ZWBFActionBirth } from "./ZLBFBirth";
+import { ZLBFActionBirth } from "./ZLBFBirth";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
@@ -7,12 +7,12 @@ import * as SpyPipewrench from "@asledgehammer/pipewrench";
 jest.mock("@asledgehammer/pipewrench");
 
 describe("ZLBFBirth", () => {
-	let action: ZWBFActionBirth;
+	let action: ZLBFActionBirth;
 	const spyPregnancyBirth = jest.fn();
 	const spyTriggerEvent = jest.spyOn(SpyPipewrench, "triggerEvent");
 
 	beforeEach(() => {
-		action = new ZWBFActionBirth(mock<Pregnancy>({ birth: spyPregnancyBirth }));
+		action = new ZLBFActionBirth(mock<Pregnancy>({ birth: spyPregnancyBirth }));
 	});
 
 	it("isValid should be true", () => {

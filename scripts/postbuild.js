@@ -17,8 +17,8 @@ const srcPath = dirPath => path.join(process.cwd(), ...dirPath.split("/"));
  * @returns {string}
  */
 const distPath = (dirPath, media = true) => {
-	const { name } = getInfo();
-	return path.join(process.cwd(), "dist", name, media ? "media" : "", ...dirPath.split("/"));
+	const { id } = getInfo();
+	return path.join(process.cwd(), "dist", id, media ? "media" : "", ...dirPath.split("/"));
 };
 
 /**
@@ -70,9 +70,49 @@ const formatBuild42Require = requireValue => {
 	return `\\${dependencies.join(",\\")}`;
 };
 
+/**
+ * Sanitizes the mod name to a filesystem-safe folder name.
+ * @param {string} value
+ * @returns {string}
+ */
+const sanitizeFolderName = value => {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+		.replace(/[.\s]+$/g, "")
+		.trim();
+
+	return sanitized || "mod";
+};
+
+/**
+ * Renames dist/id to dist/name.
+ * @returns {Promise<string>} Final dist folder path
+ */
+const renameDistFolderToModName = async () => {
+	const { id, name } = getInfo();
+	const distRoot = path.join(process.cwd(), "dist");
+	const sourcePath = path.join(distRoot, id);
+	const targetPath = path.join(distRoot, sanitizeFolderName(name));
+
+	if (sourcePath === targetPath) {
+		return targetPath;
+	}
+
+	if (!(await fs.pathExists(sourcePath))) {
+		throw new Error(`Cannot rename dist folder, source does not exist: ${sourcePath}`);
+	}
+
+	if (await fs.pathExists(targetPath)) {
+		await fs.remove(targetPath);
+	}
+
+	await fs.move(sourcePath, targetPath);
+	return targetPath;
+};
+
 const generateBuild42Folder = async () => {
-	const { name } = getInfo();
-	const basePath = path.join(process.cwd(), "dist", name);
+	const { id } = getInfo();
+	const basePath = path.join(process.cwd(), "dist", id);
 	const build42Path = path.join(basePath, "42");
 
 	await fs.ensureDir(build42Path);
@@ -97,7 +137,6 @@ const generateBuild42Folder = async () => {
 
 		await fs.copy(src, dest, { overwrite: true });
 	}
-
 	const build42InfoPath = path.join(build42Path, "mod.info");
 	if (await fs.pathExists(build42InfoPath)) {
 		const raw = await fs.readFile(build42InfoPath, "utf8");
@@ -114,8 +153,8 @@ const generateBuild42Folder = async () => {
 
 const run = async () => {
 	try {
-		const { name } = getInfo();
-		const basePath = path.join(process.cwd(), "dist", name);
+		const { id } = getInfo();
+		const basePath = path.join(process.cwd(), "dist", id);
 		const build42Path = path.join(basePath, "42");
 
 		await copyFolder(srcPath("src/media"), distPath(""));
@@ -142,6 +181,10 @@ const run = async () => {
 
 		await fs.remove(distPath(""));
 		console.info("Root media folder removed (Build 42 only artifact).");
+
+		const finalDistPath = await renameDistFolderToModName();
+		console.info(`Dist folder renamed to mod name: ${finalDistPath}`);
+		
 	} catch (err) {
 		console.error("Error copying files:", err);
 		process.exitCode = 1;

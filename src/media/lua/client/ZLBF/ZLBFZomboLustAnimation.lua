@@ -70,7 +70,7 @@ local function patchAnimationAction()
         return false
     end
 
-    if ISZomboDesireAnimationAction.__ZWBFAnimationHooked then
+    if ISZomboDesireAnimationAction.__ZLBFAnimationHooked then
         return true
     end
 
@@ -108,7 +108,7 @@ local function patchAnimationAction()
         end
     end
 
-    ISZomboDesireAnimationAction.__ZWBFAnimationHooked = true
+    ISZomboDesireAnimationAction.__ZLBFAnimationHooked = true
     print("[" .. MODULE_NAME .. "] Hooked ISZomboDesireAnimationAction lifecycle")
     return true
 end

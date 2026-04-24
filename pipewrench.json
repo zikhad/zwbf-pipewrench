@@ -9,7 +9,8 @@
 		"icon": "./logo.png",
 		"require": [
 			"ZomboLust"
-		]
+		],
+		"pzversion": "42"
 	},
 	"modelsDir": "./src/models",
 	"texturesDir": "./src/textures",

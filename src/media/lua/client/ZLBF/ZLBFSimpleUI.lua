@@ -1,5 +1,5 @@
 -- ZLBFSimpleUI.lua
--- Self-contained UI panel system for ZWBF.
+-- Self-contained UI panel system for ZLBF.
 -- Adapted from the 42UI API (MIT) by MrBounty.
 -- All class names are prefixed with ZLBF to avoid conflicts.
 
@@ -13,7 +13,7 @@ require "ISUI/ISButton"
 -- Helper: cut text to fit a given pixel width
 -- ---------------------------------------------------------------------------
 
-local function ZWBFCutTextToLong(text, width, font)
+local function ZLBFCutTextToLong(text, width, font)
     while getTextManager():MeasureStringX(font, text) > width do
         text = string.sub(text, 1, #text - 1);
         if text == "" then break end
@@ -23,12 +23,12 @@ end
 
 
 -- ---------------------------------------------------------------------------
--- ZWBFSimpleText
+-- ZLBFSimpleText
 -- ---------------------------------------------------------------------------
 
-ZWBFSimpleText = ISUIElement:derive("ZWBFSimpleText");
+ZLBFSimpleText = ISUIElement:derive("ZLBFSimpleText");
 
-function ZWBFSimpleText:render()
+function ZLBFSimpleText:render()
     self:drawRect(0, 0, self.width, self.height,
         self.backgroundColor.a, self.backgroundColor.r,
         self.backgroundColor.g, self.backgroundColor.b);
@@ -47,7 +47,7 @@ function ZWBFSimpleText:render()
     end
 end
 
-function ZWBFSimpleText:setPositionAndSize()
+function ZLBFSimpleText:setPositionAndSize()
     self.pxlW = self.parentUI.elemW[self.line][self.column];
     self.pxlX = self.parentUI.elemX[self.line][self.column];
     self.pxlH = self.parentUI.elemH[self.line];
@@ -56,10 +56,10 @@ function ZWBFSimpleText:setPositionAndSize()
     self:setY(self.pxlY);
     self:setWidth(self.pxlW);
     self:setHeight(self.pxlH);
-    self.textToDisplay, self.textW = ZWBFCutTextToLong(self.textOriginal, self:getWidth(), self.font);
+    self.textToDisplay, self.textW = ZLBFCutTextToLong(self.textOriginal, self:getWidth(), self.font);
 end
 
-function ZWBFSimpleText:new(parentUI, text, font, position)
+function ZLBFSimpleText:new(parentUI, text, font, position)
     local o = ISUIElement:new(0, 0, 1, 1);
     setmetatable(o, self);
     self.__index = self;
@@ -80,23 +80,23 @@ function ZWBFSimpleText:new(parentUI, text, font, position)
     return o;
 end
 
-function ZWBFSimpleText:setBorder(v)        self.border = v; end
-function ZWBFSimpleText:setWidthPercent(w)  self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
-function ZWBFSimpleText:setWidthPixel(w)    self.isWidthForce = true; self.pxlW = w; end
-function ZWBFSimpleText:setText(txt)
+function ZLBFSimpleText:setBorder(v)        self.border = v; end
+function ZLBFSimpleText:setWidthPercent(w)  self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
+function ZLBFSimpleText:setWidthPixel(w)    self.isWidthForce = true; self.pxlW = w; end
+function ZLBFSimpleText:setText(txt)
     self.textOriginal = txt;
     self.textToDisplay = txt;
 end
-function ZWBFSimpleText:setVisible(v)       ISUIElement.setVisible(self, v); end
+function ZLBFSimpleText:setVisible(v)       ISUIElement.setVisible(self, v); end
 
 
 -- ---------------------------------------------------------------------------
--- ZWBFSimpleImage
+-- ZLBFSimpleImage
 -- ---------------------------------------------------------------------------
 
-ZWBFSimpleImage = ISImage:derive("ZWBFSimpleImage");
+ZLBFSimpleImage = ISImage:derive("ZLBFSimpleImage");
 
-function ZWBFSimpleImage:setPositionAndSize()
+function ZLBFSimpleImage:setPositionAndSize()
     self.pxlW = self.parentUI.elemW[self.line][self.column];
     self.pxlX = self.parentUI.elemX[self.line][self.column];
     self.pxlH = self.parentUI.elemH[self.line];
@@ -108,15 +108,15 @@ function ZWBFSimpleImage:setPositionAndSize()
     self.scaledHeight = self.pxlH;
 end
 
-function ZWBFSimpleImage:render()
+function ZLBFSimpleImage:render()
     if self.border then
         self:drawRectBorder(0, 0, self:getWidth(), self:getHeight(), 0.5, 1, 1, 1);
     end
 end
 
-function ZWBFSimpleImage:new(parentUI, path)
+function ZLBFSimpleImage:new(parentUI, path)
     if not getTexture(path) then
-        print("ZWBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
+        print("ZLBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
         path = "media/ui/emotes/no.png";
     end
     local o = ISImage:new(0, 0, 1, 1, getTexture(path));
@@ -136,31 +136,31 @@ function ZWBFSimpleImage:new(parentUI, path)
     return o;
 end
 
-function ZWBFSimpleImage:setBorder(v)       self.border = v; end
-function ZWBFSimpleImage:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
-function ZWBFSimpleImage:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
-function ZWBFSimpleImage:setPath(path)
+function ZLBFSimpleImage:setBorder(v)       self.border = v; end
+function ZLBFSimpleImage:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
+function ZLBFSimpleImage:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
+function ZLBFSimpleImage:setPath(path)
     if not getTexture(path) then
-        print("ZWBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
+        print("ZLBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
         path = "media/ui/emotes/no.png";
     end
     self.path    = path;
     self.texture = getTexture(path);
 end
-function ZWBFSimpleImage:setVisible(v)      ISImage.setVisible(self, v); end
+function ZLBFSimpleImage:setVisible(v)      ISImage.setVisible(self, v); end
 
 
 -- ---------------------------------------------------------------------------
--- ZWBFSimpleButton
+-- ZLBFSimpleButton
 -- ---------------------------------------------------------------------------
 
-ZWBFSimpleButton = ISButton:derive("ZWBFSimpleButton");
+ZLBFSimpleButton = ISButton:derive("ZLBFSimpleButton");
 
-function ZWBFSimpleButton:setText(text)
+function ZLBFSimpleButton:setText(text)
     self:setTitle(text);
 end
 
-function ZWBFSimpleButton:onMouseUp(x, y)
+function ZLBFSimpleButton:onMouseUp(x, y)
     if not self:getIsVisible() then return; end
     local process = self.pressed == true;
     self.pressed = false;
@@ -171,7 +171,7 @@ function ZWBFSimpleButton:onMouseUp(x, y)
     end
 end
 
-function ZWBFSimpleButton:setPositionAndSize()
+function ZLBFSimpleButton:setPositionAndSize()
     self.pxlW = self.parentUI.elemW[self.line][self.column];
     self.pxlX = self.parentUI.elemX[self.line][self.column];
     self.pxlH = self.parentUI.elemH[self.line];
@@ -182,14 +182,14 @@ function ZWBFSimpleButton:setPositionAndSize()
     self:setOnClick(self.func);
 end
 
-function ZWBFSimpleButton:render()
+function ZLBFSimpleButton:render()
     ISButton.render(self);
     if self.border then
         self:drawRectBorder(0, 0, self:getWidth(), self:getHeight(), 0.5, 1, 1, 1);
     end
 end
 
-function ZWBFSimpleButton:new(parentUI, title, func)
+function ZLBFSimpleButton:new(parentUI, title, func)
     local o = ISButton:new(0, 0, 1, 1, title);
     setmetatable(o, self);
     self.__index = self;
@@ -203,18 +203,18 @@ function ZWBFSimpleButton:new(parentUI, title, func)
     return o;
 end
 
-function ZWBFSimpleButton:setBorder(v)       self.border = v; end
-function ZWBFSimpleButton:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
-function ZWBFSimpleButton:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
+function ZLBFSimpleButton:setBorder(v)       self.border = v; end
+function ZLBFSimpleButton:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
+function ZLBFSimpleButton:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
 
 
 -- ---------------------------------------------------------------------------
--- ZWBFSimpleProgressBar
+-- ZLBFSimpleProgressBar
 -- ---------------------------------------------------------------------------
 
-ZWBFSimpleProgressBar = ISUIElement:derive("ZWBFSimpleProgressBar");
+ZLBFSimpleProgressBar = ISUIElement:derive("ZLBFSimpleProgressBar");
 
-function ZWBFSimpleProgressBar:render()
+function ZLBFSimpleProgressBar:render()
     self:drawRect(0, 0, self.width, self.height,
         self.backgroundColor.a, self.backgroundColor.r,
         self.backgroundColor.g, self.backgroundColor.b);
@@ -234,7 +234,7 @@ function ZWBFSimpleProgressBar:render()
     end
 end
 
-function ZWBFSimpleProgressBar:setPositionAndSize()
+function ZLBFSimpleProgressBar:setPositionAndSize()
     self.pxlW = self.parentUI.elemW[self.line][self.column];
     self.pxlX = self.parentUI.elemX[self.line][self.column];
     self.pxlH = self.parentUI.elemH[self.line];
@@ -244,7 +244,7 @@ function ZWBFSimpleProgressBar:setPositionAndSize()
     self:setHeight(self.pxlH);
 end
 
-function ZWBFSimpleProgressBar:new(parentUI, value, min, max)
+function ZLBFSimpleProgressBar:new(parentUI, value, min, max)
     local o = ISUIElement:new(0, 0, 1, 1);
     setmetatable(o, self);
     self.__index = self;
@@ -267,10 +267,10 @@ function ZWBFSimpleProgressBar:new(parentUI, value, min, max)
     return o;
 end
 
-function ZWBFSimpleProgressBar:setBorder(v)       self.border = v; end
-function ZWBFSimpleProgressBar:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
-function ZWBFSimpleProgressBar:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
-function ZWBFSimpleProgressBar:setValue(v)        self.value = v; end
+function ZLBFSimpleProgressBar:setBorder(v)       self.border = v; end
+function ZLBFSimpleProgressBar:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
+function ZLBFSimpleProgressBar:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
+function ZLBFSimpleProgressBar:setValue(v)        self.value = v; end
 
 
 -- ---------------------------------------------------------------------------
@@ -334,7 +334,7 @@ function ZLBFSimpleUI:addLineToMatrices(isLastLine)
         self:setWidthPixel(
             self.elemX[i][self.lineColumnCount[i]] + self.elemW[i][self.lineColumnCount[i]]);
     elseif not isLastLine then
-        print("ZWBF UI - WARNING: line " .. i .. " has no elements.");
+        print("ZLBF UI - WARNING: line " .. i .. " has no elements.");
     end
 end
 
@@ -453,7 +453,7 @@ function ZLBFSimpleUI:initAndAddToTable(newE, name)
         table.insert(self.noNameElements, newE);
     else
         if self[name] ~= nil then
-            print("ZWBF UI - WARNING: element name '" .. name .. "' already in use.");
+            print("ZLBF UI - WARNING: element name '" .. name .. "' already in use.");
         end
         self.namedElements[name] = newE;
         self[name] = newE;
@@ -477,7 +477,7 @@ end
 
 function ZLBFSimpleUI:addText(name, txt, font, position)
     self:nextColumn();
-    local newE = ZWBFSimpleText:new(self, txt, font, position);
+    local newE = ZLBFSimpleText:new(self, txt, font, position);
     self:initAndAddToTable(newE, name);
     local dh = self.defaultLineHeight;
     if self.deltaY < dh then self.deltaY = dh; end
@@ -485,7 +485,7 @@ end
 
 function ZLBFSimpleUI:addProgressBar(name, value, min, max)
     self:nextColumn();
-    local newE = ZWBFSimpleProgressBar:new(self, value, min, max);
+    local newE = ZLBFSimpleProgressBar:new(self, value, min, max);
     self:initAndAddToTable(newE, name);
     local dh = self.defaultLineHeight;
     if self.deltaY < dh then self.deltaY = dh; end
@@ -493,7 +493,7 @@ end
 
 function ZLBFSimpleUI:addButton(name, text, func)
     self:nextColumn();
-    local newE = ZWBFSimpleButton:new(self, text, func);
+    local newE = ZLBFSimpleButton:new(self, text, func);
     self:initAndAddToTable(newE, name);
     local dh = self.defaultLineHeight;
     if self.deltaY < dh then self.deltaY = dh; end
@@ -502,7 +502,7 @@ end
 function ZLBFSimpleUI:addImage(name, path)
     self:nextColumn();
     self.lineHaveImages = true;
-    local newE = ZWBFSimpleImage:new(self, path);
+    local newE = ZLBFSimpleImage:new(self, path);
     self:initAndAddToTable(newE, name);
     local dh = self.defaultLineHeight;
     if self.deltaY < dh then self.deltaY = dh; end

@@ -1,4 +1,4 @@
-module ZWBFRecipes
+module ZLBFRecipes
 {
     import
     {
@@ -7,15 +7,15 @@ module ZWBFRecipes
 
     /************************ Pills ************************/
     craftRecipe TakeContraceptive {
-        timedAction = ZWBF.TakePills,
+        timedAction = ZLBF.TakePills,
         category = Health,
         time = 20,
         Tags = InHandCraft,
-        OnTest = ZWBFRecipes.OnTest.TakeContraceptive,
-        OnCreate = ZWBFRecipes.OnCreate.TakeContraceptive,
+        OnTest = ZLBFRecipes.OnTest.TakeContraceptive,
+        OnCreate = ZLBFRecipes.OnCreate.TakeContraceptive,
         inputs
         {
-            item 1.0 [ZWBF.Contraceptive],
+            item 1.0 [ZLBF.Contraceptive],
         }
         outputs
         {
@@ -23,15 +23,15 @@ module ZWBFRecipes
     }
 
     craftRecipe TakeLactaid {
-        timedAction = ZWBF.TakePills,
+        timedAction = ZLBF.TakePills,
         category = Health,
         time = 20,
         Tags = InHandCraft,
-        OnTest = ZWBFRecipes.OnTest.TakeLactaid,
-        OnCreate = ZWBFRecipes.OnCreate.TakeLactaid,
+        OnTest = ZLBFRecipes.OnTest.TakeLactaid,
+        OnCreate = ZLBFRecipes.OnCreate.TakeLactaid,
         inputs
         {
-            item 1.0 [ZWBF.Lactaid],
+            item 1.0 [ZLBF.Lactaid],
         }
         outputs
         {
@@ -41,15 +41,15 @@ module ZWBFRecipes
     /************************ Vaginal Cleaning ************************/
     craftRecipe ClearSperm
     {
-        timedAction = ZWBF.CleanSelf,
+        timedAction = ZLBF.CleanSelf,
         category = Health,
         time = 200,
         Tags = InHandCraft,
-        OnTest = ZWBFRecipes.OnTest.ClearSperm,
-        OnCreate = ZWBFRecipes.OnCreate.ClearSperm,
+        OnTest = ZLBFRecipes.OnTest.ClearSperm,
+        OnCreate = ZLBFRecipes.OnCreate.ClearSperm,
         inputs
         {
-            item 1 [ZWBF.VaginalDouche] flags[Prop1;IsFull] mode:keep,
+            item 1 [ZLBF.VaginalDouche] flags[Prop1;IsFull] mode:keep,
         }
         outputs
         {
@@ -58,12 +58,12 @@ module ZWBFRecipes
 
         craftRecipe PushCum
     {
-        timedAction = ZWBF.CleanSelf,
+        timedAction = ZLBF.CleanSelf,
         category = Health,
         time = 100,
         Tags = InHandCraft;CanBeDoneInDark,
-        OnTest = ZWBFRecipes.OnTest.PushCum,
-        OnCreate = ZWBFRecipes.OnCreate.PushCum,
+        OnTest = ZLBFRecipes.OnTest.PushCum,
+        OnCreate = ZLBFRecipes.OnCreate.PushCum,
         inputs
         {
             item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
@@ -83,11 +83,11 @@ module ZWBFRecipes
         recipeGroup = OpenBox,
         inputs
         {
-            item 1 [ZWBF.CondomBox],
+            item 1 [ZLBF.CondomBox],
         }
         outputs
         {
-            item 10 ZWBF.Condom,
+            item 10 ZLBF.Condom,
         }
     }
 
@@ -99,24 +99,24 @@ module ZWBFRecipes
         Tags = InHandCraft;CanBeDoneInDark,
         inputs
         {
-            item 10 [ZWBF.Condom],
+            item 10 [ZLBF.Condom],
         }
         outputs
         {
-            item 1 ZWBF.CondomBox,
+            item 1 ZLBF.CondomBox,
         }
     }
     
     /************************ Milk ************************/
     craftRecipe HandExpression
     {
-        timedAction = ZWBF.PumpMilk,
+        timedAction = ZLBF.PumpMilk,
         category = Cooking,
         time = 600,
         xpAward = Cooking:3,
         Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.HandExpress,
-        OnCreate = ZWBFRecipes.OnCreate.HandExpress,
+        OnTest = ZLBFRecipes.OnTest.HandExpress,
+        OnCreate = ZLBFRecipes.OnCreate.HandExpress,
         inputs
         {
             item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
@@ -128,16 +128,16 @@ module ZWBFRecipes
 
     craftRecipe PumpMilk
     {
-        timedAction = ZWBF.PumpMilk,
+        timedAction = ZLBF.PumpMilk,
         category = Cooking,
         time = 400,
         xpAward = Cooking:3,
         Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.BreastPump,
-        OnCreate = ZWBFRecipes.OnCreate.BreastPump,
+        OnTest = ZLBFRecipes.OnTest.BreastPump,
+        OnCreate = ZLBFRecipes.OnCreate.BreastPump,
         inputs
         {
-            item 1 [ZWBF.BreastPump] flags[Prop1] mode:keep,
+            item 1 [ZLBF.BreastPump] flags[Prop1] mode:keep,
             item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted;Base.Bucket;Base.BucketEmpty;Base.BucketWood;Base.BucketForged;Base.BucketCarved;Base.Pot;Base.PotForged;Base.Saucepan;Base.SaucepanCopper;Base.Bowl;Base.ClayBowl] mode:keep flags[Prop2;NotFull;ItemCount],
         }
         outputs
@@ -148,15 +148,15 @@ module ZWBFRecipes
     /************************ Baby ************************/
     craftRecipe BreastFeedBaby
     {
-        timedAction = ZWBF.FeedBaby,
+        timedAction = ZLBF.FeedBaby,
         time = 500,
         category = Cooking,
         Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.BreastFeedBaby,
-        OnCreate = ZWBFRecipes.OnCreate.BreastFeedBaby,
+        OnTest = ZLBFRecipes.OnTest.BreastFeedBaby,
+        OnCreate = ZLBFRecipes.OnCreate.BreastFeedBaby,
         inputs
         {
-            item 1 [ZWBF.Baby] mode:keep,
+            item 1 [ZLBF.Baby] mode:keep,
         }
         outputs
         {
@@ -165,16 +165,16 @@ module ZWBFRecipes
 
     craftRecipe BottleFeedBaby
     {
-        timedAction = ZWBF.FeedBaby,
+        timedAction = ZLBF.FeedBaby,
         time = 500,
         category = Cooking,
         Tags = InHandCraft;Cooking,
-        OnTest = ZWBFRecipes.OnTest.BottleFeedBaby,
-        OnCreate = ZWBFRecipes.OnCreate.BottleFeedBaby,
+        OnTest = ZLBFRecipes.OnTest.BottleFeedBaby,
+        OnCreate = ZLBFRecipes.OnCreate.BottleFeedBaby,
         inputs
         {
             item 1 [Base.PopBottle;Base.PopBottleRare;Base.WaterBottle;Base.MilkBottle;Base.Sportsbottle;Base.FeedingBottle;Base.BeerBottle;Base.BottleCrafted] mode:keep flags[Prop1],
-            -fluid 0.2 [ZWBF.HumanMilk]
+            -fluid 0.2 [ZLBF.HumanMilk]
         }
         outputs
         {

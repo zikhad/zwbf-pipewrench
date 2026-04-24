@@ -7,7 +7,7 @@ jest.mock("@client/components/Effects");
 jest.mock("@client/components/ContextMenu");
 jest.mock("@client/components/ZLBFUI");
 
-describe("ZWBF", () => {
+describe("ZLBF", () => {
 	it.each([
 		{ name: "Lactation", component: lactation },
 		{ name: "Pregnancy", component: pregnancy },

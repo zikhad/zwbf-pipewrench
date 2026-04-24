@@ -32,8 +32,8 @@ abstract class SandboxOptions {
 		selector: (options: ZLBFSandboxOptions) => T | undefined,
 		fallback: T
 	): T {
-		const globals = globalThis as { SandboxVars?: { ZWBF?: ZLBFSandboxOptions } };
-		const value = selector(globals.SandboxVars?.ZWBF ?? {});
+		const globals = globalThis as { SandboxVars?: { ZLBF?: ZLBFSandboxOptions } };
+		const value = selector(globals.SandboxVars?.ZLBF ?? {});
 		return value ?? fallback;
 	}
 }
