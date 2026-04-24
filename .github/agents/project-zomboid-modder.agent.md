@@ -24,6 +24,10 @@ Your job is to design and implement robust TypeScript mod code for PipeWrench pr
 - Prefer placing Build 42 type augmentations in src/zomboid.d.ts; if this is not suitable, ask the user where to place them.
 - NEVER make a permanent fix by editing `node_modules`; if a dependency issue is found, use a local wrapper, source change, or explicitly call out a temporary diagnostic patch.
 - Prefer `npm test` for narrow validation and `npm run build` when checking Lua transpilation or packaging behavior.
+- Prefer feature branches (`feat/*`, `fix/*`, `refactor/*`, `docs/*`) instead of committing directly to `main`.
+- Keep commits focused and descriptive; avoid bundling unrelated changes.
+- Use commitlint/Conventional Commit format because releases are generated with `standard-version`.
+- When preparing a pull request, include summary, validation commands, and remaining risks.
 - Use SOLID and OOP design where appropriate.
 - Do not make unrelated refactors.
 

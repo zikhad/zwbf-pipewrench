@@ -1,7 +1,9 @@
 # ZomboLust Being Female
 
 <center>
-  <img alt="poster" style="width: 300px;border: 5px solid" src="./src/root/poster.png">
+  <p style="text-align: center;">
+    <img alt="poster" style="width: 300px;border: 5px solid" src="./src/root/poster.png">
+  </p>
 </center>
 
 ---
@@ -195,8 +197,9 @@ If you are not familiar with Node.js, the short version is:
 1. Install [Node.js](https://nodejs.org/)
 2. Open a terminal in this repository
 3. Run `npm install` once to download the development tools
-4. Run `npm run build` to compile the TypeScript source into the mod output
-5. Start Project Zomboid and enable the built mod from your mods folder
+4. Run `npm run build` to compile the TypeScript source into the dist folder
+5. Copy the `dist/ZomboLust Being Female`into `~/Zomboid/mods` folder 
+6. Start Project Zomboid and enable the mod
 
 ### What The Build Does
 
@@ -210,7 +213,7 @@ If you are not familiar with Node.js, the short version is:
 2. Make changes in `src/`
 3. Run `npm test` to execute the Jest test suite
 4. Run `npm run build` to verify the mod transpiles and packages correctly
-5. Copy or sync the built mod to your Project Zomboid mods directory if you are not already doing that through your own workflow
+5. Copy or sync the built mod to your Project Zomboid mods directory
 6. Launch the game and test the feature in Project Zomboid
 
 ### Useful Commands
@@ -221,7 +224,7 @@ If you are not familiar with Node.js, the short version is:
 - `npm run build`: transpiles TypeScript to Lua and prepares the final mod package in `dist/`
 - `npm run check`: checks formatting and lint rules
 - `npm run lint`: rewrites formatting and runs eslint
-- `npm run watch:build`: rebuilds on file changes and writes output to `~/Zomboid/mods`
+- `npm run watch:build`: rebuilds on file changes and writes output to `~/Zomboid/mods` (only `.ts` files)
 
 ### Important Notes
 
