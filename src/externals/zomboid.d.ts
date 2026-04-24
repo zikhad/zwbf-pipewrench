@@ -4,5 +4,5 @@ declare const ISContextMenu: {
 };
 
 declare const SandboxVars: Record<string, string | number> & {
-	ZWBF?: ZWBFSandboxOptions;
+	ZLBF?: ZLBFSandboxOptions;
 };

@@ -1,17 +1,20 @@
-type Moodle = {
+type MFTexture = ReturnType<typeof import("@asledgehammer/pipewrench").getTexture>;
+type IsoPlayer = import("@asledgehammer/pipewrench").IsoPlayer;
+
+type MFMoodle = {
 	setThresholds: (
 		...args: [
-			number | null,
-			number | null,
-			number | null,
-			number | null,
-			number | null,
-			number | null,
-			number | null,
-			number | null
+			number | undefined,
+			number | undefined,
+			number | undefined,
+			number | undefined,
+			number | undefined,
+			number | undefined,
+			number | undefined,
+			number | undefined
 		]
 	) => void;
-	setPicture: (trasholds: unknown, level: number, texture: string) => void;
+	setPicture: (trasholds: unknown, level: number, texture: MFTexture) => void;
 	setValue: (level: number) => void;
 	getGoodBadNeutral: () => unknown;
 	getLevel: () => number;
@@ -19,6 +22,12 @@ type Moodle = {
 
 /** @noResolution */
 declare const MF: {
-	createMoodle: (name: string) => void;
-	getMoodle: (name: string) => Moodle;
+	/** Lua OOP prototype — use bracket `["new"]` syntax to call `MF.ISMoodle:new(name, player)` */
+	ISMoodle: {
+		new: (this: void, self: unknown, name: string, player: IsoPlayer) => void;
+	};
+	/** Lua dot-function — `this: void` prevents TSTL from generating a colon call */
+	createMoodle: (this: void, name: string) => void;
+	/** Lua dot-function — `this: void` prevents TSTL from generating a colon call */
+	getMoodle: (this: void, name: string) => MFMoodle | null;
 };

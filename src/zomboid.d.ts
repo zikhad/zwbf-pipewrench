@@ -69,7 +69,7 @@ declare global {
 		list: Record<string, ProceduralDistributionEntry | undefined>;
 	}
 
-	interface ZWBFSandboxOptions {
+	interface ZLBFSandboxOptions {
 		PregnancyDuration?: number;
 		PregnancyRecovery?: number;
 		WombMaxCapacity?: number;

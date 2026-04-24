@@ -1,6 +1,6 @@
 {
-	"name": "zwbf-pipewrench",
-	"version": "0.0.2",
+	"name": "zlbf-pipewrench",
+	"version": "1.0.2",
 	"scripts": {
 		"prebuild": "npm run clean",
 		"build": "tstl -p ./tsconfig.build.json",
@@ -41,7 +41,7 @@
 	],
 	"author": "Zikhad <zikhad@protonmail.com>",
 	"license": "ISC",
-	"description": "ZomboWin Being Female by Zikhad",
+	"description": "ZomboLust Being Female by Zikhad",
 	"devDependencies": {
 		"@asledgehammer/pipewrench": "^41.78.18",
 		"@asledgehammer/pipewrench-events": "^41.73.0",
