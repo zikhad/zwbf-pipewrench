@@ -192,6 +192,10 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 
 - **Project Zomboid**: Build 41.78 or later
 
+### Optional Mods
+- [ZomboLust](https://www.loverslab.com/files/file/44539-project-zomboid-zombolust-zombodesire-framework/) - Although not required, this will enable impregnation and womb animations
+- [MoodleFramework](https://steamcommunity.com/sharedfiles/filedetails/?id=3396446795&searchtext=moodle+framework) - This mod will create custom moodles for **Being Female**
+
 ## Configuration
 
 The mod includes several sandbox options for customization:
@@ -212,6 +216,7 @@ Contributions are welcome! Please:
 ## Credits
 
 - **Zikhad**: Lead developer and maintainer
+- **BlaBla**: Custom Animations
 - **[PipeWrench](https://github.com/asledgehammer/PipeWrench)**: Framework for Typescript zomboid mod creation
 
 ---

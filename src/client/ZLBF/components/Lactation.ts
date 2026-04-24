@@ -78,6 +78,8 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	onEveryMinute() {
 		triggerEvent(ZLBFEventsEnum.LACTATION_UPDATE, this.data);
+		// Apply moodle
+		this.moodle?.moodle(this.percentage);
 	}
 
 	onEveryTenMinutes() {
@@ -90,9 +92,6 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 			maxPain: 10,
 			wetness: modifier
 		});
-
-		// Apply moodle
-		this.moodle?.moodle(this.percentage);
 	}
 
 	onEveryHour() {

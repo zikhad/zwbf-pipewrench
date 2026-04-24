@@ -93,6 +93,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	}
 
 	onEveryMinute(): void {
+		this.moodle?.moodle(this.pregnancy?.progress ?? 0);
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
 		const current = this.pregnancy.current ?? 0;
@@ -108,7 +109,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZLBFActionBirth(this));
 		}
-		this.moodle?.moodle(this.pregnancy.progress);
+		
 		triggerEvent(ZLBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 
