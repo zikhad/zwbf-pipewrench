@@ -213,4 +213,4 @@ Contributions are welcome! Please:
 - [x] Add fatigue and at birth
 - [x] Create triggers event for animations
 - [x] Reintroduce Babies or similar artifacts
-- [ ] Inspect the ZomboLust (new mod that aims to replace Zombowin)
+- [x] Inspect the ZomboLust (new mod that aims to replace Zombowin)

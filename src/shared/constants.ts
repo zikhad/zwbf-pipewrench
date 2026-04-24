@@ -51,8 +51,6 @@ export const Fluids: Record<string, Fluid> = {
 };
 
 export enum MODS {
-	ZOMBOWIN = "ZomboWin",
-	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
 	ZOMBOLUST = "ZomboLust",
 	MOODLE_FRAMEWORK = "MoodleFramework"
 }
