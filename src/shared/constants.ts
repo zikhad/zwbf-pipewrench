@@ -1,13 +1,13 @@
 import { Fluid } from "server/types";
 
-export enum ZWBFTraitsEnum {
-	INFERTILE = "zwbf:infertile",
-	FERTILE = "zwbf:fertile",
-	HYPERFERTILE = "zwbf:hyperfertile",
-	PREGNANCY = "zwbf:pregnancy",
-	DAIRY_COW = "zwbf:dairycow",
-	STRONG_MENSTRUAL_CRAMPS = "zwbf:strongmenstrualcramps",
-	NO_MENSTRUAL_CRAMPS = "zwbf:nomenstrualcramps"
+export enum ZLBFTraitsEnum {
+	INFERTILE = "zlbf:infertile",
+	FERTILE = "zlbf:fertile",
+	HYPERFERTILE = "zlbf:hyperfertile",
+	PREGNANCY = "zlbf:pregnancy",
+	DAIRY_COW = "zlbf:dairycow",
+	STRONG_MENSTRUAL_CRAMPS = "zlbf:strongmenstrualcramps",
+	NO_MENSTRUAL_CRAMPS = "zlbf:nomenstrualcramps"
 }
 
 export enum CyclePhaseEnum {
@@ -19,29 +19,29 @@ export enum CyclePhaseEnum {
 	PREGNANT = "Pregnant"
 }
 
-export enum ZWBFEventsEnum {
-	PREGNANCY_UPDATE = "ZWBFPregnancyUpdate",
-	LACTATION_UPDATE = "ZWBFLactationUpdate",
-	WOMB_UPDATE = "ZWBFWombUpdate",
-	INTERCOURSE = "ZWBFIntercourse",
-	MENSTRUAL_EFFECTS = "ZWBFMenstrualEffects",
-	PREGNANCY_START = "ZWBFPregnancyStart",
-	PREGNANCY_STOP = "ZWBFPregnancyStop",
-	PREGNANCY_LABOR = "ZWBFPregnancyLabor",
-	ANIMATION = "ZWBFWombAnimation",
-	ANIMATION_STOP = "ZWBFWombAnimationStop",
-	IMAGE = "ZWBFWombImage"
+export enum ZLBFEventsEnum {
+	PREGNANCY_UPDATE = "ZLBFPregnancyUpdate",
+	LACTATION_UPDATE = "ZLBFLactationUpdate",
+	WOMB_UPDATE = "ZLBFWombUpdate",
+	INTERCOURSE = "ZLBFIntercourse",
+	MENSTRUAL_EFFECTS = "ZLBFMenstrualEffects",
+	PREGNANCY_START = "ZLBFPregnancyStart",
+	PREGNANCY_STOP = "ZLBFPregnancyStop",
+	PREGNANCY_LABOR = "ZLBFPregnancyLabor",
+	ANIMATION = "ZLBFWombAnimation",
+	ANIMATION_STOP = "ZLBFWombAnimationStop",
+	IMAGE = "ZLBFWombImage"
 }
 
 export enum ITEMS {
-	CONDOM = "ZWBF.Condom",
-	CONDOM_BOX = "ZWBF.CondomBox",
-	CONDOM_USED = "ZWBF.CondomUsed",
-	LACTAID = "ZWBF.Lactaid",
-	CONTRACEPTIVE = "ZWBF.Contraceptive",
-	VAGINAL_DOUCHE = "ZWBF.VaginalDouche",
-	BREAST_PUMP = "ZWBF.BreastPump",
-	BABY = "ZWBF.Baby"
+	CONDOM = "ZLBF.Condom",
+	CONDOM_BOX = "ZLBF.CondomBox",
+	CONDOM_USED = "ZLBF.CondomUsed",
+	LACTAID = "ZLBF.Lactaid",
+	CONTRACEPTIVE = "ZLBF.Contraceptive",
+	VAGINAL_DOUCHE = "ZLBF.VaginalDouche",
+	BREAST_PUMP = "ZLBF.BreastPump",
+	BABY = "ZLBF.Baby"
 
 }
 
@@ -51,14 +51,13 @@ export const Fluids: Record<string, Fluid> = {
 };
 
 export enum MODS {
-	ZOMBOWIN = "ZomboWin",
-	ZOMBOWIN_DEFEAT = "ZomboWinDefeatStrip",
+	ZOMBOLUST = "ZomboLust",
 	MOODLE_FRAMEWORK = "MoodleFramework"
 }
 
-export enum ZWBFAnimations {
-	TAKE_PILLS = "ZWBF.TakePills",
-	BIRTH = "ZWBF.Birth",
-	PUMP_MILK = "ZWBF.PumpMilk",
-	CLEAN_SELF = "ZWBF.CleanSelf"
+export enum ZLBFAnimations {
+	TAKE_PILLS = "ZLBF.TakePills",
+	BIRTH = "ZLBF.Birth",
+	PUMP_MILK = "ZLBF.PumpMilk",
+	CLEAN_SELF = "ZLBF.CleanSelf"
 }

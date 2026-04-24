@@ -9,15 +9,32 @@ const { copyFolder, getInfo } = require("./utils");
 const archiver = require("archiver");
 
 /**
+ * Sanitizes the mod name to a filesystem-safe folder name.
+ * @param {string} value
+ * @returns {string}
+ */
+const sanitizeFolderName = value => {
+	const sanitized = value
+		.replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+		.replace(/[.\s]+$/g, "")
+		.trim();
+
+	return sanitized || "mod";
+};
+
+/**
  * Creates a easy to share zip
  */
 const createZip = async () => {
-	const { name, zipname } = getInfo();
-	const tempDir = path.join(os.tmpdir(), `${name}-temp`);
+	const { id, name, zipname } = getInfo();
+	const tempDir = path.join(os.tmpdir(), `${id}-temp`);
+	const sourceByName = path.join(process.cwd(), "dist", sanitizeFolderName(name));
+	const sourceById = path.join(process.cwd(), "dist", id);
+	const sourcePath = (await fs.pathExists(sourceByName)) ? sourceByName : sourceById;
 
 	fs.ensureDirSync(tempDir);
 
-	await copyFolder(path.join(process.cwd(), "dist", name), path.join(tempDir));
+	await copyFolder(sourcePath, path.join(tempDir));
 
 	const output = fs.createWriteStream(zipname);
 	const archive = archiver("zip", { zlib: { level: 9 } });

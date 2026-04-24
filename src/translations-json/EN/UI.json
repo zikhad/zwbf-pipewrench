@@ -14,5 +14,11 @@
     "UI_Trait_StrongMenstrualCramps": "Bad Menstrual Cramps",
     "UI_Trait_StrongMenstrualCramps_Description": "You have more debilitating menstrual cramps <br>- Menstrual cramps 2x stronger",
     "UI_Trait_NoMenstrualCramps": "No Menstrual Cramps",
-    "UI_Trait_NoMenstrualCramps_Description": "You hardly feel menstrual cramps <br>- You menstruation does not have any bad effect"
+    "UI_Trait_NoMenstrualCramps_Description": "You hardly feel menstrual cramps <br>- You menstruation does not have any bad effect",
+    "UI_quick_tip_zlbf_1": "Keep condoms at hand so you can react quickly when needed.",
+    "UI_quick_tip_zlbf_2": "Stress and poor rest can make difficult days feel worse. Plan calmer tasks when needed.",
+    "UI_quick_tip_zlbf_3": "Track your menstrual cycle rhythm in a journal to prepare food, meds, and travel plans ahead of time.",
+    "UI_quick_tip_zlbf_4": "If you can lactate, stay hydrated and fed to support milk production.",
+    "UI_quick_tip_joke_zlbf_1": "In Knox Country, the most dangerous countdown is not always a helicopter event.",
+    "UI_quick_tip_joke_zlbf_2": "Prepared survivors fear no alarm clock, no horde, and definitely no surprise pregnancy."
 }

@@ -8,8 +8,8 @@ const { copyFolder, getInfo } = require("./utils");
  * Creates a zip for steam workshop
  */
 async function prepareSteamZip() {
-	const { name, zipname } = getInfo();
-	const tempPath = path.join(os.tmpdir(), `${name}-temp`);
+	const { id, zipname } = getInfo();
+	const tempPath = path.join(os.tmpdir(), `${id}-temp`);
 	// steam workshop expectets the following structure mod-name/contents/mods/mod-name
 	const modPath = path.join(tempPath, "contents", "mods");
 
@@ -32,7 +32,7 @@ async function prepareSteamZip() {
 	});
 
 	archive.pipe(output);
-	archive.directory(tempPath, name);
+	archive.directory(tempPath, id);
 	await archive.finalize();
 
 	fs.removeSync(tempPath);

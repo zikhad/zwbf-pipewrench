@@ -19,12 +19,12 @@
 		"paths": {
 			"@shared/components/*": ["shared/components/*"],
 			"@server/components/*": ["server/components/*"],
-			"@client/components/*": ["client/ZWBF/components/*"],
-			"@client/*": ["client/ZWBF/*"],
-			"@actions/*": ["client/ZWBF/Actions/*"],
+			"@client/components/*": ["client/ZLBF/components/*"],
+			"@client/*": ["client/ZLBF/*"],
+			"@actions/*": ["client/ZLBF/Actions/*"],
 			"@test/*": ["test/*"],
 			"@types": ["types.d.ts"],
-			"@utils": ["client/ZWBF/Utils.ts"],
+			"@utils": ["client/ZLBF/Utils.ts"],
 			"@constants": ["shared/constants.ts"]
 		}
 	}

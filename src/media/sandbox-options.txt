@@ -1,45 +1,45 @@
 VERSION = 1,
-option ZWBF.PregnancyDuration {
+option ZLBF.PregnancyDuration {
     type            = integer,
     min             = 2,
     max             = 270,
     default         = 14,
-    page            = ZWBF,
-    translation     = ZWBF_Pregnancy_Duration,
+    page            = ZLBF,
+    translation     = ZLBF_Pregnancy_Duration,
 }
 
-option ZWBF.PregnancyRecovery {
+option ZLBF.PregnancyRecovery {
     type            = integer,
     min             = 0,
     max             = 56,
     default         = 7,
-    page            = ZWBF,
-    translation     = ZWBF_Pregnancy_Recovery,
+    page            = ZLBF,
+    translation     = ZLBF_Pregnancy_Recovery,
 }
 
-option ZWBF.WombMaxCapacity {
+option ZLBF.WombMaxCapacity {
     type            = double,
     min             = 0.1,
     max             = 3,
     default         = 1.0,
-    page            = ZWBF,
-    translation     = ZWBF_Womb_Max_Capacity,
+    page            = ZLBF,
+    translation     = ZLBF_Womb_Max_Capacity,
 }
 
-option ZWBF.MilkCapacity {
+option ZLBF.MilkCapacity {
     type            = double,
     min             = 0.3,
     max             = 5,
     default         = 1.0,
-    page            = ZWBF,
-    translation     = ZWBF_Milk_Capacity,
+    page            = ZLBF,
+    translation     = ZLBF_Milk_Capacity,
 }
 
-option ZWBF.MilkExpiration {
+option ZLBF.MilkExpiration {
     type            = integer,
     min             = 1,
     max             = 365,
     default         = 7,
-    page            = ZWBF,
-    translation     = ZWBF_Milk_Expiration,
+    page            = ZLBF,
+    translation     = ZLBF_Milk_Expiration,
 }
