@@ -146,7 +146,7 @@ This will check for condoms and handle intercourse based on current conditions
   triggerEvent("ZLBFPregnancyStart");
 ```
 #### `ZLBFWombAnimation`: Triggers a womb animation
-Usually triggered inside a Update of a **Custom Animation**
+Usually triggered inside a Update of a **Animation**
 ```lua
   triggerEvent("ZLBFWombAnimation", {
     animation = "intercourse" --[[ A valid womb animation ]],
@@ -154,6 +154,21 @@ Usually triggered inside a Update of a **Custom Animation**
     duration: 1 --[[ number - usualy the action.duration ]]
   });
 ```
+It can offer a custom animation support through the custom `param`, as follows
+```lua
+  triggerEvent("ZLBFWombAnimation", {
+    animation = "intercourse" --[[ A valid womb animation ]],
+    delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
+    duration: 1 --[[ number - usualy the action.duration ]],
+    custom: {
+      steps = [0,1,2,3,4], -- the image name inside the folder must be 0.png, 1.png, ...
+      loop = true, -- can the animation be looped ?
+      fullnessSupport = true -- if true, the system will expect a full / empty folder
+      path = "media/ui/animation/example" -- final path of the animation will be media/ui/animation/example/full/0.png
+    }
+  });
+```
+
 #### `ZLBFWombAnimationStop`: Clear the womb animation state
 usually is called at Perform / Stop of a custom animation. ensure the `Animation.wombImage` can show the still image again
 ```lua

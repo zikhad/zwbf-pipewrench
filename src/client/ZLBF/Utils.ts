@@ -33,3 +33,19 @@ export const increaseClamped = (
 	const bounded = max !== undefined ? Math.min(max, next) : next;
 	return Math.max(current, bounded);
 }
+/**
+ * Repeats a frame sequence a fixed number of times using TSTL-safe loops.
+ * @param steps The sequence of frame indices to repeat.
+ * @param times The number of times to repeat the sequence.
+ * @returns A new array with the repeated sequence.
+ * @remarks This function is necessary because TSTL does not support certain array methods like `new Array(times)`.
+ */
+export const repeatArray = (steps: number[], times: number): number[] => {
+    const result: number[] = [];
+    for (let i = 0; i < times; i++) {
+		for (const step of steps) {
+			result.push(step);
+		}
+    }
+    return result;
+};

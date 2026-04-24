@@ -1,12 +1,13 @@
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Womb } from "@client/components/Womb";
-import { percentageToNumber } from "@client/Utils";
+import { percentageToNumber, repeatArray } from "@client/Utils";
 import { ITEMS, ZLBFEventsEnum } from "@constants";
 
 /** Identifies the type of animation to play. */
 export enum ANIMATIONS {
     INTERCOURSE = "intercourse",
-    BIRTH = "birth"
+    BIRTH = "birth",
+    CUSTOM = "custom"
 }
 
 /** Internal keys mapping animation states to their frame sequences. */
@@ -16,20 +17,29 @@ enum ANIMATION_KEY {
     CONDOM = "condom",
     BIRTH = "birth"
 }
+/**
+ * Defines the frame steps and optional loop count for a given animation.
+ * @property steps - An array of frame indices that dictate the animation sequence.
+ * @property loop - Optional number of times the animation should repeat within its duration (default is 1).
+ * @property fullnessSupport - Optional flag indicating if the animation has separate frames for "full" vs "empty" states. (default is false)
+ */
+type AnimationSetting = { steps: number[], loop?: number, fullnessSupport?: boolean };
 
 /** Maps each animation key to its ordered frame steps and optional loop count. */
-type AnimationSettings = Record<ANIMATION_KEY, { steps: number[], loop?: number }>;
+type AnimationSettings = Record<ANIMATION_KEY, AnimationSetting>;
 
 /**
  * Payload sent when an animation event fires.
  * @property animation - Which animation to play.
  * @property duration  - Total duration of the animation cycle in milliseconds.
  * @property delta     - Normalized playback position within the current cycle (0–1).
+ * @property custom      - Optional override for default animation settings (frame steps, loop count, fullness support).
  */
 export type AnimationConfig = {
     animation: ANIMATIONS;
     duration: number;
     delta: number;
+    custom?: AnimationSetting & { path: string };
 };
 
 /**
@@ -48,24 +58,19 @@ export class Animation {
     public static wombImage: string = "media/ui/womb/normal/womb_normal_0.png";
     private static isAnimationActive = false;
 
-    private readonly animations: AnimationSettings = {
+    private readonly defaultAnimations: AnimationSettings = {
         [ANIMATION_KEY.NORMAL]: {
             steps: [
-                [0, 1, 2, 3, 4, 3, 2, 1],
-                [0, 1, 2, 3, 4, 3, 2, 1],
-                [0, 1, 2, 3, 4, 3, 2, 1],
-                [0, 1, 2, 3, 4, 3, 2, 1],
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-            ].flat()
+                ...repeatArray([0, 1, 2, 3, 4, 3, 2, 1], 20),
+                ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            ],
+            fullnessSupport: true
         },
         [ANIMATION_KEY.PREGNANT]: {
             steps: [
-                [0, 1, 2, 3, 2, 1],
-                [0, 1, 2, 3, 2, 1],
-                [0, 1, 2, 3, 2, 1],
-                [0, 1, 2, 3, 2, 1],
-                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-            ].flat()
+                ...repeatArray([0, 1, 2, 3, 2, 1], 20),
+                ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            ],
         },
         [ANIMATION_KEY.CONDOM]: {
             steps: [0, 1, 2, 3, 4, 5, 6],
@@ -121,10 +126,10 @@ export class Animation {
      * @param props.delta Animation delta time
      * @param props.duration The duration of the animation  
     * */
-    onAnimation({ animation, delta, duration = 1 }: AnimationConfig) {
+    onAnimation({ animation, delta, duration = 1, custom }: AnimationConfig) {
         Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
-        const { steps, loop = 1 } = this.animations[key];
+        const { steps, loop = 1, fullnessSupport = false } = custom ?? this.defaultAnimations[key];
         const fullness = this.fullness;
         const loopDuration = duration / loop;
         const currentLoopDelta = (delta * duration) % loopDuration;
@@ -132,9 +137,11 @@ export class Animation {
 
 		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
 		const step = steps[stepIndex];
+        print(`Animation step: ${step}`);
 
-        const fullnessPath = (key == ANIMATION_KEY.NORMAL) ? `/${fullness}` : "";
-        Animation.wombImage = `media/ui/animation/${animation}${fullnessPath}/${step}.png`;
+        const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
+        const path = custom?.path ?? `media/ui/animation`;
+        Animation.wombImage = `${path}/${animation}${fullnessPath}/${step}.png`;
     }
 
     /** Marks the active animation as finished and re-enables idle image updates. */
