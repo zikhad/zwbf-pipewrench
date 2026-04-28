@@ -1,11 +1,4 @@
 /**
- * A single procedural loot distribution table entry.
- */
-type ProceduralDistributionEntry = {
-	items: unknown[];
-};
-
-/**
  * Map of all procedural distribution tables by name.
  */
 type ProceduralDistributionList = Record<string, ProceduralDistributionEntry | undefined>;
@@ -37,11 +30,6 @@ type DistributionGroup = {
 	readonly tableNames: readonly string[];
 	readonly items: readonly DistributionItem[];
 };
-
-/**
- * Global flag key to prevent duplicate distribution injection in the same runtime.
- */
-const APPLY_FLAG_KEY: string = "__ZLBFProceduralDistributionsApplied";
 
 /**
  * Named groups of procedural distribution tables for reusability and clarity.
@@ -211,39 +199,26 @@ class ZLBFDistributionRegistrer {
 }
 
 /**
- * Safely retrieves the procedural distribution list from the global game engine.
- * @returns The distribution list, or undefined if unavailable
- */
-const getProceduralDistributionList = (): ProceduralDistributionList | undefined => {
-	return (globalThis as { ProceduralDistributions?: { list?: ProceduralDistributionList } }).ProceduralDistributions?.list;
-};
-
-/**
  * Applies ZLBF distribution rules to procedural loot tables in the game engine.
- * This function is idempotent—it can be called multiple times without duplicating items.
  * It is automatically invoked on module load.
  *
- * @returns Number of successful injections, or 0 if already applied or unavailable
+ * @returns Number of successful injections, or 0 if unavailable
  */
 const applyZLBFDistributions = (): number => {
-	const globals = globalThis as Record<string, unknown>;
-	if (globals[APPLY_FLAG_KEY] === true) {
+	const distributions = (globalThis as any).ProceduralDistributions as ProceduralDistributionRegistry | undefined;
+	if (!distributions?.list) {
 		return 0;
 	}
 
-	const list = getProceduralDistributionList();
-	if (!list) {
-		return 0;
-	}
-
-	const repository = new ProceduralDistributionRepository(list);
+	const repository = new ProceduralDistributionRepository(distributions.list);
 	const registrer = new ZLBFDistributionRegistrer(repository, ZLBF_DISTRIBUTION_RULES);
-	const appliedEntries = registrer.apply();
-
-	globals[APPLY_FLAG_KEY] = true;
-	return appliedEntries;
+	return registrer.apply();
 };
 
-applyZLBFDistributions();
+try {
+	applyZLBFDistributions();
+} catch {
+	// ProceduralDistributions not available during initialization
+}
 
-export { APPLY_FLAG_KEY, ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions };
+export { ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions };
