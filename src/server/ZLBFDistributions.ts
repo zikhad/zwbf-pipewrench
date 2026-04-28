@@ -202,15 +202,11 @@ class ZLBFDistributionRegistrer {
  * Applies ZLBF distribution rules to procedural loot tables in the game engine.
  * It is automatically invoked on module load.
  *
+ * @param list - Optional distribution list to use; falls back to the global ProceduralDistributions
  * @returns Number of successful injections, or 0 if unavailable
  */
-const applyZLBFDistributions = (): number => {
-	const distributions = (globalThis as any).ProceduralDistributions as ProceduralDistributionRegistry | undefined;
-	if (!distributions?.list) {
-		return 0;
-	}
-
-	const repository = new ProceduralDistributionRepository(distributions.list);
+const applyZLBFDistributions = (list: ProceduralDistributionList = ProceduralDistributions.list): number => {
+	const repository = new ProceduralDistributionRepository(list);
 	const registrer = new ZLBFDistributionRegistrer(repository, ZLBF_DISTRIBUTION_RULES);
 	return registrer.apply();
 };

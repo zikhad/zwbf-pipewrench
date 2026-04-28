@@ -1,5 +1,7 @@
 import { ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions } from "./ZLBFDistributions";
 
+jest.mock("@asledgehammer/pipewrench");
+
 type Entry = { items: unknown[] };
 
 const getExpectedTableItems = (tableNames: readonly string[]) => {
@@ -37,21 +39,17 @@ describe("ZLBFDistributions.ts", () => {
 	const expectedEntries = ZLBF_DISTRIBUTION_RULES.reduce((count, rule) => count + rule.tableNames.length, 0);
 
 	beforeEach(() => {
-		delete (globalThis as any).ProceduralDistributions;
+		(globalThis as any).ProceduralDistributions = {
+			list: {}
+		} as ProceduralDistributionRegistry;
 	});
-
 	it("injects item/chance pairs into existing procedural distributions", () => {
 		const tableNames = Array.from(new Set(ZLBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames])));
 		const expectedItemsByTable = getExpectedTableItems(tableNames);
+		const list = createDistributionTable(tableNames);
 
-		(globalThis as any).ProceduralDistributions = {
-			list: createDistributionTable(tableNames)
-		};
-
-		const appliedEntries = applyZLBFDistributions();
+		const appliedEntries = applyZLBFDistributions(list);
 		expect(appliedEntries).toBe(expectedEntries);
-
-		const list = (globalThis as any).ProceduralDistributions.list;
 
 		for (const tableName of tableNames) {
 			expect(list[tableName]?.items).toEqual(expectedItemsByTable.get(tableName));
