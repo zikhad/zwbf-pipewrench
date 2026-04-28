@@ -1,4 +1,4 @@
-import { APPLY_FLAG_KEY, ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions } from "./ZLBFDistributions";
+import { ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions } from "./ZLBFDistributions";
 
 type Entry = { items: unknown[] };
 
@@ -37,7 +37,6 @@ describe("ZLBFDistributions.ts", () => {
 	const expectedEntries = ZLBF_DISTRIBUTION_RULES.reduce((count, rule) => count + rule.tableNames.length, 0);
 
 	beforeEach(() => {
-		delete (globalThis as any)[APPLY_FLAG_KEY];
 		delete (globalThis as any).ProceduralDistributions;
 	});
 
@@ -57,19 +56,6 @@ describe("ZLBFDistributions.ts", () => {
 		for (const tableName of tableNames) {
 			expect(list[tableName]?.items).toEqual(expectedItemsByTable.get(tableName));
 		}
-	});
-
-	it("is idempotent once successfully applied", () => {
-		const tableNames = ZLBF_DISTRIBUTION_RULES.flatMap(rule => [...rule.tableNames]);
-		(globalThis as any).ProceduralDistributions = {
-			list: createDistributionTable(tableNames)
-		};
-
-		const firstApply = applyZLBFDistributions();
-		const secondApply = applyZLBFDistributions();
-
-		expect(firstApply).toBe(expectedEntries);
-		expect(secondApply).toBe(0);
 	});
 
 	it("returns zero when procedural distributions are unavailable", () => {

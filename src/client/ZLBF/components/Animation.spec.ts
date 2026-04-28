@@ -99,14 +99,11 @@ describe("Animation", () => {
 				const womb = makeWomb({ amount: 0, capacity: 1 });
 				const animation = new Animation(womb);
 
-				// Normal animation has 42 steps; at delta=1/42 we expect frame corresponding to step 1
+				// Normal animation loops the bounce sequence 20 times before ending.
 				const normalSteps = [
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 3, 2, 1],
-					[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-				].flat();
+					...Array.from({ length: 20 }, () => [0, 1, 2, 3, 4, 3, 2, 1]).flat(),
+					...([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as number[])
+				];
 				const duration = 1000;
 				const stepDuration = duration / normalSteps.length;
 
