@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.1.1...v1.2.0) (2026-04-28)
+
+
+### Features
+
+* **ui:** adding quick tips & jokes ([a591e7a](https://github.com/zikhad/zwbf-pipewrench/commit/a591e7a4c58d9795224796316f2981ae2b16374d))
+
+
+### Bug Fixes
+
+* **tests:** fix broken tests ([0f5a1dc](https://github.com/zikhad/zwbf-pipewrench/commit/0f5a1dc9afefbb8954005d2c5ae3d0ebc53d402d))
+
 ### [1.1.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.1.0...v1.1.1) (2026-04-24)
 
 ## [1.1.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.0.2...v1.1.0) (2026-04-24)
