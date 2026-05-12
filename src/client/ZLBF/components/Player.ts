@@ -1,7 +1,6 @@
 import { BodyPart, BodyPartType, HaloTextHelper, IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { PregnancyData } from "@types";
-import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
+import { ZLBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 import { increaseClamped } from "@client/Utils";
 import { ModData } from "./ModData";
@@ -36,9 +35,6 @@ export abstract class Player<T> {
 	/** Actual typed data payload stored in ModData */
 	// protected data?: T;
 
-	/** Current pregnancy state data for this player */
-	protected _pregnancy?: ModData<PregnancyData>;
-
 	/** ModData key used for storage and retrieval */
 	private readonly modKey?: string;
 
@@ -55,11 +51,6 @@ export abstract class Player<T> {
 
 		// Register Zomboid lifecycle listeners
 		Events.onCreatePlayer.addListener((_, player) => this.onCreatePlayer(player));
-
-		// Register custom events
-		new Events.EventEmitter<(data: PregnancyData) => void>(
-			ZLBFEventsEnum.PREGNANCY_UPDATE
-		).addListener(data => this.onPregnancyUpdate(data));
 	}
 
 	/**
@@ -77,16 +68,6 @@ export abstract class Player<T> {
 			});
 			if(!this.data && this.defaultData) this.data = this.defaultData;
 		}
-
-		this._pregnancy = new ModData({
-			object: player,
-			modKey: "ZLBFPregnancy",
-			defaultData: {
-				current: 0,
-				progress: 0,
-				isInLabor: false
-			}
-		});
 	}
 
 	/**
@@ -210,15 +191,6 @@ export abstract class Player<T> {
 		}
 	}
 
-	/**
-	 * Updates pregnancy data for this player.
-	 *
-	 * @param {PregnancyData} data - Pregnancy state including progress and flags.
-	 */
-	protected onPregnancyUpdate(data: PregnancyData): void {
-		this.pregnancy = data;
-	}
-
 	protected hasTrait(trait: ZLBFTraitsEnum): boolean {
 		return this.player ? CharacterTraitApi.hasTrait(this.player, trait) : false;
 	}
@@ -253,15 +225,5 @@ export abstract class Player<T> {
 	set data(value: T) {
 		if (!this.modData) return;
 		this.modData.data = value;
-	}
-
-	get pregnancy(): PregnancyData | null {
-		if (!this.hasTrait(ZLBFTraitsEnum.PREGNANCY)) return null;
-		return this._pregnancy?.data ?? null;
-	}
-
-	set pregnancy(value: PregnancyData) {
-		if (!this._pregnancy) return;
-		this._pregnancy.data = value;
 	}
 }

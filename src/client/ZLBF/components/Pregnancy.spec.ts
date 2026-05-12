@@ -79,7 +79,7 @@ describe("Pregnancy", () => {
 					"Pregnancy progress is $progress and labor is $isInLabor",
 					({ current, isInLabor }) => {
 						beforeEach(() => {
-							jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+							jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
 								mock<PregnancyData>({ current, isInLabor })
 							);
 						});
@@ -160,7 +160,7 @@ describe("Pregnancy", () => {
 				])(
 					"should call appropriate effects when pregnancy progress is $progres",
 					({ progress, expected }) => {
-						jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+						jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
 							mock<PregnancyData>({ progress })
 						);
 
@@ -197,7 +197,7 @@ describe("Pregnancy", () => {
 				])(
 					"should call appropriate effects when pregnancy progress is $progress",
 					({ progress, expected }) => {
-						jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+						jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
 							mock<PregnancyData>({ progress })
 						);
 						pregnancy.onEveryDay();
@@ -251,7 +251,7 @@ describe("Pregnancy", () => {
 				writable: true,
 				configurable: true
 			});
-			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(testData);
+			jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(testData);
 
 			(pregnancy as any).onEveryMinute();
 
@@ -285,7 +285,7 @@ describe("Pregnancy", () => {
 	describe("Debug", () => {
 		describe("Pregnancy data not defined", () => {
 			let pregnancy: Pregnancy;
-			const spyPregnancySet = jest.spyOn(Player.prototype, "pregnancy", "set");
+			const spyPregnancySet = jest.spyOn(Pregnancy.prototype, "pregnancy", "set");
 			beforeEach(() => {
 				pregnancy = new Pregnancy();
 				// Mock PregnancyOptions to use a smaller duration for testing
@@ -322,7 +322,7 @@ describe("Pregnancy", () => {
 			])(
 				"Method $method should have expected result when data is $data",
 				({ method, data, args, expected }) => {
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(data);
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(data);
 					pregnancy.Debug[method](args as never);
 					expected();
 				}

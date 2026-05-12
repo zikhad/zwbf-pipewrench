@@ -6,6 +6,7 @@ import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ZLBFActionBirth } from "@actions/ZLBFBirth";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
+import { PregnancyState } from "./PregnancyState";
 import { PregnancyOptions } from "../SandboxOptions";
 
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
@@ -21,7 +22,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 			const { current = 0 } = this.pregnancy;
 			const { duration } = this.options;
-			const updated = Math.min(duration, current + minutes);
+			const updated = Math.min(duration, current + minutes);			
 			this.pregnancy = {
 				current: updated,
 				progress: updated / duration,
@@ -42,6 +43,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	protected onCreatePlayer(player: IsoPlayer): void {
 		super.onCreatePlayer(player);
+		PregnancyState.initialize(player);
 		this.moodle = new Moodle({
 			player,
 			name: "Pregnancy",
@@ -61,6 +63,14 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			.addListener((delta) => this.onLabor(delta));
 	}
 
+	public get pregnancy(): PregnancyData | null {
+		return PregnancyState.get(this.player);
+	}
+
+	public set pregnancy(value: PregnancyData) {
+		PregnancyState.set(this.player, value);
+	}
+
 	/**
 	 * Apply `default` values for `pregnancy` data
 	 */
@@ -70,6 +80,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			current: 0,
 			isInLabor: false
 		};
+		this.weightDebuff = 0;
 	}
 
 	/**
@@ -96,7 +107,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		this.moodle?.moodle(this.pregnancy?.progress ?? 0);
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
-		const current = this.pregnancy.current ?? 0;
+		const { current = 0 } = this.pregnancy;
 		const previousInLabor = this.pregnancy.isInLabor ?? false;
 		const updated = Math.min(duration, current + 1);
 		const isInLabor = updated == duration;
@@ -148,7 +159,6 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (!this.player) return;
 		this.player.getInventory().AddItem(ITEMS.BABY);
 		this.player.setBlockMovement(false);
-		this.weightDebuff = 0;
 		this.applyStatEffect({
 			stat: "FATIGUE",
 			value: 0.75,

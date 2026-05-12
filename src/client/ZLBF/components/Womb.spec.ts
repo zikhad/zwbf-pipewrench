@@ -7,12 +7,14 @@ import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { Player } from "./Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mockedPlayer } from "@test/mock";
+import { PregnancyState } from "./PregnancyState";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("@asledgehammer/pipewrench/client");
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Player");
+jest.mock("./PregnancyState");
 
 const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
 	capacity: 1,
@@ -45,7 +47,7 @@ describe("Womb", () => {
 		jest.spyOn(Events, "EventEmitter").mockReturnValue(mockEventEmitter as any);
 
 		// Default: no pregnancy, no data
-		jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(null);
+		(PregnancyState.get as jest.Mock).mockReturnValue(null);
 		jest.spyOn(Player.prototype, "data", "get").mockReturnValue(null);
 
 	});
@@ -162,8 +164,8 @@ describe("Womb", () => {
 					const womb = new Womb();
 					womb.onCreatePlayer(mockedPlayer());
 
-					// The intercourse is the first EventEmitter call
-					const [listenerFn] = mockAddListener.mock.calls[0];
+					// Event order: PREGNANCY_UPDATE, INTERCOURSE, MENSTRUAL_EFFECTS
+					const [listenerFn] = mockAddListener.mock.calls[1];
 					const spyIntercourse = jest.spyOn(womb as any, "intercourse");
 
 					listenerFn();
@@ -236,7 +238,7 @@ describe("Womb", () => {
 		])(
 			"should return $phase when pregnancy is $pregnancy",
 			({ pregnancy, progress, phase }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+				(PregnancyState.get as jest.Mock).mockReturnValue(
 					pregnancy ? { progress } : null
 				);
 
@@ -348,7 +350,7 @@ describe("Womb", () => {
 		});
 
 		it("should be 0 when pregnant", () => {
-			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress: 0.5 });
+			(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.5 });
 
 			const womb = new Womb();
 			womb.onCreatePlayer(mockedPlayer());
@@ -365,16 +367,16 @@ describe("Womb", () => {
 		});
 
 		it("should be null when no pregnancy data", () => {
-			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(null);
+			(PregnancyState.get as jest.Mock).mockReturnValue(null);
 
 			const womb = new Womb();
 			womb.onPregnancyUpdate({ progress: 0 });
 
-			expect(womb.pregnancy).toBeNull();
+			expect((womb as any).pregnancy).toBeNull();
 		});
 
 		it("should reset amount to 0 when pregnancy progress > 0.5", () => {
-			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress: 0.6 });
+			(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.6 });
 
 			const womb = new Womb();
 			womb.onCreatePlayer(mockedPlayer());
@@ -511,7 +513,7 @@ describe("Womb", () => {
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
 					mockedModData({ cycleDay: 0 })
 				);
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue({ progress: 0.5 });
+				(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.5 });
 
 				womb.Debug.cycle.nextPhase();
 

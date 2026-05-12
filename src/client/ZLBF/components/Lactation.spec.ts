@@ -8,10 +8,12 @@ import { LactationData } from "@types";
 import { Player } from "./Player";
 import { mockedPlayer } from "@test/mock";
 import { mock } from "jest-mock-extended";
+import { PregnancyState } from "./PregnancyState";
 
 jest.mock("@asledgehammer/pipewrench-events");
 jest.mock("./Moodles");
 jest.mock("./Player");
+jest.mock("./PregnancyState");
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
 
@@ -20,6 +22,7 @@ describe("Lactation", () => {
 		jest.clearAllMocks();
 		jest.resetModules();
 		SpyHasTrait.mockReset().mockReturnValue(false);
+		(PregnancyState.get as jest.Mock).mockReturnValue(null);
 	});
 
 	describe("Without player or data", () => {
@@ -196,7 +199,7 @@ describe("Lactation", () => {
 		])(
 			"Lactation should be $expected when pregnancy progress is: $progress",
 			({ progress, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+				(PregnancyState.get as jest.Mock).mockReturnValue(
 					progress ? { progress } : null
 				);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
@@ -277,7 +280,7 @@ describe("Lactation", () => {
 		])(
 			"returns correct image when state is $state and fullness is $fullness",
 			({ progress, amount, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+				(PregnancyState.get as jest.Mock).mockReturnValue(
 					progress ? { progress } : null
 				);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({

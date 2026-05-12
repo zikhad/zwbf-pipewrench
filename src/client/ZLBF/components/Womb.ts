@@ -11,6 +11,7 @@ import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "./Player";
 import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
+import { PregnancyState } from "./PregnancyState";
 
 /**
  * Manages reproductive functions, fertility, and pregnancy-related variables
@@ -166,9 +167,16 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyDays.addListener(() => this.onEveryDay());
+		new Events.EventEmitter<(data: PregnancyData) => void>(
+			ZLBFEventsEnum.PREGNANCY_UPDATE
+		).addListener((data) => this.onPregnancyUpdate(data));
 
 		new Events.EventEmitter(ZLBFEventsEnum.INTERCOURSE).addListener(() => this.intercourse());
 		new Events.EventEmitter(ZLBFEventsEnum.MENSTRUAL_EFFECTS).addListener(() => this.menstruationEffects());
+	}
+
+	public get pregnancy(): PregnancyData | null {
+		return PregnancyState.get(this.player);
 	}
 
 	private intercourse() {
@@ -207,12 +215,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 	 * @param data - Pregnancy data.
 	 */
 	onPregnancyUpdate(data: PregnancyData) {
-		super.onPregnancyUpdate(data);
-
 		if (!this.pregnancy) return;
 
 		this.cycleDay = -this.options.recovery;
-		if (this.pregnancy.progress > 0.5) {
+		if (data.progress > 0.5) {
 			this.amount = 0;
 		}
 	}

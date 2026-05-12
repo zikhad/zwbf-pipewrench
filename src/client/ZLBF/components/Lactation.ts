@@ -6,6 +6,7 @@ import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { LactationOptions } from "@client/SandboxOptions";
 import { Player, TimedEvents } from "./Player";
 import { Moodle } from "./Moodles";
+import { PregnancyState } from "./PregnancyState";
 
 /**
  * Lactation management system for a player character.
@@ -64,13 +65,19 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
+		new Events.EventEmitter<(data: PregnancyData) => void>(
+			ZLBFEventsEnum.PREGNANCY_UPDATE
+		).addListener((data) => this.onPregnancyUpdate(data));
+	}
+
+	private get pregnancy(): PregnancyData | null {
+		return PregnancyState.get(this.player);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
-		super.onPregnancyUpdate(data);
 		if (!this.pregnancy) return;
 
-		const { progress } = this.pregnancy;
+		const { progress } = data;
 		if (progress < 0.5) return;
 		this.toggle(true);
 		this.useMilk(0, progress);

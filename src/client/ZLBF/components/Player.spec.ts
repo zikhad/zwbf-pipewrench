@@ -10,7 +10,6 @@ import {
 	ItemContainer,
 	HaloTextHelper
 } from "@asledgehammer/pipewrench";
-import { PregnancyData } from "@types";
 import { ZLBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
@@ -50,9 +49,6 @@ class ConcretePlayer extends Player<Record<string, unknown>> {
 	}
 	public triggerOnCreatePlayer(player: IsoPlayer) {
 		this.onCreatePlayer(player);
-	}
-	public triggerPregnancyUpdate(data: PregnancyData) {
-		this.onPregnancyUpdate(data);
 	}
 	// Expose protected methods for testing
 	public testHasTrait(trait: ZLBFTraitsEnum): boolean {
@@ -99,19 +95,6 @@ describe("Player class", () => {
 			const [callback] = addListener.mock.calls[0];
 			callback(mockPlayer);
 
-			expect(addListener).toHaveBeenCalledWith(expect.any(Function));
-		});
-	});
-
-	describe("Custom Events", () => {
-		const addListener = jest.fn();
-		beforeEach(() => {
-			jest.spyOn(Events, "EventEmitter").mockReturnValue({ addListener } as any);
-		});
-		it("should register PREGNANCY_UPDATE event", () => {
-			new ConcretePlayer("TEST_KEY");
-			const [callback] = addListener.mock.calls[0];
-			callback(mock<PregnancyData>());
 			expect(addListener).toHaveBeenCalledWith(expect.any(Function));
 		});
 	});
@@ -283,35 +266,6 @@ describe("Player class", () => {
 			instance.triggerOnCreatePlayer(mockPlayer);
 			// The line `if(!this.data && this.defaultData) this.data = this.defaultData;` should be executed
 			expect(instance.data).toEqual({ initial: "data" });
-		});
-	});
-
-	describe("Pregnancy", () => {
-		it.each([
-			{ pregnancy: true, data: { progress: 0.5, current: 1, isInLabor: false } },
-			{ pregnancy: false, data: null }
-		])("Should return $data when pregnancy is $pregnancy", ({ pregnancy, data }) => {
-			(mockPlayer.getCharacterTraits().get as any).mockReturnValue(pregnancy);
-			const instance = new ConcretePlayer("TEST_KEY");
-			instance.triggerOnCreatePlayer(mockPlayer);
-			data && (instance.pregnancy = data);
-			(instance as any)._pregnancy = { data };
-			expect(instance.pregnancy).toBe(data);
-		});
-		it("Pregnancy should return null if player is not pregnant", () => {
-			(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(false);
-			const instance = new ConcretePlayer("TEST_KEY");
-			instance.triggerOnCreatePlayer(mockPlayer);
-			instance.pregnancy = mock<PregnancyData>();
-			expect(instance.pregnancy).toBeNull();
-		});
-		it("Pregnancy should return null if pregnancy data is not present", () => {
-			(mockPlayer.getCharacterTraits().get as any).mockReturnValue(true);
-			const instance = new ConcretePlayer("TEST_KEY");
-			instance.triggerOnCreatePlayer(mockPlayer);
-			// Mock the _pregnancy ModData to return null
-			(instance as any)._pregnancy = { data: null };
-			expect(instance.pregnancy).toBeNull();
 		});
 	});
 
