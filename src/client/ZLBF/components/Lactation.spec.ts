@@ -5,6 +5,7 @@ import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import * as SpyModData from "./ModData";
 import { LactationData } from "@types";
+import { ZLBFEventsEnum } from "@constants";
 import { Player } from "./Player";
 import { mockedPlayer } from "@test/mock";
 import { mock } from "jest-mock-extended";
@@ -86,11 +87,18 @@ describe("Lactation", () => {
 			});
 
 			describe("everyOneMinute event", () => {
-				it("should keep lactation active", () => {
+				it("should trigger LACTATION_UPDATE with current data", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
 					lactation.onEveryMinute();
-					expect(SpyPipewrench.triggerEvent).toHaveBeenCalled();
+					expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(
+						ZLBFEventsEnum.LACTATION_UPDATE,
+						expect.objectContaining({
+							isActive: true,
+							milkAmount: 0.4,
+							multiplier: 0
+						})
+					);
 				});
 			});
 			describe("everyTenMinutes", () => {
@@ -126,6 +134,52 @@ describe("Lactation", () => {
 			});
 		});
 
+		describe("Lactation update event", () => {
+			it("should register LACTATION_UPDATE listener and call onLactationUpdate", () => {
+				const addListener = jest.fn();
+				jest.spyOn(Events, "EventEmitter").mockImplementation(() => ({ addListener }) as any);
+
+				const lactation = new Lactation();
+				const onLactationUpdateSpy = jest.spyOn(lactation, "onLactationUpdate");
+				lactation.onCreatePlayer(mockedPlayer());
+
+				expect(Events.EventEmitter).toHaveBeenCalledWith(ZLBFEventsEnum.LACTATION_UPDATE);
+				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+
+				const payload: LactationData = {
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				};
+				const [callback] = addListener.mock.calls[1];
+				callback(payload);
+
+				expect(onLactationUpdateSpy).toHaveBeenCalledWith(payload);
+			});
+
+			it("onLactationUpdate should increase milk amount while lactating", () => {
+				jest.spyOn(SpyPipewrench, "ZombRandFloat").mockReturnValue(0.005);
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				});
+
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
+				lactation.onLactationUpdate({
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				});
+
+				expect(lactation.milkAmount).toBeGreaterThan(0.4);
+			});
+		});
+
 		describe("Debug functions", () => {
 			it.each<{ operation: "add" | "remove" | "set"; expected: number }>([
 			{ operation: "add", expected: 0.5 },
@@ -136,6 +190,7 @@ describe("Lactation", () => {
 			lactation.onCreatePlayer(mockedPlayer());
 			lactation.Debug.set(0.4);
 			lactation.Debug[operation](0.1);
+			expect(lactation.milkAmount).toBeCloseTo(expected);
 			});
 
 		it("should be able to toggle lactation and call moodle with 0", () => {
