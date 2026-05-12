@@ -1,7 +1,5 @@
-import type { IsoPlayer } from "@asledgehammer/pipewrench";
-import { mock } from "jest-mock-extended";
-import { CharacterTraitApi } from "./CharacterTraitApi";
-import { mockedPlayer } from "../../test/mock";
+import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
+import { mockedPlayer } from "@test/mock";
 
 describe("CharacterTraitApi", () => {
 	describe("getCharacterTraits", () => {

@@ -1,4 +1,4 @@
-import { percentageToNumber } from "./Utils";
+import { percentageToNumber } from "@client/Utils";
 describe("Utils", () => {
 	describe("percentageToNumber", () => {
 		it.each([

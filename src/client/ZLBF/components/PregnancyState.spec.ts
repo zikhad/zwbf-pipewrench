@@ -1,7 +1,7 @@
 import { mock } from "jest-mock-extended";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { ZLBFTraitsEnum } from "@constants";
-import { PregnancyState } from "./PregnancyState";
+import { PregnancyState } from "@client/components/PregnancyState";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 
 jest.mock("@shared/components/CharacterTraitApi");

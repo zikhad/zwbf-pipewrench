@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Player } from "./Player";
+import { Player } from "@client/components/Player";
 import {
 	IsoPlayer,
 	BodyPartType,
@@ -16,7 +16,7 @@ import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 // Mocks
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./ModData", () => ({
+jest.mock("@client/components/ModData", () => ({
 	ModData: jest.fn().mockImplementation(({ defaultData }) => {
 		let storedData: any = null;
 		let accessed = false;

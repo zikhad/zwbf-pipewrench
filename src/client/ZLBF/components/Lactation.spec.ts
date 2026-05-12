@@ -1,20 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Lactation } from "./Lactation";
-import { BodyPart } from "@asledgehammer/pipewrench";
+import { Lactation } from "@client/components/Lactation";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import * as SpyModData from "./ModData";
+import * as SpyModData from "@client/components/ModData";
 import { LactationData } from "@types";
 import { ZLBFEventsEnum } from "@constants";
-import { Player } from "./Player";
+import { Player } from "@client/components/Player";
 import { mockedPlayer } from "@test/mock";
-import { mock } from "jest-mock-extended";
-import { PregnancyState } from "./PregnancyState";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./Moodles");
-jest.mock("./Player");
-jest.mock("./PregnancyState");
+jest.mock("@client/components/Moodles");
+jest.mock("@client/components/Player");
+jest.mock("@client/components/PregnancyState");
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
 

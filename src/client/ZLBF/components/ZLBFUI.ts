@@ -1,10 +1,10 @@
 import { getText, IsoPlayer, triggerEvent, require as pipewrenchRequire } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
-import { Lactation } from "./Lactation";
-import { Pregnancy } from "./Pregnancy";
-import { Womb } from "./Womb";
-import { Player } from "./Player";
+import { Lactation } from "@client/components/Lactation";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Womb } from "@client/components/Womb";
+import { Player } from "@client/components/Player";
 import { Animation } from "@client/components/Animation";
 // import { ZLBFTabManager } from "@client/components/UI/ZLBFTabManager";
 

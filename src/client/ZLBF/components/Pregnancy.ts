@@ -4,7 +4,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ZLBFActionBirth } from "@actions/ZLBFBirth";
-import { Player, TimedEvents } from "./Player";
+import { Player, TimedEvents } from "@client/components/Player";
 import { Moodle } from "@client/components/Moodles";
 import { PregnancyState } from "@client/components/PregnancyState";
 import { PregnancyOptions } from "@client/SandboxOptions";

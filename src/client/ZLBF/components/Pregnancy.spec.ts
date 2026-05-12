@@ -4,14 +4,14 @@ import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
-import { Pregnancy } from "./Pregnancy";
-import { Player } from "./Player";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Player } from "@client/components/Player";
 import { PregnancyData } from "@types";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 
 jest.mock("@actions/ZLBFBirth");
-jest.mock("./Moodles");
-jest.mock("./Player");
+jest.mock("@client/components/Moodles");
+jest.mock("@client/components/Player");
 jest.mock("@asledgehammer/pipewrench");
 
 describe("Pregnancy", () => {

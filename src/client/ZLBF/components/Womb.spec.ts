@@ -2,19 +2,19 @@
 import { BodyPartType } from "@asledgehammer/pipewrench";
 import * as SpyPipeWrench from "@asledgehammer/pipewrench";
 import { CyclePhase, WombData } from "@types";
-import { Womb } from "./Womb";
+import { Womb } from "@client/components/Womb";
 import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
-import { Player } from "./Player";
+import { Player } from "@client/components/Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mockedPlayer } from "@test/mock";
-import { PregnancyState } from "./PregnancyState";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
 jest.mock("@asledgehammer/pipewrench/client");
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./Player");
-jest.mock("./PregnancyState");
+jest.mock("@client/components/Player");
+jest.mock("@client/components/PregnancyState");
 
 const mockedModData = (overrides: Partial<WombData> = {}): WombData => ({
 	capacity: 1,

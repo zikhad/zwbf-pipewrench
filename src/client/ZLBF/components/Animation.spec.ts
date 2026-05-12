@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Animation, AnimationConfig, ANIMATIONS } from "./Animation";
-import { Womb } from "./Womb";
+import { Animation, AnimationConfig, ANIMATIONS } from "@client/components/Animation";
+import { Womb } from "@client/components/Womb";
 import { ITEMS, ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./Womb");
+jest.mock("@client/components/Womb");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

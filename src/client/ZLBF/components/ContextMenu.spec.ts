@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { ContextMenu, Option } from "./ContextMenu";
+import { ContextMenu, Option } from "@client/components/ContextMenu";
 
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { IsoPlayer } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Lactation } from "./Lactation";
-import { Pregnancy } from "./Pregnancy";
-import { Womb } from "./Womb";
+import { Lactation } from "@client/components/Lactation";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Womb } from "@client/components/Womb";
 import { ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench-events");

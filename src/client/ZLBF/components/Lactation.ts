@@ -4,9 +4,9 @@ import { LactationData, LactationImage as LactationImages, PregnancyData } from 
 import { percentageToNumber } from "@utils";
 import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { LactationOptions } from "@client/SandboxOptions";
-import { Player, TimedEvents } from "./Player";
-import { Moodle } from "./Moodles";
-import { PregnancyState } from "./PregnancyState";
+import { Player, TimedEvents } from "@client/components/Player";
+import { Moodle } from "@client/components/Moodles";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 /**
  * Lactation management system for a player character.

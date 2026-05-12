@@ -1,7 +1,7 @@
 import { mock } from "jest-mock-extended";
 import { InventoryItem } from "@asledgehammer/pipewrench";
-import { FluidContainerApi } from "./FluidContainerApi";
-import { Fluid } from "../../server/types";
+import { FluidContainerApi } from "@shared/components/FluidContainerApi";
+import { Fluid } from "@server/types";
 import { Fluids } from "@constants";
 
 const getMockedItem = ({

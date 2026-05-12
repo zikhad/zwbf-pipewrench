@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { ZLBFUI } from "./ZLBFUI";
+import { ZLBFUI } from "@client/components/ZLBFUI";
 import * as Events from "@asledgehammer/pipewrench-events";
 import * as Pipewrench from "@asledgehammer/pipewrench";
-import { Lactation } from "./Lactation";
-import { Womb } from "./Womb";
-import { Animation } from "@client/components/Animation";
+import { Lactation } from "@client/components/Lactation";
+import { Womb } from "@client/components/Womb";
 import { PregnancyData } from "@types";
-import { Pregnancy } from "./Pregnancy";
+import { Pregnancy } from "@client/components/Pregnancy";
 import { mockedPlayer } from "@test/mock";
 
 jest.mock("@asledgehammer/pipewrench-events");
