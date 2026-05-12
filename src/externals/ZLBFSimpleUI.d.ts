@@ -73,7 +73,7 @@ type ZLBFTabbedUI = {
 	addImage: (id: string, imagePath: string) => void;
 	setBorderToAllElements: (border: boolean) => void;
 	saveLayout: () => void;
-} & { [id: string]: ZLBFUIElement };
+} & { [id: string]: ZLBFUIElement | undefined };
 
 /** Create and register the tabbed ZLBF PoC window. */
 declare const NewZLBFTabbedUI: () => ZLBFTabbedUI;

@@ -1,6 +1,6 @@
 import { BodyPartType, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
+import { LactationData, LactationImages, PregnancyData } from "@types";
 import { percentageToNumber } from "@utils";
 import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { LactationOptions } from "@client/SandboxOptions";

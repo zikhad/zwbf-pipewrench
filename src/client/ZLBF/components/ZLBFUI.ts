@@ -6,6 +6,7 @@ import { Pregnancy } from "@client/components/Pregnancy";
 import { Womb } from "@client/components/Womb";
 import { Player } from "@client/components/Player";
 import { Animation } from "@client/components/Animation";
+import { LactationData } from "@types";
 
 type UIProps = {
 	lactation: Lactation;
@@ -65,8 +66,8 @@ export class ZLBFUI {
 		Events.onPostRender.addListener(() => this.onUpdateUI());
 	}
 
-	private label(txt: string): string {
-		return `${getText(txt)}:`;
+	private label(txt: string, separator = ":"): string {
+		return `${getText(txt)}${separator}`;
 	}
 
 	private onCreatePlayer(player: IsoPlayer) {
@@ -74,7 +75,7 @@ export class ZLBFUI {
 		if (!this.UI) return;
 		if (!this.player?.isFemale()) return;
 
-		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_title"));
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_title", ""));
 		this.UI.nextLine();
 		this.UI.addImage(this.UIElements.womb.image, "media/ui/womb/normal/womb_normal_0.png");
 		this.UI.nextLine();
@@ -122,7 +123,7 @@ export class ZLBFUI {
 			this.UI.nextLine();
 		}
 
-		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Lactation_title"));
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Lactation_title", ""));
 		this.UI.addImage(
 			this.UIElements.lactation.image,
 			"media/ui/lactation/boobs/color-0/normal_empty.png"
@@ -141,7 +142,7 @@ export class ZLBFUI {
 
 		this.UI.setBorderToAllElements(true);
 		this.UI.saveLayout();
-		this.UI.setActiveTab("Womb");
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_title", ""));
 	}
 
 	private onCreateUI() {
@@ -159,16 +160,15 @@ export class ZLBFUI {
 			!this.lactation ||
 			!this.womb ||
 			!this.pregnancy
-		)
-			return;
+		) return;
 
-		const lactationImage = this.UI[this.UIElements.lactation.image];
-		const lactationLevel = this.UI[this.UIElements.lactation.level];
-		if (lactationImage !== undefined && lactationLevel !== undefined) {
-			const { breasts, level } = this.lactation.images;
-			lactationImage.setPath(breasts);
-			lactationLevel.setPath(level);
-		}
+        const { breasts, level } = this.lactation.images;
+		
+        const $lactationImage = this.UI[this.UIElements.lactation.image];
+        $lactationImage?.setPath(breasts);
+		
+        const $lactationLevel = this.UI[this.UIElements.lactation.level];
+        $lactationLevel?.setPath(level);
 
 		const { phaseTranslation, fertility, amount, total } = this.womb;
 		const { pregnancy } = this.pregnancy;
@@ -177,25 +177,30 @@ export class ZLBFUI {
 
 		triggerEvent(ZLBFEventsEnum.IMAGE);
 
-		const spermCurrent = this.UI[this.UIElements.womb.sperm.current.amount];
-		const spermTotal = this.UI[this.UIElements.womb.sperm.total.amount];
-		const wombImage = this.UI[this.UIElements.womb.image];
-		const phaseValue = this.UI[this.UIElements.womb.cycle.phase.value];
-		if (spermCurrent !== undefined) spermCurrent.setText(`${amountInMilliliters} ml`);
-		if (spermTotal !== undefined) spermTotal.setText(`${totalInMilliliters} ml`);
-		if (wombImage !== undefined) wombImage.setPath(Animation.wombImage);
-		if (phaseValue !== undefined) phaseValue.setText(getText(phaseTranslation));
+		const $spermCurrent = this.UI[this.UIElements.womb.sperm.current.amount];
+        $spermCurrent?.setText(`${amountInMilliliters} ml`);
+		
+        const $spermTotal = this.UI[this.UIElements.womb.sperm.total.amount];
+		$spermTotal?.setText(`${totalInMilliliters} ml`);
+		
+        const $wombImage = this.UI[this.UIElements.womb.image];
+		$wombImage?.setPath(Animation.wombImage);
+		
+        const $phaseValue = this.UI[this.UIElements.womb.cycle.phase.value];
+		$phaseValue?.setText(getText(phaseTranslation));
 
 		if (!Player.hasTrait(this.player, ZLBFTraitsEnum.INFERTILE)) {
 			const title = getText(`IGUI_ZLBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
 			const progress = pregnancy ? pregnancy.progress : fertility;
 
-			const fertilityTitle = this.UI[this.UIElements.womb.fertility.title];
-			const fertilityBar = this.UI[this.UIElements.womb.fertility.bar];
-			const fertilityValue = this.UI[this.UIElements.womb.fertility.value];
-			if (fertilityTitle !== undefined) fertilityTitle.setText(title);
-			if (fertilityBar !== undefined) fertilityBar.setValue(progress);
-			if (fertilityValue !== undefined) fertilityValue.setText(`${Math.floor(progress * 100)}%`);
+			const $fertilityTitle = this.UI[this.UIElements.womb.fertility.title];
+            $fertilityTitle?.setText(title);
+			
+            const $fertilityBar = this.UI[this.UIElements.womb.fertility.bar];
+			$fertilityBar?.setValue(progress);
+			
+            const $fertilityValue = this.UI[this.UIElements.womb.fertility.value];
+			$fertilityValue?.setText(`${Math.floor(progress * 100)}%`);
 		}
 	}
 

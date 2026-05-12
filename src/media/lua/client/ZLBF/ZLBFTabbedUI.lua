@@ -52,31 +52,48 @@ function ZLBFTabbedUI:createChildren()
 	self.wombTab:initialise()
 	self.wombTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
 	self.wombTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.panel:addView("Womb", self.wombTab)
+	self.wombTabName = getText("IGUI_ZLBF_UI_Womb_title") .. ":"
+	self.panel:addView(self.wombTabName, self.wombTab)
 
 	self.lactationTab = ISPanel:new(0, 8, self.width, self.height - th - rh)
 	self.lactationTab:initialise()
 	self.lactationTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
 	self.lactationTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.panel:addView("Lactation", self.lactationTab)
+	self.lactationTabName = getText("IGUI_ZLBF_UI_Lactation_title") .. ":"
+	self.panel:addView(self.lactationTabName, self.lactationTab)
 
 	self.tabContexts = {
-		Womb = createTabContext(self.wombTab, self.width),
-		Lactation = createTabContext(self.lactationTab, self.width)
+		[self.wombTabName] = createTabContext(self.wombTab, self.width),
+		[self.lactationTabName] = createTabContext(self.lactationTab, self.width)
 	}
-	self.activeTabName = "Womb"
+	self.tabAliases = {
+		Womb = self.wombTabName,
+		Lactation = self.lactationTabName,
+		[self.wombTabName] = self.wombTabName,
+		[self.lactationTabName] = self.lactationTabName
+	}
+	self.tabContentHeights = {
+		[self.wombTabName] = 60,
+		[self.lactationTabName] = 60
+	}
+	self.activeTabName = self.wombTabName
 
-	self.panel:activateView("Womb")
+	self.panel:activateView(self.wombTabName)
 end
 
 function ZLBFTabbedUI:setActiveTab(name)
-	if not self.tabContexts or not self.tabContexts[name] then
+	if not self.tabContexts then
 		return
 	end
-	self.activeTabName = name
-	if self.panel then
-		self.panel:activateView(name)
+	local resolvedName = (self.tabAliases and self.tabAliases[name]) or name
+	if not self.tabContexts[resolvedName] then
+		return
 	end
+	self.activeTabName = resolvedName
+	if self.panel then
+		self.panel:activateView(resolvedName)
+	end
+	self:applyTabHeight(resolvedName)
 end
 
 function ZLBFTabbedUI:getActiveContext()
@@ -282,37 +299,68 @@ function ZLBFTabbedUI:saveLayout()
 		return
 	end
 
-	local maxContentHeight = 60
-
-	for _, context in pairs(self.tabContexts) do
+	for tabName, context in pairs(self.tabContexts) do
 		if context.lineColumnCount[context.lineAct] > 0 then
 			local previous = self.activeTabName
-			for name, candidate in pairs(self.tabContexts) do
-				if candidate == context then
-					self.activeTabName = name
-					break
-				end
-			end
+			self.activeTabName = tabName
 			self:nextLine()
 			self.activeTabName = previous
 		end
 
 		self:setElementsPositionAndSize(context)
-		maxContentHeight = math.max(maxContentHeight, context.yAct)
+		self.tabContentHeights[tabName] = math.max(60, context.yAct)
+	end
+
+	self.collapseButton:setVisible(false)
+	self.pinButton:setVisible(false)
+	self:applyTabHeight(self.activeTabName)
+	self:setInCenterOfScreen()
+end
+
+function ZLBFTabbedUI:applyTabHeight(tabName)
+	if not self.panel or not self.tabContentHeights then
+		return
 	end
 
 	local th = self:titleBarHeight()
 	local rh = self:resizeWidgetHeight()
-	local tabHeight = (self.panel and self.panel.tabHeight) or 24
-	local panelHeight = tabHeight + maxContentHeight + UI_BORDER_SPACING * 2
+	local tabHeight = self.panel.tabHeight or 24
+	local contentHeight = self.tabContentHeights[tabName] or 60
+	local panelHeight = tabHeight + contentHeight + UI_BORDER_SPACING * 2
 
 	self.panel:setHeight(panelHeight)
 	self.wombTab:setHeight(panelHeight - tabHeight)
 	self.lactationTab:setHeight(panelHeight - tabHeight)
 	self:setHeight(th + rh + panelHeight)
-	self.collapseButton:setVisible(false)
-	self.pinButton:setVisible(false)
-	self:setInCenterOfScreen()
+end
+
+function ZLBFTabbedUI:getPanelActiveTabName()
+	if not self.panel then
+		return nil
+	end
+
+	local activeView = self.panel:getActiveView()
+	if activeView == self.wombTab then
+		return self.wombTabName
+	end
+	if activeView == self.lactationTab then
+		return self.lactationTabName
+	end
+
+	return nil
+end
+
+function ZLBFTabbedUI:syncActiveTabFromPanel()
+	local panelTabName = self:getPanelActiveTabName()
+	if panelTabName and panelTabName ~= self.activeTabName then
+		self.activeTabName = panelTabName
+		self:applyTabHeight(panelTabName)
+	end
+end
+
+function ZLBFTabbedUI:prerender()
+	self:syncActiveTabFromPanel()
+	ISCollapsableWindow.prerender(self)
 end
 
 function ZLBFTabbedUI:setInCenterOfScreen()

@@ -2,7 +2,7 @@ import { KahluaTable } from "@asledgehammer/pipewrench";
 
 type ModDataProps<T> = {
 	/** The player object from PZ */
-	object: { getModData(): KahluaTable };
+	object: { getModData(): KahluaTable | undefined };
 	/** The key to be used in `getModData()` */
 	modKey: string;
 	/** The data that shall be returned by default */
@@ -16,7 +16,7 @@ type LactationData = {
 	expiration: number;
 };
 
-type LactationImage = {
+type LactationImages = {
 	breasts: string;
 	level: string;
 };

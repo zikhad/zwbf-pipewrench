@@ -22,10 +22,10 @@ export class ModData<T> {
 		if (!this.object.getModData()[this.modKey]) {
 			this.object.getModData()[this.modKey] = this.defaultData;
 		}
-		return this.object.getModData()[this.modKey] as T;
+		return this.object.getModData()[this.modKey];
 	}
 
-	set data(value: T) {
+	set data(value: T | undefined) {
 		this.object.getModData()[this.modKey] = value;
 	}
 }
