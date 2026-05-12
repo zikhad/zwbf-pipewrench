@@ -81,6 +81,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			isInLabor: false
 		};
 		this.weightDebuff = 0;
+		this.moodle?.moodle(0);
 	}
 
 	/**
@@ -104,7 +105,6 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	}
 
 	onEveryMinute(): void {
-		this.moodle?.moodle(this.pregnancy?.progress ?? 0);
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
 		const { current = 0 } = this.pregnancy;
@@ -126,18 +126,20 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	onEveryHour(): void {
 		if (!this.pregnancy) return;
-
+		
 		const { progress } = this.pregnancy;
+		this.moodle?.moodle(progress);
+		
 		if (progress < 0.25) return;
 
 		this.weightDebuff = progress;
 
-		// Constume extra water
+		// Consume extra water
 		const stats = this.player!.getStats();
 		const water = (0.5 * progress) / 1440;
 		stats.set(CharacterStat.THIRST, Math.min(1, stats.get(CharacterStat.THIRST) + water));
 
-		// Constume extra calories
+		// Consume extra calories
 		const nutrition = this.player!.getNutrition();
 		const calories = (600 * progress) / 1440;
 		nutrition.setCalories(Math.max(-2200, nutrition.getCalories() - calories));
@@ -145,7 +147,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 
 	onEveryDay() {
 		if (!this.pregnancy) return;
-		/** Apply sickness in the begining of Pregnancy */
+		/** Apply sickness in the beginning of Pregnancy */
 		const { progress } = this.pregnancy;
 		if (progress < 0.05 || progress > 0.33) return;
 		this.player!.getBodyDamage().setFoodSicknessLevel(50 + ZombRand(0, 50));

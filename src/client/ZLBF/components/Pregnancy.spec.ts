@@ -71,33 +71,6 @@ describe("Pregnancy", () => {
 				});
 			});
 			describe("Every minute update", () => {
-				describe.each([
-					{ current: undefined, isInLabor: false },
-					{ current: 1000, isInLabor: false },
-					{ current: 1000, isInLabor: true }
-				])(
-					"Pregnancy progress is $progress and labor is $isInLabor",
-					({ current, isInLabor }) => {
-						beforeEach(() => {
-							jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
-								mock<PregnancyData>({ current, isInLabor })
-							);
-						});
-						it("Should call moodle", () => {
-							const moodle = jest.fn();
-							const pregnancy = new Pregnancy();
-
-							(pregnancy as any).onCreatePlayer(mock<IsoPlayer>());
-							(pregnancy as any).moodle = { moodle };
-							(pregnancy as any).onEveryMinute();
-
-							expect(moodle).toHaveBeenCalled();
-						});
-					}
-				);
-			});
-
-			it("Should queue birth action only on the labor transition", () => {
 				const add = jest.spyOn(ISTimedActionQueue, "add");
 				const mockPlayer = mock<IsoPlayer>({ setBlockMovement: jest.fn() });
 				const pregnancy = new Pregnancy();
@@ -141,6 +114,28 @@ describe("Pregnancy", () => {
 							getCalories: () => 0
 						})
 					});
+				});
+				it("Should call moodle", () => {
+					const moodle = jest.fn();
+					const testPregnancy = new Pregnancy();
+					(testPregnancy as any).onCreatePlayer({
+						...player,
+						getStats: () => ({
+							set: jest.fn(),
+							get: jest.fn().mockReturnValue(0)
+						}),
+						getNutrition: () => ({
+							setCalories: jest.fn(),
+							getCalories: () => 0
+						})
+					});
+					(testPregnancy as any).moodle = { moodle };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({ progress: 0.5 })
+					);
+					(testPregnancy as any).onEveryHour();
+
+					expect(moodle).toHaveBeenCalled();
 				});
 				it.each([
 					{
