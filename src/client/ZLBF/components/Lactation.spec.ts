@@ -108,7 +108,14 @@ describe("Lactation", () => {
 						.mockReturnValueOnce(data)
 						.mockReturnValue({ ...data, expiration: 0 });
 				});
-
+			it("Should call moodle", () => {
+				const moodle = jest.fn();
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
+				(lactation as any).moodle = { moodle };
+				lactation.onEveryHour();
+				expect(moodle).toHaveBeenCalled();
+			});
 				it("Should de-activate lactation when it expires", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
@@ -131,12 +138,16 @@ describe("Lactation", () => {
 			lactation.Debug[operation](0.1);
 			});
 
-			it("should be able to toggle lactation", () => {
-				const lactation = new Lactation();
-				lactation.onCreatePlayer(mockedPlayer());
-				expect(lactation.isLactating).toBe(true);
-				lactation.Debug.toggle(false);
-				expect(lactation.isLactating).toBe(false);
+		it("should be able to toggle lactation and call moodle with 0", () => {
+			const moodle = jest.fn();
+			const lactation = new Lactation();
+			lactation.onCreatePlayer(mockedPlayer());
+			(lactation as any).moodle = { moodle };
+			expect(lactation.isLactating).toBe(true);
+			moodle.mockClear();
+			lactation.Debug.toggle(false);
+			expect(lactation.isLactating).toBe(false);
+			expect(moodle).toHaveBeenCalledWith(0);
 			});
 		});
 	});
@@ -176,7 +187,6 @@ describe("Lactation", () => {
 				};
 				const player = mockedPlayer();
 				lactation = new Lactation();
-				(lactation as any)[handler] = jest.fn();
 				lactation.onCreatePlayer(player);
 			});
 			it(`should register ${event} listener during player creation`, () => {
