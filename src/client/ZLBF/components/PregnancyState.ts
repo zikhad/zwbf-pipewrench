@@ -2,7 +2,7 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { ZLBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 import type { PregnancyData } from "@types";
-import { ModData } from "./ModData";
+import { ModData } from "@client/components/ModData";
 
 const DEFAULT_PREGNANCY_DATA: PregnancyData = {
 	current: 0,

@@ -5,9 +5,9 @@ import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ZLBFActionBirth } from "@actions/ZLBFBirth";
 import { Player, TimedEvents } from "./Player";
-import { Moodle } from "./Moodles";
-import { PregnancyState } from "./PregnancyState";
-import { PregnancyOptions } from "../SandboxOptions";
+import { Moodle } from "@client/components/Moodles";
+import { PregnancyState } from "@client/components/PregnancyState";
+import { PregnancyOptions } from "@client/SandboxOptions";
 
 export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private readonly options = {

@@ -3,7 +3,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { ZLBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 import { increaseClamped } from "@client/Utils";
-import { ModData } from "./ModData";
+import { ModData } from "@client/components/ModData";
 
 export interface TimedEvents {
 	/**

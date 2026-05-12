@@ -9,9 +9,9 @@ import {
 } from "@asledgehammer/pipewrench";
 import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Player, TimedEvents } from "./Player";
+import { Player, TimedEvents } from "@client/components/Player";
 import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
-import { PregnancyState } from "./PregnancyState";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 /**
  * Manages reproductive functions, fertility, and pregnancy-related variables
