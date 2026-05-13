@@ -103,8 +103,13 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
 		const { current = 0 } = this.pregnancy;
-		const previousInLabor = this.pregnancy.isInLabor ?? false;
-		const updated = Math.min(duration, current + 1);
+		let previousInLabor: boolean;
+		if (this.pregnancy.isInLabor === null || this.pregnancy.isInLabor === undefined) {
+			previousInLabor = false;
+		} else {
+			previousInLabor = this.pregnancy.isInLabor;
+		}
+		const updated = current + 1 > duration ? duration : current + 1;
 		const isInLabor = updated == duration;
 		PregnancyState.set(this.player, {
 			current: updated,
