@@ -64,6 +64,7 @@ export class Animation {
                 ...repeatArray([0, 1, 2, 3, 4, 3, 2, 1], 20),
                 ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
             ],
+            loop: 1,
             fullnessSupport: true
         },
         [ANIMATION_KEY.PREGNANT]: {
@@ -71,13 +72,18 @@ export class Animation {
                 ...repeatArray([0, 1, 2, 3, 2, 1], 20),
                 ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
             ],
+            loop: 1,
+            fullnessSupport: false
         },
         [ANIMATION_KEY.CONDOM]: {
             steps: [0, 1, 2, 3, 4, 5, 6],
-            loop: 4
+            loop: 4,
+            fullnessSupport: false
         },
         [ANIMATION_KEY.BIRTH]: {
-            steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+            loop: 1,
+            fullnessSupport: false
         }
     };
 
@@ -126,18 +132,26 @@ export class Animation {
      * @param props.delta Animation delta time
      * @param props.duration The duration of the animation  
     * */
-    onAnimation({ animation, delta, duration = 1, custom }: AnimationConfig) {
+    onAnimation({ animation, delta, duration, custom }: AnimationConfig) {
         Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
-        const { steps, loop = 1, fullnessSupport = false } = custom ?? this.defaultAnimations[key];
+        const baseConfig = custom ?? this.defaultAnimations[key];
+        const steps = baseConfig.steps;
+        const loop = baseConfig.loop ?? 1;
+        const fullnessSupport = baseConfig.fullnessSupport ?? false;
         const fullness = this.fullness;
         const loopDuration = duration / loop;
+        if (!steps.length) {
+            // Defensive: fallback to frame 0 if no steps are defined
+            const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
+            const path = custom?.path ?? `media/ui/animation`;
+            Animation.wombImage = `${path}/${animation}${fullnessPath}/0.png`;
+            return;
+        }
         const currentLoopDelta = (delta * duration) % loopDuration;
-		const stepDuration = loopDuration / steps.length;
-
-		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
-		const step = steps[stepIndex];
-
+        const stepDuration = loopDuration / steps.length;
+        const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
+        const step = steps[stepIndex];
         const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
         const path = custom?.path ?? `media/ui/animation`;
         Animation.wombImage = `${path}/${animation}${fullnessPath}/${step}.png`;

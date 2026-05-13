@@ -133,6 +133,24 @@ describe("Lactation", () => {
 		});
 
 		describe("Lactation update event", () => {
+			it("should register PREGNANCY_UPDATE listener and call onPregnancyUpdate", () => {
+				const addListener = jest.fn();
+				jest.spyOn(Events, "EventEmitter").mockImplementation(() => ({ addListener }) as any);
+
+				const lactation = new Lactation();
+				const onPregnancyUpdateSpy = jest.spyOn(lactation, "onPregnancyUpdate");
+				lactation.onCreatePlayer(mockedPlayer());
+
+				expect(Events.EventEmitter).toHaveBeenCalledWith(ZLBFEventsEnum.PREGNANCY_UPDATE);
+				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+
+				const payload = { progress: 0.8 };
+				const [callback] = addListener.mock.calls[0];
+				callback(payload);
+
+				expect(onPregnancyUpdateSpy).toHaveBeenCalledWith(payload);
+			});
+
 			it("should register LACTATION_UPDATE listener and call onLactationUpdate", () => {
 				const addListener = jest.fn();
 				jest.spyOn(Events, "EventEmitter").mockImplementation(() => ({ addListener }) as any);
@@ -223,6 +241,17 @@ describe("Lactation", () => {
 				expect(lactation.milkAmount).toBe(0);
 			}
 		);
+
+		it("onLactationUpdate should do nothing when not lactating", () => {
+			const lactation = new Lactation();
+			lactation.onLactationUpdate({
+				isActive: false,
+				milkAmount: 0,
+				expiration: 1,
+				multiplier: 0
+			});
+			expect(lactation.milkAmount).toBe(0);
+		});
 	});
 
 	describe("Timer Events", () => {

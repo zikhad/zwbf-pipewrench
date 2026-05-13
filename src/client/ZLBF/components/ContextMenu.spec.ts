@@ -193,6 +193,14 @@ describe("DebugMenu", () => {
 					title: "Advance_Pregnancy_Labor",
 					mockCondition: () => ((pregnancy as any).pregnancy = mock()),
 					expected: () => expect(pregnancy.Debug.advanceToLabor).toHaveBeenCalled()
+				},
+				{
+					title: "Intercourse",
+					expected: () => expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(ZLBFEventsEnum.INTERCOURSE)
+				},
+				{
+					title: "Menstrual_Effects",
+					expected: () => expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(ZLBFEventsEnum.MENSTRUAL_EFFECTS)
 				}
 			])("option $title should trigger correct", ({ title, mockCondition, expected }) => {
 				mockCondition && mockCondition();

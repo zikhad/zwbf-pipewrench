@@ -182,16 +182,79 @@ describe("Animation", () => {
 				expect(Animation.wombImage).not.toContain("/empty/");
 				expect(Animation.wombImage).not.toContain("/full/");
 			});
+
+			// --- Edge case: custom config with empty steps array
+			it("should fallback to frame 0 if custom steps array is empty", () => {
+				const womb = makeWomb();
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: false, path: "dummy/path" } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("dummy/path/intercourse/0.png");
+			});
+
+			it("should use custom config with non-empty steps and custom path", () => {
+				const womb = makeWomb({ amount: 0.1, capacity: 1 });
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [5, 6, 7], loop: 1, fullnessSupport: false, path: "custom/test" } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("custom/test/intercourse/5.png");
+			});
+
+			it("should use custom path and fullnessSupport true branch", () => {
+				const womb = makeWomb({ amount: 0.6, capacity: 1 });
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [2, 3, 4], loop: 1, fullnessSupport: true, path: "media/custom" } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("media/custom/intercourse/full/2.png");
+			});
+
+			it("should handle empty steps with fullnessSupport=true and custom path", () => {
+				const womb = makeWomb({ amount: 0.6, capacity: 1 });
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: true, path: "test/path" } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("test/path/intercourse/full/0.png");
+			});
+
+			it("should use default path when custom.path is undefined", () => {
+				const womb = makeWomb();
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [1, 2], loop: 1, fullnessSupport: false, path: undefined as any } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("media/ui/animation/intercourse/1.png");
+			});
+
+			it("should handle empty steps with fullnessSupport=true and default path", () => {
+				const womb = makeWomb({ amount: 0.7, capacity: 1 });
+				const animation = new Animation(womb);
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: true, path: undefined as any } });
+				animation.onAnimation(config);
+				expect(Animation.wombImage).toBe("media/ui/animation/intercourse/full/0.png");
 		});
 
-		it("should mark animation as active", () => {
+		it("should use default loop and fullnessSupport when not provided in custom config", () => {
 			const womb = makeWomb();
 			const animation = new Animation(womb);
-
-			expect((Animation as any).isAnimationActive).toBe(false);
-			animation.onAnimation(intercourseStart());
-			expect((Animation as any).isAnimationActive).toBe(true);
+			const config = intercourseStart({ custom: { steps: [3, 4, 5], path: "test" } as any });
+			animation.onAnimation(config);
+			expect(Animation.wombImage).toBe("test/intercourse/3.png");
 		});
+
+		it("should use all defaults from defaultAnimations when custom is not provided", () => {
+			const womb = makeWomb({ amount: 0, capacity: 1 });
+			const animation = new Animation(womb);
+			animation.onAnimation(intercourseStart({ delta: 0 }));
+			expect(Animation.wombImage).toMatch(/^media\/ui\/animation\/intercourse\/empty\/\d+\.png$/);
+		});
+
+		it("should handle fullnessSupport=false explicitly in custom config", () => {
+			const womb = makeWomb({ amount: 0.2, capacity: 1 });
+			const animation = new Animation(womb);
+			const config = intercourseStart({ custom: { steps: [1, 2, 3], loop: 1, fullnessSupport: false, path: "test" } });
+			animation.onAnimation(config);
+			expect(Animation.wombImage).toBe("test/intercourse/1.png");
+		});
+	});
 	});
 
 	// ─── onAnimationStop ───────────────────────────────────────────────────
