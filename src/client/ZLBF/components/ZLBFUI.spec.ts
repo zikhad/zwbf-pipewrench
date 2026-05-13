@@ -23,6 +23,7 @@ describe("ZLBFUI", () => {
 				setWidthPixel: jest.fn(),
 				setTitle: jest.fn(),
 				setVisible: jest.fn(),
+				registerTab: jest.fn(),
 				setActiveTab: jest.fn(),
 				addText: jest.fn(),
 				nextLine: jest.fn(),
@@ -145,6 +146,16 @@ describe("ZLBFUI", () => {
 				expect(isFemale).toHaveBeenCalled();
 			}
 		);
+
+		it("should register tabs dynamically for female players", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			(ui as any).onCreateUI();
+
+			(ui as any).onCreatePlayer(player);
+
+			const tabbedUI = newTabbedUI.mock.results[0].value;
+			expect(tabbedUI.registerTab).toHaveBeenCalledTimes(2);
+		});
 	});
 
 	describe("Toggle UI", () => {

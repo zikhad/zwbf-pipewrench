@@ -30,12 +30,28 @@ local function createTabContext(container, width)
 	}
 end
 
+
+---
+-- Tabbed UI window for ZLBF, supporting dynamic tab registration and context management.
+-- @class ZLBFTabbedUI : ISCollapsableWindow
+-- @field panel ISTabPanel The tab panel instance.
+-- @field tabsByName table<string, ISPanel> Mapping of tab display names to panels.
+-- @field tabContexts table<string, table> Mapping of tab display names to their context objects.
+-- @field tabAliases table<string, string> Mapping of tab aliases to display names.
+-- @field tabContentHeights table<string, number> Mapping of tab display names to their content heights.
+-- @field activeTabName string The currently active tab's display name.
 ZLBFTabbedUI = ISCollapsableWindow:derive("ZLBFTabbedUI")
 
+---
+-- Initializes the tabbed UI window.
+-- @return void
 function ZLBFTabbedUI:initialise()
 	ISCollapsableWindow.initialise(self)
 end
 
+---
+-- Creates child UI elements, including the tab panel and tab state tables.
+-- @return void
 function ZLBFTabbedUI:createChildren()
 	ISCollapsableWindow.createChildren(self)
 
@@ -48,39 +64,59 @@ function ZLBFTabbedUI:createChildren()
 	self.panel.equalTabWidth = false
 	self:addChild(self.panel)
 
-	self.wombTab = ISPanel:new(0, 8, self.width, self.height - th - rh)
-	self.wombTab:initialise()
-	self.wombTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.wombTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.wombTabName = getText("IGUI_ZLBF_UI_Womb_Title")
-	self.panel:addView(self.wombTabName, self.wombTab)
-
-	self.lactationTab = ISPanel:new(0, 8, self.width, self.height - th - rh)
-	self.lactationTab:initialise()
-	self.lactationTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.lactationTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.lactationTabName = getText("IGUI_ZLBF_UI_Lactation_Title")
-	self.panel:addView(self.lactationTabName, self.lactationTab)
-
-	self.tabContexts = {
-		[self.wombTabName] = createTabContext(self.wombTab, self.width),
-		[self.lactationTabName] = createTabContext(self.lactationTab, self.width)
-	}
-	self.tabAliases = {
-		Womb = self.wombTabName,
-		Lactation = self.lactationTabName,
-		[self.wombTabName] = self.wombTabName,
-		[self.lactationTabName] = self.lactationTabName
-	}
-	self.tabContentHeights = {
-		[self.wombTabName] = 60,
-		[self.lactationTabName] = 60
-	}
-	self.activeTabName = self.wombTabName
-
-	self.panel:activateView(self.wombTabName)
+	self.tabsByName = {}
+	self.tabContexts = {}
+	self.tabAliases = {}
+	self.tabContentHeights = {}
+	self.activeTabName = nil
 end
 
+---
+-- Registers a new tab with the given alias and display name.
+-- If the tab already exists, only the alias is added.
+-- @param alias string An alternate name for the tab (can be nil or empty).
+-- @param displayName string The display name for the tab (must be unique).
+-- @return void
+function ZLBFTabbedUI:registerTab(alias, displayName)
+	if not self.panel or not displayName then
+		return
+	end
+
+	if self.tabContexts[displayName] then
+		if alias and alias ~= "" then
+			self.tabAliases[alias] = displayName
+		end
+		self.tabAliases[displayName] = displayName
+		return
+	end
+
+	local th = self:titleBarHeight()
+	local rh = self:resizeWidgetHeight()
+	local tab = ISPanel:new(0, 8, self.width, self.height - th - rh)
+	tab:initialise()
+	tab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
+	tab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
+
+	self.panel:addView(displayName, tab)
+	self.tabsByName[displayName] = tab
+	self.tabContexts[displayName] = createTabContext(tab, self.width)
+	self.tabAliases[displayName] = displayName
+	if alias and alias ~= "" then
+		self.tabAliases[alias] = displayName
+	end
+	self.tabContentHeights[displayName] = 60
+
+	if not self.activeTabName then
+		self.activeTabName = displayName
+		self.panel:activateView(displayName)
+		self:applyTabHeight(displayName)
+	end
+end
+
+---
+-- Sets the active tab by name or alias.
+-- @param name string The tab's display name or alias.
+-- @return void
 function ZLBFTabbedUI:setActiveTab(name)
 	if not self.tabContexts then
 		return
@@ -96,6 +132,9 @@ function ZLBFTabbedUI:setActiveTab(name)
 	self:applyTabHeight(resolvedName)
 end
 
+---
+-- Returns the context object for the currently active tab.
+-- @return table|nil The context object, or nil if not available.
 function ZLBFTabbedUI:getActiveContext()
 	if not self.tabContexts then
 		return nil
@@ -329,8 +368,9 @@ function ZLBFTabbedUI:applyTabHeight(tabName)
 	local panelHeight = tabHeight + contentHeight + UI_BORDER_SPACING * 2
 
 	self.panel:setHeight(panelHeight)
-	self.wombTab:setHeight(panelHeight - tabHeight)
-	self.lactationTab:setHeight(panelHeight - tabHeight)
+	for _, tab in pairs(self.tabsByName) do
+		tab:setHeight(panelHeight - tabHeight)
+	end
 	self:setHeight(th + rh + panelHeight)
 end
 
@@ -340,11 +380,10 @@ function ZLBFTabbedUI:getPanelActiveTabName()
 	end
 
 	local activeView = self.panel:getActiveView()
-	if activeView == self.wombTab then
-		return self.wombTabName
-	end
-	if activeView == self.lactationTab then
-		return self.lactationTabName
+	for name, tab in pairs(self.tabsByName) do
+		if activeView == tab then
+			return name
+		end
 	end
 
 	return nil
