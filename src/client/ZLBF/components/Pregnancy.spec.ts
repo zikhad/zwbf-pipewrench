@@ -267,6 +267,29 @@ describe("Pregnancy", () => {
 					// if (false && !false) = false
 					expect(add).not.toHaveBeenCalled();
 				});
+
+				it("should use default current = 0 when current is undefined", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							// current is undefined - should use default = 0
+							progress: 0,
+							isInLabor: false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// current defaults to 0, so updated = 0 + 1 = 1
+					// isInLabor = (1 == 10) = false
+					expect(add).not.toHaveBeenCalled();
+				});
 			});
 
 			describe("Every Hour update", () => {
