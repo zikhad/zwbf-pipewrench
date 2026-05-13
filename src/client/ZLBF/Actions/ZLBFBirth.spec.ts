@@ -3,6 +3,7 @@ import { ZLBFActionBirth } from "@client/Actions/ZLBFBirth";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
+import { ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench");
 
@@ -28,6 +29,12 @@ describe("ZLBFBirth", () => {
 	it("Update should trigger ANIMATION_UPDATE event", () => {
 		action.update();
 		expect(spyTriggerEvent).toHaveBeenCalled();
+	});
+
+	it("Stop should trigger ANIMATION_STOP event", () => {
+		spyTriggerEvent.mockClear();
+		action.stop();
+		expect(spyTriggerEvent).toHaveBeenCalledWith(ZLBFEventsEnum.ANIMATION_STOP);
 	});
 
 	it("Perform should trigger ANIMATION_UPDATE & Pregnancy Birth", () => {

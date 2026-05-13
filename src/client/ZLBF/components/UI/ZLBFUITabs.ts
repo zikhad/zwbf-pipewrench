@@ -1,12 +1,10 @@
 
-export { ZLBFUITabContext, ZLBFUITabDefinition } from "@client/components/UI/ZLBFUITabDefinition";
-export { ZLBFUIElements } from "@client/components/UI/ZLBFUIElements";
-export { LactationTab } from "@client/components/UI/tabs/LactationTab";
-export { WombTab } from "@client/components/UI/tabs/WombTab";
-
-import { ZLBFUITabDefinition } from "@client/components/UI/ZLBFUITabDefinition";
+import { ZLBFUITabContext, ZLBFUITabDefinition } from "@client/components/UI/ZLBFUITabDefinition";
+import { ZLBFUIElements } from "@client/components/UI/ZLBFUIElements";
 import { LactationTab } from "@client/components/UI/tabs/LactationTab";
 import { WombTab } from "@client/components/UI/tabs/WombTab";
+
+export { ZLBFUITabContext, ZLBFUITabDefinition, ZLBFUIElements, LactationTab, WombTab };
 
 /**
  * Default set of ZLBF UI tabs (order matters).

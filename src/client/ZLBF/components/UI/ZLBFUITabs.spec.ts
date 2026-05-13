@@ -1,4 +1,10 @@
-import { defaultZLBFUITabs, LactationTab, WombTab, ZLBFUITabDefinition } from "@client/components/UI/ZLBFUITabs";
+import {
+	defaultZLBFUITabs,
+	LactationTab,
+	WombTab,
+	ZLBFUIElements,
+	ZLBFUITabDefinition
+} from "@client/components/UI/ZLBFUITabs";
 
 describe("ZLBFUITabDefinition", () => {
 	it("can be subclassed with concrete implementations", () => {
@@ -36,6 +42,10 @@ describe("ZLBFUITabDefinition", () => {
 });
 
 describe("defaultZLBFUITabs", () => {
+	it("re-exports ZLBFUIElements", () => {
+		expect(ZLBFUIElements).toBeDefined();
+	});
+
 	it("contains exactly 2 tabs", () => {
 		expect(defaultZLBFUITabs).toHaveLength(2);
 	});

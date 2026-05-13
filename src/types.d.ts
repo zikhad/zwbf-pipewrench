@@ -23,7 +23,7 @@ type LactationImages = {
 
 type PregnancyData = {
 	progress: number;
-	current?: number;
+	current: number;
 	isInLabor?: boolean;
 };
 
