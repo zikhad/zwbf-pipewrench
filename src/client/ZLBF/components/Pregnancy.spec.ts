@@ -290,6 +290,31 @@ describe("Pregnancy", () => {
 					// isInLabor = (1 == 10) = false
 					expect(add).not.toHaveBeenCalled();
 				});
+
+				it("should cap updated at duration when current + 1 exceeds duration", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					// Set duration to 5, current to 5: current + 1 = 6 > 5
+					(pregnancy as any).options = { duration: 5 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 1,
+							isInLabor: false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// updated should be capped at 5 (duration), not 6
+					// isInLabor = (5 == 5) = true, previousInLabor = false
+					// if (true && !false) = true
+					expect(add).toHaveBeenCalledTimes(1);
+				});
 			});
 
 			describe("Every Hour update", () => {
