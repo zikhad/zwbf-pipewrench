@@ -1,4 +1,4 @@
-import { DataInputStream, IsoPlayer } from "@asledgehammer/pipewrench";
+import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { ZLBFTraitsEnum } from "@constants";
 import { CharacterTraitApi } from "@shared/components/CharacterTraitApi";
 import type { PregnancyData } from "@types";
@@ -29,13 +29,11 @@ export class PregnancyState {
 		if (!player) return null;
 		if (!CharacterTraitApi.hasTrait(player, ZLBFTraitsEnum.PREGNANCY)) return null;
 		const data = this.getStore(player).data ?? null;
-		// print(`[ZLBF] Pregnancy - Retrieved pregnancy data current: ${data?.current} progress: ${data?.progress} isInLabor: ${data?.isInLabor}`);
 		return data;
 	}
 
 	public static set(player: IsoPlayer | undefined, value: PregnancyData): void {
 		if (!player) return;
-		print(`[ZLBF] Pregnancy - Setting pregnancy data current: ${value.current} progress: ${value.progress} isInLabor: ${value.isInLabor}`);
 		this.getStore(player).data = value;
 	}
 }

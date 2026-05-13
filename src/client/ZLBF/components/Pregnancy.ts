@@ -23,11 +23,11 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 			const { current = 0 } = this.pregnancy;
 			const { duration } = this.options;
 			const updated = Math.min(duration, current + minutes);			
-			this.pregnancy = {
+			PregnancyState.set(this.player, {
 				current: updated,
 				progress: updated / duration,
 				isInLabor: updated == duration
-			};
+			});
 		},
 		advanceToLabor: () => {
 			if (!this.pregnancy) return;
@@ -64,23 +64,18 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	}
 
 	public get pregnancy(): PregnancyData | null {
-		print(`[ZLBF] Pregnancy - Getting pregnancy data for player`);
 		return PregnancyState.get(this.player);
-	}
-
-	public set pregnancy(value: PregnancyData) {
-		PregnancyState.set(this.player, value);
 	}
 
 	/**
 	 * Apply `default` values for `pregnancy` data
 	 */
 	private resetVariables() {
-		this.pregnancy = {
+		PregnancyState.set(this.player, {
 			progress: 0,
 			current: 0,
 			isInLabor: false
-		};
+		});
 		this.weightDebuff = 0;
 		this.moodle?.moodle(0);
 	}
@@ -112,16 +107,15 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		const previousInLabor = this.pregnancy.isInLabor ?? false;
 		const updated = Math.min(duration, current + 1);
 		const isInLabor = updated == duration;
-		this.pregnancy = {
+		PregnancyState.set(this.player, {
 			current: updated,
 			progress: updated / duration,
 			isInLabor
-		};
+		});
 		if (isInLabor && !previousInLabor) {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZLBFActionBirth(this));
 		}
-		print(`[ZLBF] Pregnancy - Updated pregnancy data`);
 		triggerEvent(ZLBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 

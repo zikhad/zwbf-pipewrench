@@ -66,7 +66,7 @@ export class ZLBFUI {
 		Events.onPostRender.addListener(() => this.onUpdateUI());
 	}
 
-	private label(txt: string, separator = ":"): string {
+	private label(txt: string, separator = ""): string {
 		return `${getText(txt)}${separator}`;
 	}
 
@@ -75,7 +75,7 @@ export class ZLBFUI {
 		if (!this.UI) return;
 		if (!this.player?.isFemale()) return;
 
-		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_title", ""));
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_Title"));
 		this.UI.nextLine();
 		this.UI.addImage(this.UIElements.womb.image, "media/ui/womb/normal/womb_normal_0.png");
 		this.UI.nextLine();
@@ -123,7 +123,7 @@ export class ZLBFUI {
 			this.UI.nextLine();
 		}
 
-		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Lactation_title", ""));
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Lactation_Title"));
 		this.UI.addImage(
 			this.UIElements.lactation.image,
 			"media/ui/lactation/boobs/color-0/normal_empty.png"
@@ -142,7 +142,7 @@ export class ZLBFUI {
 
 		this.UI.setBorderToAllElements(true);
 		this.UI.saveLayout();
-		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_title", ""));
+		this.UI.setActiveTab(this.label("IGUI_ZLBF_UI_Womb_Title", ""));
 	}
 
 	private onCreateUI() {
@@ -152,6 +152,10 @@ export class ZLBFUI {
 		this.UI.setWidthPixel(200);
 		this.UI.setTitle(getText("IGUI_ZLBF_UI_Panel"));
 		this.UI.close();
+	}
+
+	private valueInMilliliters (value: number) {
+		return `${Math.round(value * 1000)} ml`;
 	}
 
 	private onUpdateUI() {
@@ -172,16 +176,15 @@ export class ZLBFUI {
 
 		const { phaseTranslation, fertility, amount, total } = this.womb;
 		const { pregnancy } = this.pregnancy;
-		const amountInMilliliters = Math.round(amount * 1000);
-		const totalInMilliliters = Math.round(total * 1000);
+		
 
 		triggerEvent(ZLBFEventsEnum.IMAGE);
 
 		const $spermCurrent = this.UI[this.UIElements.womb.sperm.current.amount];
-        $spermCurrent?.setText(`${amountInMilliliters} ml`);
+        $spermCurrent?.setText(this.valueInMilliliters(amount));
 		
         const $spermTotal = this.UI[this.UIElements.womb.sperm.total.amount];
-		$spermTotal?.setText(`${totalInMilliliters} ml`);
+		$spermTotal?.setText(this.valueInMilliliters(total));
 		
         const $wombImage = this.UI[this.UIElements.womb.image];
 		$wombImage?.setPath(Animation.wombImage);

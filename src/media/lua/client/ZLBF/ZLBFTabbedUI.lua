@@ -52,14 +52,14 @@ function ZLBFTabbedUI:createChildren()
 	self.wombTab:initialise()
 	self.wombTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
 	self.wombTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.wombTabName = getText("IGUI_ZLBF_UI_Womb_title") .. ":"
+	self.wombTabName = getText("IGUI_ZLBF_UI_Womb_Title")
 	self.panel:addView(self.wombTabName, self.wombTab)
 
 	self.lactationTab = ISPanel:new(0, 8, self.width, self.height - th - rh)
 	self.lactationTab:initialise()
 	self.lactationTab.backgroundColor = { r = 0, g = 0, b = 0, a = 0 }
 	self.lactationTab.borderColor = { r = 0, g = 0, b = 0, a = 0 }
-	self.lactationTabName = getText("IGUI_ZLBF_UI_Lactation_title") .. ":"
+	self.lactationTabName = getText("IGUI_ZLBF_UI_Lactation_Title")
 	self.panel:addView(self.lactationTabName, self.lactationTab)
 
 	self.tabContexts = {
