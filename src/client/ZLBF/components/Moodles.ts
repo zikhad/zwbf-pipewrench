@@ -15,6 +15,12 @@ type MoodleProps = {
 	type: "Good" | "Bad";
 	tresholds: [number, number, number, number];
 };
+/**
+ * Represents a custom moodle for a player, supporting both Moodle Framework (MF) and fallback HaloText.
+ *
+ * If Moodle Framework is active, moodles are registered and updated via MF APIs, and can be called more frequently for real-time updates.
+ * If not, falls back to HaloText for one-off moodle notifications.
+ */
 export class Moodle {
 	private isMF = false;
 	private player: IsoPlayer;
@@ -23,6 +29,14 @@ export class Moodle {
 	private texture?: ReturnType<typeof getTexture>;
 	private tresholds: [number, number, number, number];
 
+	/**
+	 * Creates a new Moodle instance for a player.
+	 *
+	 * If Moodle Framework is active, registers the moodle and prepares it for frequent updates.
+	 * Otherwise, prepares fallback logic using HaloText.
+	 *
+	 * @param props - Moodle configuration
+	 */
 	constructor(props: MoodleProps) {
 		const { player, name, type, texture, tresholds } = props;
 		this.player = player;
@@ -107,18 +121,33 @@ export class Moodle {
 		return level;
 	}
 
-	public moodle(level: number): void {
+	/**
+	 * Updates the moodle state for the player.
+	 *
+	 * If Moodle Framework is active, updates the moodle via MF APIs (can be called frequently for real-time updates).
+	 * If not, falls back to a one-off HaloText notification.
+	 *
+	 * @param level - The moodle value (0-1 or 0-100, normalized internally)
+	 * @param onlyMoodleFramework - If true, skips fallback and only attempts MF update
+	 */
+	public moodle(level: number, onlyMoodleFramework = false): void {
 		level = this.normalizeLevel(level);
 		const mfLevel = this.type === "Bad" ? 1 - level : level;
 
 		if (!this.isMF) {
-			this.fallbackMoodle(level);
+			// If MF is not active, fallback to HaloText (one-off notification)
+			if (!onlyMoodleFramework) {
+				this.fallbackMoodle(level);
+			}
 			return;
 		}
 
+		// If MF is active, update moodle state (can be called frequently for real-time updates)
 		const moodle = MF.getMoodle(this.name);
 		if (!moodle) {
-			this.fallbackMoodle(level);
+			if (!onlyMoodleFramework) {
+				this.fallbackMoodle(level);
+			}
 			return;
 		}
 		const { bad4, bad3, bad2, bad1, good1, good2, good3, good4 } = this.buildTresholds();

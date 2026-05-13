@@ -99,7 +99,6 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private onLabor(_delta: number) {
 		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
-
 	onEveryMinute(): void {
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
@@ -115,7 +114,8 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (isInLabor && !previousInLabor) {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZLBFActionBirth(this));
-		}
+		}		
+		this.moodle?.moodle(this.pregnancy.progress, true);
 		triggerEvent(ZLBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 
