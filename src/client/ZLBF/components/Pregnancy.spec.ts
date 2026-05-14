@@ -10,6 +10,7 @@ import { PregnancyData } from "@types";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 
 jest.mock("@actions/ZLBFBirth");
+jest.mock("@actions/ZLBFPregnancyStartAnimation");
 jest.mock("@client/components/Moodles");
 jest.mock("@client/components/Player");
 jest.mock("@asledgehammer/pipewrench");
@@ -434,10 +435,13 @@ describe("Pregnancy", () => {
 		describe("Custom Events", () => {
 			const addListener = jest.fn();
 			const listener = jest.fn();
+			const queueAdd = jest.spyOn(ISTimedActionQueue, "add");
 			beforeEach(() => {
 				(Events.EventEmitter as jest.Mock).mockImplementation(() => ({
 					addListener
 				}));
+				addListener.mockClear();
+				queueAdd.mockClear();
 				jest.spyOn(Player.prototype as any, "addTrait").mockImplementation(listener);
 				jest.spyOn(Player.prototype as any, "removeTrait").mockImplementation(listener);
 				jest.spyOn(Player.prototype as any, "applyBodyEffect").mockImplementation(listener);
@@ -454,6 +458,20 @@ describe("Pregnancy", () => {
 				const [callback] = addListener.mock.calls[index];
 				callback();
 				expect(listener).toHaveBeenCalled();
+			});
+
+			it("should queue pregnancy-start animation timed action on PREGNANCY_START", () => {
+				const pregnancy = new Pregnancy();
+				(pregnancy as any).onCreatePlayer(
+					mock({
+						getModData: jest.fn(() => ({}))
+					})
+				);
+
+				const [callback] = addListener.mock.calls[0];
+				callback();
+
+				expect(queueAdd).toHaveBeenCalledTimes(1);
 			});
 		});
 	});

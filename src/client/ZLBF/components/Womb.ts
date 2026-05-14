@@ -12,14 +12,17 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "@client/components/Player";
 import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { PregnancyState } from "@client/components/PregnancyState";
+import { percentageToNumber } from "@client/Utils";
 
 /**
  * Manages reproductive functions, fertility, and pregnancy-related variables
- * for a player character in the game. Handles cycle tracking, fertility logic,
- * and dynamic image rendering for different states.
+ * for a player character in the game. Handles cycle tracking, fertility logic.
  */
 export class Womb extends Player<WombData> implements TimedEvents {
 
+	private readonly CONSTANTS = {
+		fertilityLevel: 5,
+	}
 	private readonly options = {
 		recovery: WombOptions.recovery,
 		capacity: WombOptions.capacity
@@ -134,6 +137,20 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		return this.data?.fertility ?? 0;
 	}
 
+	get fertilityLevelStatus() {
+		switch (this.phase) {
+			case CyclePhaseEnum.RECOVERY:
+				return "recovery";
+			case CyclePhaseEnum.PREGNANT:
+				if ((this.pregnancy?.progress ?? 0) >= 0.05) {
+					return "pregnant";
+				}
+				return "fertilized";
+			default:
+				return percentageToNumber(this.fertility * 100, this.CONSTANTS.fertilityLevel);
+		}
+	}
+
 	get phase() {
 		return this.getCyclePhase(this.cycleDay);
 	}
@@ -181,7 +198,6 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	private intercourse() {
 		if (!this.player) return;
-		if (this.pregnancy) return;
 		const amountInMilliliters = ZombRand(10, 50);
 		const amount = amountInMilliliters / 1000;
 		this.haloText({
@@ -195,7 +211,7 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		} else {
 			this.amount += amount;
 			this.total += amount;
-			this.impregnate();
+			if (!this.pregnancy) this.impregnate();
 		}
 	}
 

@@ -263,11 +263,11 @@ describe("Womb", () => {
 				(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.5 });
 				const womb = new Womb();
 				womb.onCreatePlayer(mockedPlayer());
-				const spyHaloText = jest.spyOn(womb as any, "haloText");
+				const spyImpregnate = jest.spyOn(womb as any, "impregnate");
 				
 				(womb as any).intercourse();
 				
-				expect(spyHaloText).not.toHaveBeenCalled();
+				expect(spyImpregnate).not.toHaveBeenCalled();
 			});
 		});
 	});
@@ -573,6 +573,39 @@ describe("Womb", () => {
 			const womb = new Womb();
 			womb.onCreatePlayer(mockedPlayer());
 			expect(womb.phaseTranslation).toBe("IGUI_ZLBF_UI_Menstruation");
+		});
+
+		describe("fertilityLevelStatus", () => {
+			it("returns recovery image during recovery phase", () => {
+				const womb = new Womb();
+				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.RECOVERY);
+
+				expect(womb.fertilityLevelStatus).toBe("recovery");
+			});
+
+			it("returns fertilized image in early pregnancy", () => {
+				const womb = new Womb();
+				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
+				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.04, current: 0 });
+
+				expect(womb.fertilityLevelStatus).toBe("fertilized");
+			});
+
+			it("returns pregnant image after pregnancy threshold", () => {
+				const womb = new Womb();
+				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
+				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.05, current: 0 });
+
+				expect(womb.fertilityLevelStatus).toBe("pregnant");
+			});
+
+			it("maps fertility percentage to fertility level image for non-special phases", () => {
+				const womb = new Womb();
+				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.OVULATION);
+				jest.spyOn(womb, "fertility", "get").mockReturnValue(0.8);
+
+				expect(womb.fertilityLevelStatus).toBe(4);
+			});
 		});
 	});
 
