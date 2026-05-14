@@ -575,12 +575,12 @@ describe("Womb", () => {
 			expect(womb.phaseTranslation).toBe("IGUI_ZLBF_UI_Menstruation");
 		});
 
-		describe("fertilityLevelImage", () => {
+		describe("fertilityLevelStatus", () => {
 			it("returns recovery image during recovery phase", () => {
 				const womb = new Womb();
 				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.RECOVERY);
 
-				expect(womb.fertilityLevelImage).toBe("fertility_level_recovery.png");
+				expect(womb.fertilityLevelStatus).toBe("recovery");
 			});
 
 			it("returns fertilized image in early pregnancy", () => {
@@ -588,7 +588,7 @@ describe("Womb", () => {
 				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
 				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.04, current: 0 });
 
-				expect(womb.fertilityLevelImage).toBe("fertility_level_fertilized.png");
+				expect(womb.fertilityLevelStatus).toBe("fertilized");
 			});
 
 			it("returns pregnant image after pregnancy threshold", () => {
@@ -596,7 +596,7 @@ describe("Womb", () => {
 				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
 				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.05, current: 0 });
 
-				expect(womb.fertilityLevelImage).toBe("fertility_level_pregnant.png");
+				expect(womb.fertilityLevelStatus).toBe("pregnant");
 			});
 
 			it("maps fertility percentage to fertility level image for non-special phases", () => {
@@ -604,39 +604,7 @@ describe("Womb", () => {
 				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.OVULATION);
 				jest.spyOn(womb, "fertility", "get").mockReturnValue(0.8);
 
-				expect(womb.fertilityLevelImage).toBe("fertility_level_4.png");
-			});
-		});
-
-		describe("fertilityEggImage", () => {
-			it("returns recovery egg image during recovery phase", () => {
-				const womb = new Womb();
-				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.RECOVERY);
-
-				expect(womb.fertilityEggImage).toBe("egg_recovery.png");
-			});
-
-			it("returns fertilized egg image in early pregnancy", () => {
-				const womb = new Womb();
-				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
-				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.049, current: 0 });
-
-				expect(womb.fertilityEggImage).toBe("egg_fertilized.png");
-			});
-
-			it("returns pregnant egg image after pregnancy threshold", () => {
-				const womb = new Womb();
-				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
-				jest.spyOn(womb, "pregnancy", "get").mockReturnValue({ progress: 0.5, current: 0 });
-
-				expect(womb.fertilityEggImage).toBe("egg_pregnant.png");
-			});
-
-			it("returns default egg image for non-special phases", () => {
-				const womb = new Womb();
-				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.FOLLICULAR);
-
-				expect(womb.fertilityEggImage).toBe("egg_default.png");
+				expect(womb.fertilityLevelStatus).toBe(4);
 			});
 		});
 	});

@@ -137,32 +137,17 @@ export class Womb extends Player<WombData> implements TimedEvents {
 		return this.data?.fertility ?? 0;
 	}
 
-	get fertilityLevelImage() {
+	get fertilityLevelStatus() {
 		switch (this.phase) {
 			case CyclePhaseEnum.RECOVERY:
-				return "fertility_level_recovery.png";
+				return "recovery";
 			case CyclePhaseEnum.PREGNANT:
 				if ((this.pregnancy?.progress ?? 0) >= 0.05) {
-					return "fertility_level_pregnant.png";
+					return "pregnant";
 				}
-				return "fertility_level_fertilized.png";
+				return "fertilized";
 			default:
-				const level = percentageToNumber(this.fertility * 100, this.CONSTANTS.fertilityLevel);
-				return `fertility_level_${level}.png`;
-		}
-	}
-
-	get fertilityEggImage() {
-		switch (this.phase) {
-			case CyclePhaseEnum.RECOVERY:
-				return "egg_recovery.png";
-			case CyclePhaseEnum.PREGNANT:
-				if ((this.pregnancy?.progress ?? 0) >= 0.05) {
-					return "egg_pregnant.png";
-				}
-				return "egg_fertilized.png";
-			default:
-				return "egg_default.png";
+				return percentageToNumber(this.fertility * 100, this.CONSTANTS.fertilityLevel);
 		}
 	}
 

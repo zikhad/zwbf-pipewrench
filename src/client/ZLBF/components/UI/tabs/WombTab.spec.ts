@@ -103,7 +103,7 @@ describe("WombTab", () => {
 			);
 			expect(ui.addImage).toHaveBeenCalledWith(
 				tabElements.fertility.eggImage,
-				"media/ui/fertility/egg/egg.png",
+				"media/ui/fertility/egg/egg_default.png",
 				{ height: 26 }
 			);
 		});
@@ -149,8 +149,7 @@ describe("WombTab", () => {
 			(womb as any).fertility = 0.5;
 			(womb as any).amount = 0.25;
 			(womb as any).total = 0.5;
-			(womb as any).fertilityLevelImage = "fertility_level_2.png";
-			(womb as any).fertilityEggImage = "egg_2.png";
+			(womb as any).fertilityLevelStatus = 2;
 
 			const context: ZLBFUITabContext = { womb };
 			tab.update(ui as any, context);
@@ -169,8 +168,7 @@ describe("WombTab", () => {
 			(womb as any).fertility = 0.75;
 			(womb as any).amount = 0;
 			(womb as any).total = 0;
-			(womb as any).fertilityLevelImage = "fertility_level_4.png";
-			(womb as any).fertilityEggImage = "egg_4.png";
+			(womb as any).fertilityLevelStatus = 4;
 			const player = mockedPlayer();
 			mockHasTrait.mockReturnValue(false);
 
@@ -181,7 +179,7 @@ describe("WombTab", () => {
 				"media/ui/fertility/level/fertility_level_4.png"
 			);
 			expect((ui as any)[tabElements.fertility.eggImage].setPath).toHaveBeenCalledWith(
-				"media/ui/fertility/egg/egg_4.png"
+				"media/ui/fertility/egg/egg_default.png"
 			);
 		});
 
@@ -191,8 +189,7 @@ describe("WombTab", () => {
 			(womb as any).fertility = 0.5;
 			(womb as any).amount = 0;
 			(womb as any).total = 0;
-			(womb as any).fertilityLevelImage = "fertility_level_3.png";
-			(womb as any).fertilityEggImage = "egg_3.png";
+			(womb as any).fertilityLevelStatus = 3;
 			const player = mockedPlayer();
 			mockHasTrait.mockReturnValue(false);
 
