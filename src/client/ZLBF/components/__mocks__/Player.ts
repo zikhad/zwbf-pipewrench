@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BodyPartType, IsoPlayer } from "@asledgehammer/pipewrench";
-import { PregnancyData } from "../../../../types";
+import { PregnancyData } from "@types";
 import { ZLBFTraitsEnum } from "@constants";
 export class Player<T = unknown> {
 	private static resolveTraitRef(trait: ZLBFTraitsEnum): CharacterTraitRef | undefined {

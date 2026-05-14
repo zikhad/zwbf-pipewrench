@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
-import { Moodle } from "./Moodles";
+import { Moodle } from "@client/components/Moodles";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { IsoPlayer, ArrayList } from "@asledgehammer/pipewrench";
 

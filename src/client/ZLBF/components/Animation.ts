@@ -137,7 +137,6 @@ export class Animation {
 
 		const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
 		const step = steps[stepIndex];
-        print(`Animation step: ${step}`);
 
         const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
         const path = custom?.path ?? `media/ui/animation`;
