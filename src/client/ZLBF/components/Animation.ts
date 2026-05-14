@@ -1,13 +1,14 @@
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Womb } from "@client/components/Womb";
-import { percentageToNumber, repeatArray } from "@client/Utils";
+import { createArray, percentageToNumber, repeatArray } from "@client/Utils";
 import { ITEMS, ZLBFEventsEnum } from "@constants";
 
 /** Identifies the type of animation to play. */
 export enum ANIMATIONS {
     INTERCOURSE = "intercourse",
     BIRTH = "birth",
-    CUSTOM = "custom"
+    CUSTOM = "custom",
+    FERTILIZATION = "fertilization"
 }
 
 /** Internal keys mapping animation states to their frame sequences. */
@@ -15,7 +16,8 @@ enum ANIMATION_KEY {
     NORMAL = "normal",
     PREGNANT = "pregnant",
     CONDOM = "condom",
-    BIRTH = "birth"
+    BIRTH = "birth",
+    FERTILIZATION = "fertilization"
 }
 /**
  * Defines the frame steps and optional loop count for a given animation.
@@ -84,6 +86,11 @@ export class Animation {
             steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
             loop: 1,
             fullnessSupport: false
+        },
+        [ANIMATION_KEY.FERTILIZATION]: {
+            steps: createArray(45),
+            loop: 1,
+            fullnessSupport: false
         }
     };
 
@@ -117,12 +124,17 @@ export class Animation {
      * @returns A valid animation key
      */
     private animationKey(key: ANIMATIONS ): ANIMATION_KEY {
-        if(key === ANIMATIONS.BIRTH) {
-            return ANIMATION_KEY.BIRTH;
+        switch(key) {
+            case ANIMATIONS.BIRTH:
+                return ANIMATION_KEY.BIRTH;
+            case ANIMATIONS.FERTILIZATION:
+                return ANIMATION_KEY.FERTILIZATION;
         }
+        
         const { pregnancy } = this.womb;
         if (this.womb.hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
         if (pregnancy && pregnancy.progress > 0.5) return ANIMATION_KEY.PREGNANT;
+        
         return ANIMATION_KEY.NORMAL;
     }
 
@@ -154,7 +166,8 @@ export class Animation {
         const step = steps[stepIndex];
         const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
         const path = custom?.path ?? `media/ui/animation`;
-        Animation.wombImage = `${path}/${animation}${fullnessPath}/${step}.png`;
+        const animationName = (animation === ANIMATIONS.CUSTOM) ? "" : animation;
+        Animation.wombImage = `${path}/${animationName}${fullnessPath}/${step}.png`;
     }
 
     /** Marks the active animation as finished and re-enables idle image updates. */

@@ -171,14 +171,14 @@ Usually triggered inside a Update of a **Animation**
 It can offer a custom animation support through the custom `param`, as follows
 ```lua
   triggerEvent("ZLBFWombAnimation", {
-    animation = "intercourse" --[[ A valid womb animation ]],
+    animation = "custom" --[[ A valid womb animation or "custom" for new animations]],
     delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
     duration: 1 --[[ number - usualy the action.duration ]],
     custom: {
       steps = [0,1,2,3,4], -- the image name inside the folder must be 0.png, 1.png, ...
       loop = true, -- can the animation be looped ?
       fullnessSupport = true -- if true, the system will expect a full / empty folder
-      path = "media/ui/animation/example" -- final path of the animation will be media/ui/animation/example/full/0.png
+      path = "media/ui/animation/path-example" -- final path of the animation will be media/ui/animation/path-example/full/0.png
     }
   });
 ```

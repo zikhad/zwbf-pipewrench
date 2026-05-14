@@ -4,6 +4,7 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ZLBFActionBirth } from "@actions/ZLBFBirth";
+import { ZLBFActionPregnancyStartAnimation } from "@actions/ZLBFPregnancyStartAnimation";
 import { Player, TimedEvents } from "@client/components/Player";
 import { Moodle } from "@client/components/Moodles";
 import { PregnancyState } from "@client/components/PregnancyState";
@@ -86,6 +87,9 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private start() {
 		this.addTrait(ZLBFTraitsEnum.PREGNANCY);
 		this.resetVariables();
+		if (this.player) {
+			ISTimedActionQueue.add(new ZLBFActionPregnancyStartAnimation(this.player));
+		}
 	}
 
 	/**

@@ -57,3 +57,16 @@ export const repeatArray = (steps: number[], times: number): number[] => {
     }
     return result;
 };
+
+/**
+ * Creates an array of sequential numbers from 0 to length - 1.
+ * @param length  The length of the array to create.
+ * @returns An array containing numbers from 0 to length - 1.
+ */
+export const createArray = (length: number) => {
+	const steps: number[] = [];
+	for (let index = 0; index < length; index++) {
+		steps.push(index);
+	}
+	return steps;
+};

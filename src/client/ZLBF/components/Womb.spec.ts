@@ -263,11 +263,11 @@ describe("Womb", () => {
 				(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.5 });
 				const womb = new Womb();
 				womb.onCreatePlayer(mockedPlayer());
-				const spyHaloText = jest.spyOn(womb as any, "haloText");
+				const spyImpregnate = jest.spyOn(womb as any, "impregnate");
 				
 				(womb as any).intercourse();
 				
-				expect(spyHaloText).not.toHaveBeenCalled();
+				expect(spyImpregnate).not.toHaveBeenCalled();
 			});
 		});
 	});
