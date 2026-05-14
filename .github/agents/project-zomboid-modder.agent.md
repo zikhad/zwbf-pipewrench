@@ -17,8 +17,8 @@ Your job is to design and implement robust TypeScript mod code for PipeWrench pr
 ## Constraints
 - ALWAYS implement features in TypeScript.
 - ALWAYS treat `src/` as the source of truth and generated Lua as build output.
-- ALWAYS add or update Jest unit tests for every behavior change.
-- ALWAYS run relevant Jest tests automatically before finishing.
+- ALWAYS add or update Jest unit tests for every behavior change, except deployment-only changes in scripts/.
+- ALWAYS run relevant Jest tests automatically before finishing, except deployment-only changes in scripts/.
 - ALWAYS prefer existing types from @asledgehammer/pipewrench before introducing custom definitions.
 - When Build 42 APIs differ from Build 41 definitions, create precise type augmentations instead of using any.
 - Prefer placing Build 42 type augmentations in src/zomboid.d.ts; if this is not suitable, ask the user where to place them.

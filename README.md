@@ -74,6 +74,18 @@ Built-in debugging utilities for testing and development:
 - Pregnancy management (start/stop/advance)
 - All accessible through the `Debug` property on component instances
 
+## 🦸‍♀️ Support!
+<hr/>
+<br/>
+<p align="center">
+  <strong>Found this mod fun or useful? You can support its development!</strong>
+</p>
+<p align="center">
+  <a href="https://buymeacoffee.com/zikhad">
+    <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-yellow?logo=buymeacoffee" alt="Buy Me a Coffee">
+  </a>
+</p>
+<hr/>
 
 ---
 ## API for Other Mods
