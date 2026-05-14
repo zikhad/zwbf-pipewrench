@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LactationTab } from "@client/components/UI/tabs/LactationTab";
-import { ZLBFUIElements } from "@client/components/UI/ZLBFUIElements";
 import { ZLBFUITabContext } from "@client/components/UI/ZLBFUITabDefinition";
 import { mock } from "jest-mock-extended";
 import { Lactation } from "@client/components/Lactation";
@@ -9,12 +8,14 @@ jest.mock("@asledgehammer/pipewrench", () => ({
 	getText: jest.fn().mockImplementation((key: string) => key)
 }));
 
+const tabElements = new LactationTab().ELEMENTS;
+
 const makeUI = () => ({
 	addImage: jest.fn(),
 	addText: jest.fn(),
 	nextLine: jest.fn(),
-	[ZLBFUIElements.lactation.image]: { setPath: jest.fn() },
-	[ZLBFUIElements.lactation.level]: { setPath: jest.fn() }
+	[tabElements.image]: { setPath: jest.fn() },
+	[tabElements.level]: { setPath: jest.fn() }
 });
 
 const addSizedImage = (ui: Pick<ZLBFTabbedUI, "addImage">) => {
@@ -51,15 +52,15 @@ describe("LactationTab", () => {
 			tab.build(ui as any, {});
 
 			expect(ui.addImage).toHaveBeenCalledWith(
-				ZLBFUIElements.lactation.image,
+				tabElements.image,
 				"media/ui/lactation/boobs/color-0/normal_empty.png"
 			);
 			expect(ui.addImage).toHaveBeenCalledWith(
-				ZLBFUIElements.lactation.level,
+				tabElements.level,
 				"media/ui/lactation/level/milk_level_0.png"
 			);
 			expect(ui.addText).toHaveBeenCalledWith(
-				ZLBFUIElements.lactation.title,
+				tabElements.title,
 				expect.any(String),
 				undefined,
 				"Center"
@@ -103,8 +104,8 @@ describe("LactationTab", () => {
 		it("returns early when lactation is not in context", () => {
 			tab.update(ui as any, {});
 
-			expect((ui as any)[ZLBFUIElements.lactation.image].setPath).not.toHaveBeenCalled();
-			expect((ui as any)[ZLBFUIElements.lactation.level].setPath).not.toHaveBeenCalled();
+			expect((ui as any)[tabElements.image].setPath).not.toHaveBeenCalled();
+			expect((ui as any)[tabElements.level].setPath).not.toHaveBeenCalled();
 		});
 
 		it("updates breast and level images from lactation context", () => {
@@ -117,10 +118,10 @@ describe("LactationTab", () => {
 			const context: ZLBFUITabContext = { lactation };
 			tab.update(ui as any, context);
 
-			expect((ui as any)[ZLBFUIElements.lactation.image].setPath).toHaveBeenCalledWith(
+			expect((ui as any)[tabElements.image].setPath).toHaveBeenCalledWith(
 				"path/to/breasts.png"
 			);
-			expect((ui as any)[ZLBFUIElements.lactation.level].setPath).toHaveBeenCalledWith(
+			expect((ui as any)[tabElements.level].setPath).toHaveBeenCalledWith(
 				"path/to/level.png"
 			);
 		});

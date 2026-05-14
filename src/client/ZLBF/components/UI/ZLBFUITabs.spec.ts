@@ -2,7 +2,6 @@ import {
 	defaultZLBFUITabs,
 	LactationTab,
 	WombTab,
-	ZLBFUIElements,
 	ZLBFUITabDefinition
 } from "@client/components/UI/ZLBFUITabs";
 
@@ -11,6 +10,7 @@ describe("ZLBFUITabDefinition", () => {
 		class TestTab extends ZLBFUITabDefinition {
 			readonly id = "Test";
 			readonly TITLE_KEY = "IGUI_TEST";
+			readonly ELEMENTS = { test: "test-element" };
 			build = jest.fn();
 			update = jest.fn();
 		}
@@ -25,6 +25,7 @@ describe("ZLBFUITabDefinition", () => {
 		class TestTab extends ZLBFUITabDefinition {
 			readonly id = "Test";
 			readonly TITLE_KEY = "IGUI_TEST";
+			readonly ELEMENTS = { test: "test-element" };
 			build = jest.fn();
 			update = jest.fn();
 		}
@@ -42,10 +43,6 @@ describe("ZLBFUITabDefinition", () => {
 });
 
 describe("defaultZLBFUITabs", () => {
-	it("re-exports ZLBFUIElements", () => {
-		expect(ZLBFUIElements).toBeDefined();
-	});
-
 	it("contains exactly 2 tabs", () => {
 		expect(defaultZLBFUITabs).toHaveLength(2);
 	});
