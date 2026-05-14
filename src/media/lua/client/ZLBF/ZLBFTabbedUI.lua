@@ -212,10 +212,13 @@ function ZLBFTabbedUI:nextLine()
 		context.lineHaveImages = false
 		for _, v in ipairs(context.matriceLayout[context.lineAct]) do
 			if v.isImage then
-				if context.deltaY < context.elemW[v.line][v.column] * v.ratio then
-					context.deltaY = context.elemW[v.line][v.column] * v.ratio
+				local desiredHeight = v.isHeightForce and v.pxlH or (context.elemW[v.line][v.column] * v.ratio)
+				if context.deltaY < desiredHeight then
+					context.deltaY = desiredHeight
 				else
-					context.elemW[v.line][v.column] = context.deltaY / v.ratio
+					if not v.isWidthForce and not v.isHeightForce then
+						context.elemW[v.line][v.column] = context.deltaY / v.ratio
+					end
 				end
 			end
 		end
@@ -295,15 +298,23 @@ function ZLBFTabbedUI:addButton(name, text, func)
 	end
 end
 
-function ZLBFTabbedUI:addImage(name, path)
+function ZLBFTabbedUI:addImage(name, path, sizeOrWidth, height)
 	local context = self:getActiveContext()
 	if not context then
 		return
 	end
 
+	local width = nil
+	if type(sizeOrWidth) == "table" then
+		width = sizeOrWidth.width
+		height = sizeOrWidth.height
+	else
+		width = sizeOrWidth
+	end
+
 	self:nextColumn()
 	context.lineHaveImages = true
-	local newE = ZLBFSimpleImage:new(context, path)
+	local newE = ZLBFSimpleImage:new(context, path, width, height)
 	self:initAndAddToTable(newE, name)
 	if context.deltaY < context.defaultLineHeight then
 		context.deltaY = context.defaultLineHeight

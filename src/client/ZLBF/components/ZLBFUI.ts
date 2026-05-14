@@ -36,7 +36,7 @@ export class ZLBFUI {
 		if (!this.player?.isFemale()) return;
 		const context = this.getTabContext();
 		for (const tab of this.tabs) {
-			const tabTitle = getText(tab.titleKey);
+			const tabTitle = getText(tab.TITLE_KEY);
 			this.UI.registerTab(tab.id, tabTitle);
 			this.UI.setActiveTab(tabTitle);
 			tab.build(this.UI, context);
@@ -45,7 +45,7 @@ export class ZLBFUI {
 		this.UI.setBorderToAllElements(true);
 		this.UI.saveLayout();
 		if (this.tabs[0]) {
-			this.UI.setActiveTab(getText(this.tabs[0].titleKey));
+			this.UI.setActiveTab(getText(this.tabs[0].TITLE_KEY));
 		}
 	}
 

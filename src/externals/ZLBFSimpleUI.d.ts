@@ -11,6 +11,11 @@ interface ZLBFUIElement {
 	setVisible: (visible: boolean) => void;
 }
 
+type ZLBFUIImageOptions = {
+	width?: number;
+	height?: number;
+};
+
 interface ZLBFUIObject {
 	// State
 	yAct: number;
@@ -38,7 +43,7 @@ interface ZLBFUIObject {
 	nextLine: () => void;
 	addProgressBar: (id: string, value: number, min: number, max: number) => void;
 	addButton: (id: string, text: string, callback: () => void) => void;
-	addImage: (id: string, imagePath: string) => void;
+	addImage: (id: string, imagePath: string, options?: ZLBFUIImageOptions) => void;
 
 	// Layout methods
 	setBorderToAllElements: (border: boolean) => void;
@@ -71,7 +76,7 @@ type ZLBFTabbedUI = {
 	nextLine: () => void;
 	addProgressBar: (id: string, value: number, min: number, max: number) => void;
 	addButton: (id: string, text: string, callback: () => void) => void;
-	addImage: (id: string, imagePath: string) => void;
+	addImage: (id: string, imagePath: string, options?: ZLBFUIImageOptions) => void;
 	setBorderToAllElements: (border: boolean) => void;
 	saveLayout: () => void;
 } & { [id: string]: ZLBFUIElement | undefined };

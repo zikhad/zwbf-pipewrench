@@ -99,7 +99,9 @@ ZLBFSimpleImage = ISImage:derive("ZLBFSimpleImage");
 function ZLBFSimpleImage:setPositionAndSize()
     self.pxlW = self.parentUI.elemW[self.line][self.column];
     self.pxlX = self.parentUI.elemX[self.line][self.column];
-    self.pxlH = self.parentUI.elemH[self.line];
+    if not self.isHeightForce then
+        self.pxlH = self.parentUI.elemH[self.line];
+    end
     self:setX(self.pxlX);
     self:setY(self.pxlY);
     self:setWidth(self.pxlW);
@@ -114,7 +116,7 @@ function ZLBFSimpleImage:render()
     end
 end
 
-function ZLBFSimpleImage:new(parentUI, path)
+function ZLBFSimpleImage:new(parentUI, path, width, height)
     if not getTexture(path) then
         print("ZLBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
         path = "media/ui/emotes/no.png";
@@ -133,12 +135,32 @@ function ZLBFSimpleImage:new(parentUI, path)
     o.origH    = o.texture:getHeightOrig();
     o.ratio    = o.origH / o.origW;
     o.border   = false;
+
+    if width ~= nil and width > 0 then
+        o.isWidthForce = true;
+        o.pxlW = width;
+    end
+
+    if height ~= nil and height > 0 then
+        o.isHeightForce = true;
+        o.pxlH = height;
+    end
+
+    if o.isWidthForce and not o.isHeightForce then
+        o.pxlH = o.pxlW * o.ratio;
+        o.isHeightForce = true;
+    elseif o.isHeightForce and not o.isWidthForce then
+        o.isWidthForce = true;
+        o.pxlW = o.pxlH / o.ratio;
+    end
+
     return o;
 end
 
 function ZLBFSimpleImage:setBorder(v)       self.border = v; end
 function ZLBFSimpleImage:setWidthPercent(w) self.isWidthForce = true; self.pxlW = w * getCore():getScreenWidth(); end
 function ZLBFSimpleImage:setWidthPixel(w)   self.isWidthForce = true; self.pxlW = w; end
+function ZLBFSimpleImage:setHeightPixel(h)  self.isHeightForce = true; self.pxlH = h; end
 function ZLBFSimpleImage:setPath(path)
     if not getTexture(path) then
         print("ZLBF UI - WARNING: Texture not found: " .. path .. ". Using fallback.");
@@ -426,10 +448,13 @@ function ZLBFSimpleUI:nextLine()
         self.lineHaveImages = false;
         for _, v in ipairs(self.matriceLayout[self.lineAct]) do
             if v.isImage then
-                if self.deltaY < self.elemW[v.line][v.column] * v.ratio then
-                    self.deltaY = self.elemW[v.line][v.column] * v.ratio;
+                local desiredHeight = v.isHeightForce and v.pxlH or (self.elemW[v.line][v.column] * v.ratio);
+                if self.deltaY < desiredHeight then
+                    self.deltaY = desiredHeight;
                 else
-                    self.elemW[v.line][v.column] = self.deltaY / v.ratio;
+                    if not v.isWidthForce and not v.isHeightForce then
+                        self.elemW[v.line][v.column] = self.deltaY / v.ratio;
+                    end
                 end
             end
         end
@@ -499,10 +524,18 @@ function ZLBFSimpleUI:addButton(name, text, func)
     if self.deltaY < dh then self.deltaY = dh; end
 end
 
-function ZLBFSimpleUI:addImage(name, path)
+function ZLBFSimpleUI:addImage(name, path, sizeOrWidth, height)
+    local width = nil;
+    if type(sizeOrWidth) == "table" then
+        width = sizeOrWidth.width;
+        height = sizeOrWidth.height;
+    else
+        width = sizeOrWidth;
+    end
+
     self:nextColumn();
     self.lineHaveImages = true;
-    local newE = ZLBFSimpleImage:new(self, path);
+    local newE = ZLBFSimpleImage:new(self, path, width, height);
     self:initAndAddToTable(newE, name);
     local dh = self.defaultLineHeight;
     if self.deltaY < dh then self.deltaY = dh; end

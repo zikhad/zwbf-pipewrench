@@ -21,14 +21,17 @@ export type ZLBFUITabContext = {
 /**
  * Abstract base class for a UI tab in the ZLBF system.
  *
- * Extend this class to implement a new tab. Each tab must define its unique id, titleKey,
+ * Extend this class to implement a new tab. Each tab must define its unique id, TITLE_KEY,
  * and implement the build and update methods.
  */
 export abstract class ZLBFUITabDefinition {
 	/** Unique identifier for the tab. */
 	abstract readonly id: string;
 	/** Translation key for the tab's title. */
-	abstract readonly titleKey: string;
+	abstract readonly TITLE_KEY: string;
+	
+	/** Mapping of UI element identifiers to their keys. */
+	abstract readonly ELEMENTS: Record<string, string | Record<string, string>>;
 	/**
 	 * Build the tab's static UI elements.
 	 * @param ui - The tabbed UI instance.

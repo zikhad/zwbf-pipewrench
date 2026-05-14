@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
 import { WombTab } from "@client/components/UI/tabs/WombTab";
-import { ZLBFUIElements } from "@client/components/UI/ZLBFUIElements";
 import { ZLBFUITabContext } from "@client/components/UI/ZLBFUITabDefinition";
 import { Womb } from "@client/components/Womb";
 import { mockedPlayer } from "@test/mock";
@@ -18,19 +17,20 @@ jest.mock("@client/components/Animation", () => ({
 
 import { Player } from "@client/components/Player";
 let mockHasTrait: jest.SpyInstance;
+const tabElements = new WombTab().ELEMENTS;
 
 const makeUI = () => ({
 	addImage: jest.fn(),
 	addText: jest.fn(),
-	addProgressBar: jest.fn(),
 	nextLine: jest.fn(),
-	[ZLBFUIElements.womb.image]: { setPath: jest.fn() },
-	[ZLBFUIElements.womb.sperm.current.amount]: { setText: jest.fn() },
-	[ZLBFUIElements.womb.sperm.total.amount]: { setText: jest.fn() },
-	[ZLBFUIElements.womb.cycle.phase.value]: { setText: jest.fn() },
-	[ZLBFUIElements.womb.fertility.title]: { setText: jest.fn() },
-	[ZLBFUIElements.womb.fertility.bar]: { setValue: jest.fn() },
-	[ZLBFUIElements.womb.fertility.value]: { setText: jest.fn() }
+	[tabElements.womb.image]: { setPath: jest.fn() },
+	[tabElements.sperm.currentAmount]: { setText: jest.fn() },
+	[tabElements.sperm.totalAmount]: { setText: jest.fn() },
+	[tabElements.cycle.phaseValue]: { setText: jest.fn() },
+	[tabElements.fertility.title]: { setText: jest.fn() },
+	[tabElements.fertility.levelValue]: { setText: jest.fn() },
+	[tabElements.fertility.levelImage]: { setPath: jest.fn() },
+	[tabElements.fertility.eggImage]: { setPath: jest.fn() }
 });
 
 describe("WombTab", () => {
@@ -48,7 +48,7 @@ describe("WombTab", () => {
 	});
 
 	it("has correct titleKey", () => {
-		expect(tab.titleKey).toBe("IGUI_ZLBF_UI_Womb_Title");
+		expect(tab.TITLE_KEY).toBe("IGUI_ZLBF_UI_Womb_Title");
 	});
 
 	describe("build", () => {
@@ -56,55 +56,70 @@ describe("WombTab", () => {
 			tab.build(ui as any, {});
 
 			expect(ui.addImage).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.image,
+				tabElements.womb.image,
 				"media/ui/womb/normal/womb_normal_0.png"
 			);
 			expect(ui.addText).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.sperm.current.title,
+				tabElements.sperm.currentTitle,
 				expect.any(String),
 				undefined,
 				"Center"
 			);
 			expect(ui.addText).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.sperm.total.title,
+				tabElements.sperm.totalTitle,
 				expect.any(String),
 				undefined,
 				"Center"
 			);
 			expect(ui.addText).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.cycle.phase.title,
+				tabElements.cycle.phaseTitle,
 				expect.any(String),
 				undefined,
 				"Center"
 			);
 		});
 
-		it("adds fertility bar when player is not infertile", () => {
+		it("adds fertility section when player is not infertile", () => {
 			mockHasTrait.mockReturnValue(false);
 			const player = mockedPlayer();
 
 			tab.build(ui as any, { player });
 
-			expect(ui.addProgressBar).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.fertility.bar,
-				0,
-				0,
-				1
+			expect(ui.addText).toHaveBeenCalledWith(
+				tabElements.fertility.title,
+				expect.any(String),
+				undefined,
+				"Center"
+			);
+			expect(ui.addText).toHaveBeenCalledWith(
+				tabElements.fertility.levelValue,
+				"100%",
+				undefined,
+				"Center"
+			);
+			expect(ui.addImage).toHaveBeenCalledWith(
+				tabElements.fertility.levelImage,
+				"media/ui/fertility/level/fertility_level_5.png"
+			);
+			expect(ui.addImage).toHaveBeenCalledWith(
+				tabElements.fertility.eggImage,
+				"media/ui/fertility/egg/egg_default.png",
+				{ height: 26 }
 			);
 		});
 
-		it("adds fertility bar when no player is provided", () => {
+		it("adds fertility section when no player is provided", () => {
 			tab.build(ui as any, {});
 
-			expect(ui.addProgressBar).toHaveBeenCalledWith(
-				ZLBFUIElements.womb.fertility.bar,
-				0,
-				0,
-				1
+			expect(ui.addText).toHaveBeenCalledWith(
+				tabElements.fertility.title,
+				expect.any(String),
+				undefined,
+				"Center"
 			);
 		});
 
-		it("does NOT add fertility bar when player has INFERTILE trait", () => {
+		it("does NOT add fertility section when player has INFERTILE trait", () => {
 			mockHasTrait.mockImplementation(
 				(_player: any, trait: ZLBFTraitsEnum) => trait === ZLBFTraitsEnum.INFERTILE
 			);
@@ -112,7 +127,12 @@ describe("WombTab", () => {
 
 			tab.build(ui as any, { player });
 
-			expect(ui.addProgressBar).not.toHaveBeenCalled();
+			expect(ui.addText).not.toHaveBeenCalledWith(
+				tabElements.fertility.title,
+				expect.any(String),
+				undefined,
+				"Center"
+			);
 		});
 	});
 
@@ -120,7 +140,7 @@ describe("WombTab", () => {
 		it("returns early when womb is not in context", () => {
 			tab.update(ui as any, {});
 
-			expect((ui as any)[ZLBFUIElements.womb.sperm.current.amount].setText).not.toHaveBeenCalled();
+			expect((ui as any)[tabElements.sperm.currentAmount].setText).not.toHaveBeenCalled();
 		});
 
 		it("updates sperm amounts, womb image, and cycle phase", () => {
@@ -129,42 +149,49 @@ describe("WombTab", () => {
 			(womb as any).fertility = 0.5;
 			(womb as any).amount = 0.25;
 			(womb as any).total = 0.5;
+			(womb as any).fertilityLevelStatus = 2;
+			const player = mockedPlayer();
+			mockHasTrait.mockReturnValue(false);
 
-			const context: ZLBFUITabContext = { womb };
+			const context: ZLBFUITabContext = { womb, player };
 			tab.update(ui as any, context);
 
-			expect((ui as any)[ZLBFUIElements.womb.sperm.current.amount].setText).toHaveBeenCalledWith("250 ml");
-			expect((ui as any)[ZLBFUIElements.womb.sperm.total.amount].setText).toHaveBeenCalledWith("500 ml");
-			expect((ui as any)[ZLBFUIElements.womb.image].setPath).toHaveBeenCalledWith("path/to/womb.png");
-			expect((ui as any)[ZLBFUIElements.womb.cycle.phase.value].setText).toHaveBeenCalledWith(
+			expect((ui as any)[tabElements.sperm.currentAmount].setText).toHaveBeenCalledWith("250 ml");
+			expect((ui as any)[tabElements.sperm.totalAmount].setText).toHaveBeenCalledWith("500 ml");
+			expect((ui as any)[tabElements.womb.image].setPath).toHaveBeenCalledWith("path/to/womb.png");
+			expect((ui as any)[tabElements.cycle.phaseValue].setText).toHaveBeenCalledWith(
 				"IGUI_ZLBF_UI_Phase_Ovulation"
 			);
 		});
 
-		it("shows fertility progress when no pregnancy and player is not infertile", () => {
+		it("updates fertility level UI when no pregnancy and player is not infertile", () => {
 			const womb = mock<Womb>();
 			(womb as any).phaseTranslation = "IGUI_TEST";
 			(womb as any).fertility = 0.75;
 			(womb as any).amount = 0;
 			(womb as any).total = 0;
+			(womb as any).fertilityLevelStatus = 4;
 			const player = mockedPlayer();
 			mockHasTrait.mockReturnValue(false);
 
 			tab.update(ui as any, { womb, player });
 
-			expect((ui as any)[ZLBFUIElements.womb.fertility.bar].setValue).toHaveBeenCalledWith(0.75);
-			expect((ui as any)[ZLBFUIElements.womb.fertility.value].setText).toHaveBeenCalledWith("75%");
-			expect((ui as any)[ZLBFUIElements.womb.fertility.title].setText).toHaveBeenCalledWith(
-				"IGUI_ZLBF_UI_Fertility"
+			expect((ui as any)[tabElements.fertility.levelValue].setText).toHaveBeenCalledWith("75%");
+			expect((ui as any)[tabElements.fertility.levelImage].setPath).toHaveBeenCalledWith(
+				"media/ui/fertility/level/fertility_level_4.png"
+			);
+			expect((ui as any)[tabElements.fertility.eggImage].setPath).toHaveBeenCalledWith(
+				"media/ui/fertility/egg/egg_default.png"
 			);
 		});
 
-		it("shows pregnancy progress when pregnancy is active", () => {
+		it("updates fertility level value using pregnancy progress when pregnancy is active", () => {
 			const womb = mock<Womb>();
 			(womb as any).phaseTranslation = "IGUI_TEST";
 			(womb as any).fertility = 0.5;
 			(womb as any).amount = 0;
 			(womb as any).total = 0;
+			(womb as any).fertilityLevelStatus = 3;
 			const player = mockedPlayer();
 			mockHasTrait.mockReturnValue(false);
 
@@ -174,11 +201,7 @@ describe("WombTab", () => {
 
 			tab.update(ui as any, { womb, player, pregnancy: { pregnancy } as any });
 
-			expect((ui as any)[ZLBFUIElements.womb.fertility.bar].setValue).toHaveBeenCalledWith(0.4);
-			expect((ui as any)[ZLBFUIElements.womb.fertility.value].setText).toHaveBeenCalledWith("40%");
-			expect((ui as any)[ZLBFUIElements.womb.fertility.title].setText).toHaveBeenCalledWith(
-				"IGUI_ZLBF_UI_Pregnancy"
-			);
+			expect((ui as any)[tabElements.fertility.levelValue].setText).toHaveBeenCalledWith("40%");
 		});
 
 		it("skips fertility section when player has INFERTILE trait", () => {
@@ -194,8 +217,8 @@ describe("WombTab", () => {
 
 			tab.update(ui as any, { womb, player });
 
-			expect((ui as any)[ZLBFUIElements.womb.fertility.bar].setValue).not.toHaveBeenCalled();
-			expect((ui as any)[ZLBFUIElements.womb.fertility.title].setText).not.toHaveBeenCalled();
+			expect((ui as any)[tabElements.fertility.levelValue].setText).not.toHaveBeenCalled();
+			expect((ui as any)[tabElements.fertility.levelImage].setPath).not.toHaveBeenCalled();
 		});
 	});
 });
