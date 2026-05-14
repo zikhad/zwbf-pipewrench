@@ -55,21 +55,6 @@ export class WombTab extends ZLBFUITabDefinition {
 		);
 		ui.addText(this.ELEMENTS.sperm.totalAmount, "0 ml", undefined, "Center");
 		ui.nextLine();
-		ui.addText(
-			this.ELEMENTS.cycle.title,
-			getText("IGUI_ZLBF_UI_Cycle"),
-			undefined,
-			"Center"
-		);
-		ui.nextLine();
-		ui.addText(
-			this.ELEMENTS.cycle.phaseTitle,
-			getText("IGUI_ZLBF_UI_Phase"),
-			undefined,
-			"Center"
-		);
-		ui.addText(this.ELEMENTS.cycle.phaseValue, "", undefined, "Center");
-		ui.nextLine();
 
 		if (!context.player || !Player.hasTrait(context.player, ZLBFTraitsEnum.INFERTILE)) {
 			ui.addText(
@@ -91,17 +76,32 @@ export class WombTab extends ZLBFUITabDefinition {
 			);
 			ui.addImage(
 				this.ELEMENTS.fertility.eggImage,
-				"media/ui/fertility/egg/egg.png",
+				"media/ui/fertility/egg/egg_default.png",
 				{ height: 26 }
 			);
 			ui.nextLine();
 		}
+		
+		ui.addText(
+			this.ELEMENTS.cycle.title,
+			getText("IGUI_ZLBF_UI_Cycle"),
+			undefined,
+			"Center"
+		);
+		ui.nextLine();
+		ui.addText(
+			this.ELEMENTS.cycle.phaseTitle,
+			getText("IGUI_ZLBF_UI_Phase"),
+			undefined,
+			"Center"
+		);
+		ui.addText(this.ELEMENTS.cycle.phaseValue, "", undefined, "Center");
 	}
 
 	update(ui: ZLBFTabbedUI, context: ZLBFUITabContext) {
 		if (!context.womb) return;
 
-		const { phaseTranslation, fertility, amount, total, fertilityLevelImage, fertilityEggImage } = context.womb;
+		const { phaseTranslation, fertility, amount, total, fertilityLevelStatus } = context.womb;
 		const pregnancy = context.pregnancy?.pregnancy;
 
 		triggerEvent(ZLBFEventsEnum.IMAGE);
@@ -109,21 +109,19 @@ export class WombTab extends ZLBFUITabDefinition {
 		ui[this.ELEMENTS.sperm.currentAmount]?.setText(valueInMilliliters(amount));
 		ui[this.ELEMENTS.sperm.totalAmount]?.setText(valueInMilliliters(total));
 		ui[this.ELEMENTS.womb.image]?.setPath(Animation.wombImage);
-		ui[this.ELEMENTS.cycle.phaseValue]?.setText(getText(phaseTranslation));
 
 		if (!context.player || Player.hasTrait(context.player, ZLBFTraitsEnum.INFERTILE)) {
 			return;
 		}
 
-		/* const title = getText(`IGUI_ZLBF_UI_${pregnancy ? "Pregnancy" : "Fertility"}`);
-		const progress = pregnancy ? pregnancy.progress : fertility; */
+		ui[this.ELEMENTS.cycle.phaseValue]?.setText(getText(phaseTranslation));
+
 		const progress = pregnancy ? pregnancy.progress : fertility;
 
 		ui[this.ELEMENTS.fertility.levelValue]?.setText(`${Math.floor(progress * 100)}%`);
-		ui[this.ELEMENTS.fertility.levelImage]?.setPath(`media/ui/fertility/level/${fertilityLevelImage}`);
-		ui[this.ELEMENTS.fertility.eggImage]?.setPath(`media/ui/fertility/egg/${fertilityEggImage}`);
-		/* ui[this.ELEMENTS.fertility.title]?.setText(title);
-		ui[this.ELEMENTS.fertility.bar]?.setValue(progress);
-		ui[this.ELEMENTS.fertility.value]?.setText(`${Math.floor(progress * 100)}%`); */
+		ui[this.ELEMENTS.fertility.levelImage]?.setPath(`media/ui/fertility/level/fertility_level_${fertilityLevelStatus}.png`);
+		
+		const eggImage = typeof fertilityLevelStatus !== "number" ? fertilityLevelStatus : "default";
+		ui[this.ELEMENTS.fertility.eggImage]?.setPath(`media/ui/fertility/egg/egg_${eggImage}.png`);
 	}
 }

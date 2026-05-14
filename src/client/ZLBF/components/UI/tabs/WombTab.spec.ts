@@ -150,8 +150,10 @@ describe("WombTab", () => {
 			(womb as any).amount = 0.25;
 			(womb as any).total = 0.5;
 			(womb as any).fertilityLevelStatus = 2;
+			const player = mockedPlayer();
+			mockHasTrait.mockReturnValue(false);
 
-			const context: ZLBFUITabContext = { womb };
+			const context: ZLBFUITabContext = { womb, player };
 			tab.update(ui as any, context);
 
 			expect((ui as any)[tabElements.sperm.currentAmount].setText).toHaveBeenCalledWith("250 ml");
