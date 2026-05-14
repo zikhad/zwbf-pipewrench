@@ -305,7 +305,7 @@ describe("Lactation", () => {
 				lactation.onCreatePlayer(
 					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
-				lactation.onPregnancyUpdate({ progress: progress ?? 0 });
+				lactation.onPregnancyUpdate({ progress: progress ?? 0, current: 0 });
 				expect(lactation.isLactating).toBe(expected);
 			}
 		);

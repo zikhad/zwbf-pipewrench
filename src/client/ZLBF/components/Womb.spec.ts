@@ -194,7 +194,7 @@ describe("Womb", () => {
 					const [listenerFn] = mockAddListener.mock.calls[0];
 					const spyPregnancyUpdate = jest.spyOn(womb as any, "onPregnancyUpdate");
 
-					const pregnancyData = { progress: 0.5 };
+					const pregnancyData = { progress: 0.5, current: 0 };
 					listenerFn(pregnancyData);
 					expect(spyPregnancyUpdate).toHaveBeenCalledWith(pregnancyData);
 				});
@@ -459,7 +459,7 @@ describe("Womb", () => {
 			(PregnancyState.get as jest.Mock).mockReturnValue(null);
 
 			const womb = new Womb();
-			womb.onPregnancyUpdate({ progress: 0 });
+			womb.onPregnancyUpdate({ progress: 0, current: 0 });
 
 			expect((womb as any).pregnancy).toBeNull();
 		});
@@ -472,7 +472,7 @@ describe("Womb", () => {
 			const initialAmount = womb.amount;
 			const initialCycleDay = womb.cycleDay;
 
-			womb.onPregnancyUpdate({ progress: 0.5 });
+			womb.onPregnancyUpdate({ progress: 0.5, current: 0 });
 
 			expect(womb.amount).toBe(initialAmount);
 			expect(womb.cycleDay).toBe(initialCycleDay);
@@ -485,7 +485,7 @@ describe("Womb", () => {
 			womb.onCreatePlayer(mockedPlayer());
 			const initialAmount = womb.amount;
 
-			womb.onPregnancyUpdate({ progress: 0.3 });
+			womb.onPregnancyUpdate({ progress: 0.3, current: 0 });
 
 			expect(womb.cycleDay).toBe(-WombOptions.recovery);
 			expect(womb.amount).toBe(initialAmount); // amount should NOT be reset when progress <= 0.5
@@ -498,7 +498,7 @@ describe("Womb", () => {
 			womb.onCreatePlayer(mockedPlayer());
 			expect(womb.amount).toBe(0.2);
 
-			womb.onPregnancyUpdate({ progress: 0.6 });
+			womb.onPregnancyUpdate({ progress: 0.6, current: 0 });
 			expect(womb.amount).toBe(0);
 		});
 	});
