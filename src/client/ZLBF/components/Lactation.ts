@@ -96,6 +96,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	}
 
 	onEveryMinute() {
+		this.moodle?.moodle(this.percentage, true);
 		triggerEvent(ZLBFEventsEnum.LACTATION_UPDATE, this.data);
 	}
 

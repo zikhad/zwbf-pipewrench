@@ -60,6 +60,7 @@ type ZLBFTabbedUI = {
 	open: () => void;
 	close: () => void;
 	setVisible: (visible: boolean) => void;
+	registerTab: (id: string, name: string) => void;
 	setActiveTab: (name: string) => void;
 	addText: (
 		id: string,

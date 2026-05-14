@@ -23,6 +23,7 @@ describe("ZLBFUI", () => {
 				setWidthPixel: jest.fn(),
 				setTitle: jest.fn(),
 				setVisible: jest.fn(),
+				registerTab: jest.fn(),
 				setActiveTab: jest.fn(),
 				addText: jest.fn(),
 				nextLine: jest.fn(),
@@ -145,6 +146,62 @@ describe("ZLBFUI", () => {
 				expect(isFemale).toHaveBeenCalled();
 			}
 		);
+
+		it("should register tabs dynamically for female players", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			(ui as any).onCreateUI();
+
+			(ui as any).onCreatePlayer(player);
+
+			const tabbedUI = newTabbedUI.mock.results[0].value;
+			expect(tabbedUI.registerTab).toHaveBeenCalledTimes(2);
+		});
+
+		it("should return early if UI is not initialized", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			const ui = new ZLBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			expect(() => (ui as any).onCreatePlayer(player)).not.toThrow();
+			// UI should not be set, so nothing should happen
+		});
+
+		it("should call setBorderToAllElements and saveLayout for female players", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			(ui as any).onCreateUI();
+
+			(ui as any).onCreatePlayer(player);
+
+			const tabbedUI = newTabbedUI.mock.results[0].value;
+			expect(tabbedUI.setBorderToAllElements).toHaveBeenCalledWith(true);
+			expect(tabbedUI.saveLayout).toHaveBeenCalled();
+		});
+
+		it("should set active tab to first tab if tabs[0] exists", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			(ui as any).onCreateUI();
+
+			(ui as any).onCreatePlayer(player);
+
+			const tabbedUI = newTabbedUI.mock.results[0].value;
+			// setActiveTab should be called for the first tab at the end
+			expect(tabbedUI.setActiveTab).toHaveBeenCalledWith(expect.any(String));
+		});
+
+		it("should not fail when tabs array is empty", () => {
+			const player = mockedPlayer({ isFemale: jest.fn().mockReturnValue(true) });
+			(ui as any).onCreateUI();
+			(ui as any).tabs = [];
+
+			expect(() => (ui as any).onCreatePlayer(player)).not.toThrow();
+
+			const tabbedUI = newTabbedUI.mock.results[0].value;
+			expect(tabbedUI.setBorderToAllElements).toHaveBeenCalledWith(true);
+			expect(tabbedUI.saveLayout).toHaveBeenCalled();
+		});
 	});
 
 	describe("Toggle UI", () => {
@@ -196,6 +253,86 @@ describe("ZLBFUI", () => {
 			(ui as any).UI = { isUIVisible: true };
 
 			expect(ui.isVisible()).toBe(true);
+		});
+	});
+
+	describe("Update UI", () => {
+		it("should return early when UI is not visible", () => {
+			const ui = new ZLBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			(ui as any).UI = { isUIVisible: false };
+
+			const tabUpdateSpy = jest.fn();
+			(ui as any).tabs = [{ update: tabUpdateSpy }];
+
+			(ui as any).onUpdateUI();
+
+			expect(tabUpdateSpy).not.toHaveBeenCalled();
+		});
+
+		it("should call tab.update for each tab when UI is visible", () => {
+			const ui = new ZLBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			const tabUpdate1 = jest.fn();
+			const tabUpdate2 = jest.fn();
+			const tab1 = { update: tabUpdate1 };
+			const tab2 = { update: tabUpdate2 };
+
+			(ui as any).UI = { isUIVisible: true };
+			(ui as any).tabs = [tab1, tab2];
+			(ui as any).player = mockedPlayer();
+
+			(ui as any).onUpdateUI();
+
+			expect(tabUpdate1).toHaveBeenCalledWith((ui as any).UI, expect.any(Object));
+			expect(tabUpdate2).toHaveBeenCalledWith((ui as any).UI, expect.any(Object));
+		});
+
+		it("should handle empty tabs without throwing", () => {
+			const ui = new ZLBFUI({
+				lactation: mock(),
+				pregnancy: mock(),
+				womb: mock()
+			});
+
+			(ui as any).UI = { isUIVisible: true };
+			(ui as any).tabs = [];
+
+			expect(() => (ui as any).onUpdateUI()).not.toThrow();
+		});
+
+		it("should pass correct context to tab.update", () => {
+			const lactation = mock() as any;
+			const pregnancy = mock() as any;
+			const womb = mock() as any;
+			const player = mockedPlayer();
+
+			const ui = new ZLBFUI({
+				lactation,
+				pregnancy,
+				womb
+			});
+
+			const tabUpdate = jest.fn();
+			(ui as any).UI = { isUIVisible: true };
+			(ui as any).tabs = [{ update: tabUpdate }];
+			(ui as any).player = player;
+
+			(ui as any).onUpdateUI();
+
+			const [, context] = tabUpdate.mock.calls[0];
+			expect(context.player).toBe(player);
+			expect(context.lactation).toBe(lactation);
+			expect(context.pregnancy).toBe(pregnancy);
+			expect(context.womb).toBe(womb);
 		});
 	});
 });

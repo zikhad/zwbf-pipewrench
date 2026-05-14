@@ -38,6 +38,21 @@ describe("PregnancyState", () => {
 		});
 	});
 
+	it("returns null if getStore().data is undefined", () => {
+		(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(true);
+		const player = mock<IsoPlayer>({
+			getModData: jest.fn(() => ({ ZLBFPregnancy: undefined }))
+		});
+		// Patch getStore to return { data: undefined }
+		const origGetStore = (PregnancyState as any).getStore;
+		(PregnancyState as any).getStore = () => ({ data: undefined });
+		try {
+			expect(PregnancyState.get(player)).toBeNull();
+		} finally {
+			(PregnancyState as any).getStore = origGetStore;
+		}
+	});
+
 	it("returns null when player is missing pregnancy trait", () => {
 		(CharacterTraitApi.hasTrait as jest.Mock).mockReturnValue(false);
 

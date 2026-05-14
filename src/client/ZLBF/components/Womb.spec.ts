@@ -8,6 +8,7 @@ import { Player } from "@client/components/Player";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mockedPlayer } from "@test/mock";
 import { PregnancyState } from "@client/components/PregnancyState";
+import { WombOptions } from "@client/SandboxOptions";
 
 // === Mocks ===
 jest.mock("@asledgehammer/pipewrench");
@@ -66,6 +67,23 @@ describe("Womb", () => {
 				expect(womb.fertility).toBe(0);
 				expect(womb.contraceptive).toBe(false);
 				expect(womb.phase).toBe("Recovery");
+			});
+
+			it("should apply nullish coalescing in onCreatePlayer when data.amount is falsy", () => {
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
+					capacity: 1,
+					amount: undefined, // falsy value to trigger ?? 0
+					total: 0,
+					cycleDay: 1,
+					fertility: 0,
+					onContraceptive: false,
+					chances: mockedModData().chances
+				});
+
+				const womb = new Womb();
+				womb.onCreatePlayer(mockedPlayer());
+
+				expect(womb.amount).toBe(0); // Should use the ?? 0 fallback
 			});
 		});
 
@@ -159,6 +177,28 @@ describe("Womb", () => {
 					addListener: mockAddListener
 				}));
 			});
+			describe("Pregnancy update", () => {
+				it("should register pregnancy update event listener", () => {
+					const womb = new Womb();
+					womb.onCreatePlayer(mockedPlayer());
+
+					expect(mockAddListener).toHaveBeenCalled();
+					// PREGNANCY_UPDATE is the first event (index 0)
+					expect(mockAddListener.mock.calls[0]).toHaveLength(1);
+				});
+				it("should call onPregnancyUpdate via event listener", () => {
+					const womb = new Womb();
+					womb.onCreatePlayer(mockedPlayer());
+
+					// Event order: PREGNANCY_UPDATE, INTERCOURSE, MENSTRUAL_EFFECTS
+					const [listenerFn] = mockAddListener.mock.calls[0];
+					const spyPregnancyUpdate = jest.spyOn(womb as any, "onPregnancyUpdate");
+
+					const pregnancyData = { progress: 0.5 };
+					listenerFn(pregnancyData);
+					expect(spyPregnancyUpdate).toHaveBeenCalledWith(pregnancyData);
+				});
+			});
 			describe("Intercourse", () => {
 				it("should call intercourse via event Listener", () => {
 					const womb = new Womb();
@@ -197,6 +237,38 @@ describe("Womb", () => {
 					}
 				);
 			});
+			describe("Menstrual effects", () => {
+				it("should call menstruationEffects via event listener", () => {
+					const womb = new Womb();
+					womb.onCreatePlayer(mockedPlayer());
+
+					// Event order: PREGNANCY_UPDATE, INTERCOURSE, MENSTRUAL_EFFECTS
+					const [listenerFn] = mockAddListener.mock.calls[2];
+					const spyMenstrualEffects = jest.spyOn(womb as any, "menstruationEffects");
+
+					listenerFn();
+					expect(spyMenstrualEffects).toHaveBeenCalled();
+				});
+			});
+			it("should return early when player is null", () => {
+				const womb = new Womb();
+				// Don't call onCreatePlayer, so womb.player is null
+				const spyHaloText = jest.spyOn(womb as any, "haloText");
+				
+				(womb as any).intercourse();
+				
+				expect(spyHaloText).not.toHaveBeenCalled();
+			});
+			it("should return early when pregnancy exists", () => {
+				(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.5 });
+				const womb = new Womb();
+				womb.onCreatePlayer(mockedPlayer());
+				const spyHaloText = jest.spyOn(womb as any, "haloText");
+				
+				(womb as any).intercourse();
+				
+				expect(spyHaloText).not.toHaveBeenCalled();
+			});
 		});
 	});
 
@@ -209,6 +281,23 @@ describe("Womb", () => {
 			(womb as any).impregnate();
 			expect(SpyPipeWrench.triggerEvent).toHaveBeenCalledWith(ZLBFEventsEnum.PREGNANCY_START);
 		});
+	it("should not start pregnancy when fertility is too low", () => {
+		const womb = new Womb();
+		jest.spyOn(womb, "fertility", "get").mockReturnValue(0);
+		
+		(womb as any).impregnate();
+		
+		expect(SpyPipeWrench.triggerEvent).not.toHaveBeenCalledWith(ZLBFEventsEnum.PREGNANCY_START);
+	});
+	it("should not start pregnancy when random is less than required threshold", () => {
+		const womb = new Womb();
+		jest.spyOn(womb, "fertility", "get").mockReturnValue(0.5);
+		jest.spyOn(SpyPipeWrench, "ZombRandFloat").mockReturnValue(0.3); // 0.3 < 1 - 0.5 (0.5)
+		
+		(womb as any).impregnate();
+		
+		expect(SpyPipeWrench.triggerEvent).not.toHaveBeenCalledWith(ZLBFEventsEnum.PREGNANCY_START);
+	});
 	});
 
 	// === Cycle Phase Tests ===
@@ -375,6 +464,33 @@ describe("Womb", () => {
 			expect((womb as any).pregnancy).toBeNull();
 		});
 
+		it("should return early when onPregnancyUpdate is called with no pregnancy", () => {
+			(PregnancyState.get as jest.Mock).mockReturnValue(null);
+
+			const womb = new Womb();
+			womb.onCreatePlayer(mockedPlayer());
+			const initialAmount = womb.amount;
+			const initialCycleDay = womb.cycleDay;
+
+			womb.onPregnancyUpdate({ progress: 0.5 });
+
+			expect(womb.amount).toBe(initialAmount);
+			expect(womb.cycleDay).toBe(initialCycleDay);
+		});
+
+		it("should update cycle day when pregnancy exists and progress <= 0.5", () => {
+			(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.3 });
+
+			const womb = new Womb();
+			womb.onCreatePlayer(mockedPlayer());
+			const initialAmount = womb.amount;
+
+			womb.onPregnancyUpdate({ progress: 0.3 });
+
+			expect(womb.cycleDay).toBe(-WombOptions.recovery);
+			expect(womb.amount).toBe(initialAmount); // amount should NOT be reset when progress <= 0.5
+		});
+
 		it("should reset amount to 0 when pregnancy progress > 0.5", () => {
 			(PregnancyState.get as jest.Mock).mockReturnValue({ progress: 0.6 });
 
@@ -491,6 +607,36 @@ describe("Womb", () => {
 			it("should add a cycleDay", () => {
 				womb.Debug.cycle.addDay();
 				expect(womb.cycleDay).toBe(2);
+			});
+			it("should handle recovery days (cycleDay < 0)", () => {
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
+					mockedModData({ cycleDay: -2 })
+				);
+				womb.Debug.cycle.addDay();
+				expect(womb.cycleDay).toBe(-1);
+			});
+			it("should transition from recovery day to cycle start", () => {
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
+					mockedModData({ cycleDay: -1 })
+				);
+				womb.Debug.cycle.addDay();
+				expect(womb.cycleDay).toBe(0);
+			});
+			it("should transition from near-zero to cycle start", () => {
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue(
+					mockedModData({ cycleDay: 0 })
+				);
+				womb.Debug.cycle.addDay();
+				expect(womb.cycleDay).toBe(1);
+			});
+			it("should add custom amount of days", () => {
+				womb.Debug.cycle.addDay(3);
+				expect(womb.cycleDay).toBe(4);
+			});
+			it("should reset contraceptive flag when adding day", () => {
+				womb.contraceptive = true;
+				womb.Debug.cycle.addDay();
+				expect(womb.contraceptive).toBe(false);
 			});
 			it.each([
 				{ cycleDay: 0, expectedDay: 1 },

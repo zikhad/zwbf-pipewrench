@@ -274,23 +274,38 @@ describe("Player class", () => {
 		const getAdditionalPain = jest.fn().mockReturnValue(0);
 		const setBleedingTime = jest.fn();
 		const getBleedingTime = jest.fn().mockReturnValue(0);
+		const setWetness = jest.fn();
+		const getWetness = jest.fn().mockReturnValue(0);
 
 		beforeEach(() => {
 			jest.clearAllMocks();
 			getAdditionalPain.mockReturnValue(0);
 			getBleedingTime.mockReturnValue(0);
+			getWetness.mockReturnValue(0);
 			(mockBodyPart as any).getAdditionalPain = getAdditionalPain;
 			(mockBodyPart as any).setAdditionalPain = setAdditionalPain;
 			(mockBodyPart as any).getBleedingTime = getBleedingTime;
 			(mockBodyPart as any).setBleedingTime = setBleedingTime;
+			(mockBodyPart as any).getWetness = getWetness;
+			(mockBodyPart as any).setWetness = setWetness;
 		});
 
 		class ConcretePlayerWithApplyDamage extends ConcretePlayer {
 			public testApplyDamage(
 				part: BodyPartType,
-				options?: Partial<{ pain: number; bleedTime: number }>
+				options?: Partial<{ pain: number; bleedTime: number; wetness: number }>
 			): void {
 				this.applyBodyEffect(part, options);
+			}
+		}
+
+		class ConcretePlayerWithApplyStat extends ConcretePlayer {
+			public testApplyStatEffect(options: {
+				stat: keyof typeof CharacterStat;
+				value: number;
+				maxValue?: number;
+			}): void {
+				this.applyStatEffect(options);
 			}
 		}
 
@@ -332,6 +347,14 @@ describe("Player class", () => {
 			expect(setBleedingTime).toHaveBeenCalledWith(8); // 5 + 3
 		});
 
+		it("should add wetness to existing wetness", () => {
+			getWetness.mockReturnValue(10);
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { wetness: 5 });
+			expect(setWetness).toHaveBeenCalledWith(15); // 10 + 5
+		});
+
 		it("should not apply negative pain values", () => {
 			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
 			instance.triggerOnCreatePlayer(mockPlayer);
@@ -359,7 +382,19 @@ describe("Player class", () => {
 			instance.testApplyDamage(BodyPartType.Groin, { bleedTime: 0 });
 			expect(setBleedingTime).not.toHaveBeenCalled();
 		});
+		it("should not apply zero wetness values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { wetness: 0 });
+			expect(setWetness).not.toHaveBeenCalled();
+		});
 
+		it("should not apply negative wetness values", () => {
+			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+			instance.testApplyDamage(BodyPartType.Groin, { wetness: -5 });
+			expect(setWetness).not.toHaveBeenCalled();
+		});
 		it("should do nothing if body part does not exist", () => {
 			(mockBodyDamage.getBodyPart as jest.Mock).mockReturnValue(null);
 			const instance = new ConcretePlayerWithApplyDamage("TEST_KEY");
@@ -381,6 +416,100 @@ describe("Player class", () => {
 			instance.testApplyDamage(BodyPartType.Groin);
 			expect(setAdditionalPain).not.toHaveBeenCalled();
 			expect(setBleedingTime).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("applyStatEffect", () => {
+		const mockStats = mock<any>({
+			get: jest.fn(),
+			set: jest.fn()
+		});
+
+		class ConcretePlayerWithApplyStat extends ConcretePlayer {
+			public testApplyStatEffect(options: {
+				stat: any;
+				value: number;
+				maxValue?: number;
+			}): void {
+				this.applyStatEffect(options);
+			}
+		}
+
+		beforeEach(() => {
+			jest.clearAllMocks();
+			(mockPlayer.getStats as jest.Mock).mockReturnValue(mockStats);
+		});
+
+		it("should apply stat increase with optional maxValue", () => {
+			const mockStats = mock<any>({
+				get: jest.fn().mockReturnValue(50),
+				set: jest.fn()
+			});
+			(mockPlayer.getStats as jest.Mock).mockReturnValue(mockStats);
+
+			const instance = new ConcretePlayerWithApplyStat("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+
+			instance.testApplyStatEffect({
+				stat: "Fitness" as any,
+				value: 20,
+				maxValue: 100
+			});
+
+			expect(mockStats.set).toHaveBeenCalled();
+		});
+
+		it("should return early if player is not defined", () => {
+			const instance = new ConcretePlayerWithApplyStat("TEST_KEY");
+			const mockStats = mock<any>({
+				get: jest.fn(),
+				set: jest.fn()
+			});
+
+			expect(() =>
+				instance.testApplyStatEffect({
+					stat: "Fitness" as any,
+					value: 20
+				})
+			).not.toThrow();
+			expect(mockStats.set).not.toHaveBeenCalled();
+		});
+
+		it("should return early if stats is not available", () => {
+			(mockPlayer.getStats as jest.Mock).mockReturnValue(null);
+			const instance = new ConcretePlayerWithApplyStat("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+
+			const mockStats = mock<any>({
+				get: jest.fn(),
+				set: jest.fn()
+			});
+
+			expect(() =>
+				instance.testApplyStatEffect({
+					stat: "Fitness" as any,
+					value: 20
+				})
+			).not.toThrow();
+			expect(mockStats.set).not.toHaveBeenCalled();
+		});
+
+		it("should apply stat increase without maxValue", () => {
+			const mockStats = mock<any>({
+				get: jest.fn().mockReturnValue(30),
+				set: jest.fn()
+			});
+			(mockPlayer.getStats as jest.Mock).mockReturnValue(mockStats);
+
+			const instance = new ConcretePlayerWithApplyStat("TEST_KEY");
+			instance.triggerOnCreatePlayer(mockPlayer);
+
+			instance.testApplyStatEffect({
+				stat: "Fitness" as any,
+				value: 15
+			});
+
+			expect(mockStats.set).toHaveBeenCalled();
 		});
 	});
 });

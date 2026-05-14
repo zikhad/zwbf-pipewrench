@@ -1,0 +1,85 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { LactationTab } from "@client/components/UI/tabs/LactationTab";
+import { ZLBFUIElements } from "@client/components/UI/ZLBFUIElements";
+import { ZLBFUITabContext } from "@client/components/UI/ZLBFUITabDefinition";
+import { mock } from "jest-mock-extended";
+import { Lactation } from "@client/components/Lactation";
+
+jest.mock("@asledgehammer/pipewrench", () => ({
+	getText: jest.fn().mockImplementation((key: string) => key)
+}));
+
+const makeUI = () => ({
+	addImage: jest.fn(),
+	addText: jest.fn(),
+	nextLine: jest.fn(),
+	[ZLBFUIElements.lactation.image]: { setPath: jest.fn() },
+	[ZLBFUIElements.lactation.level]: { setPath: jest.fn() }
+});
+
+describe("LactationTab", () => {
+	let tab: LactationTab;
+	let ui: ReturnType<typeof makeUI>;
+
+	beforeEach(() => {
+		tab = new LactationTab();
+		ui = makeUI();
+	});
+
+	it("has correct id", () => {
+		expect(tab.id).toBe("Lactation");
+	});
+
+	it("has correct titleKey", () => {
+		expect(tab.titleKey).toBe("IGUI_ZLBF_UI_Lactation_Title");
+	});
+
+	describe("build", () => {
+		it("adds boob image, title text, and level image", () => {
+			tab.build(ui as any, {});
+
+			expect(ui.addImage).toHaveBeenCalledWith(
+				ZLBFUIElements.lactation.image,
+				"media/ui/lactation/boobs/color-0/normal_empty.png"
+			);
+			expect(ui.addImage).toHaveBeenCalledWith(
+				ZLBFUIElements.lactation.level,
+				"media/ui/lactation/level/milk_level_0.png"
+			);
+			expect(ui.addText).toHaveBeenCalledWith(
+				ZLBFUIElements.lactation.title,
+				expect.any(String),
+				undefined,
+				"Center"
+			);
+			expect(ui.nextLine).toHaveBeenCalled();
+		});
+	});
+
+	describe("update", () => {
+		it("returns early when lactation is not in context", () => {
+			tab.update(ui as any, {});
+
+			expect((ui as any)[ZLBFUIElements.lactation.image].setPath).not.toHaveBeenCalled();
+			expect((ui as any)[ZLBFUIElements.lactation.level].setPath).not.toHaveBeenCalled();
+		});
+
+		it("updates breast and level images from lactation context", () => {
+			const lactation = mock<Lactation>();
+			(lactation as any).images = {
+				breasts: "path/to/breasts.png",
+				level: "path/to/level.png"
+			};
+
+			const context: ZLBFUITabContext = { lactation };
+			tab.update(ui as any, context);
+
+			expect((ui as any)[ZLBFUIElements.lactation.image].setPath).toHaveBeenCalledWith(
+				"path/to/breasts.png"
+			);
+			expect((ui as any)[ZLBFUIElements.lactation.level].setPath).toHaveBeenCalledWith(
+				"path/to/level.png"
+			);
+		});
+	});
+});

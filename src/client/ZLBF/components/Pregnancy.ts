@@ -20,7 +20,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		advance: (minutes: number) => {
 			if (!this.pregnancy) return;
 
-			const { current = 0 } = this.pregnancy;
+			const current = this.pregnancy.current ?? 0;
 			const { duration } = this.options;
 			const updated = Math.min(duration, current + minutes);			
 			PregnancyState.set(this.player, {
@@ -31,7 +31,7 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		},
 		advanceToLabor: () => {
 			if (!this.pregnancy) return;
-			const { current = 0 } = this.pregnancy;
+			const current = this.pregnancy.current ?? 0;
 			const { duration } = this.options;
 			this.Debug.advance(duration - current - 1);
 		}
@@ -99,13 +99,12 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 	private onLabor(_delta: number) {
 		this.applyBodyEffect(BodyPartType.Groin, { pain: 1, maxPain: 30 });
 	}
-
 	onEveryMinute(): void {
 		if (!this.pregnancy) return;
 		const { duration } = this.options;
-		const { current = 0 } = this.pregnancy;
+		const current = this.pregnancy.current ?? 0;
 		const previousInLabor = this.pregnancy.isInLabor ?? false;
-		const updated = Math.min(duration, current + 1);
+		const updated = current + 1 > duration ? duration : current + 1;
 		const isInLabor = updated == duration;
 		PregnancyState.set(this.player, {
 			current: updated,
@@ -115,7 +114,8 @@ export class Pregnancy extends Player<PregnancyData> implements TimedEvents {
 		if (isInLabor && !previousInLabor) {
 			this.player!.setBlockMovement(true);
 			ISTimedActionQueue.add(new ZLBFActionBirth(this));
-		}
+		}		
+		this.moodle?.moodle(this.pregnancy.progress, true);
 		triggerEvent(ZLBFEventsEnum.PREGNANCY_UPDATE, this.pregnancy);
 	}
 

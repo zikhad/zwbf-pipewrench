@@ -1,3 +1,168 @@
+
+
+describe("Moodle fallback and onlyMoodleFramework logic", () => {
+	let player: IsoPlayer;
+	beforeEach(() => {
+		jest.clearAllMocks();
+		player = mock<IsoPlayer>();
+	});
+
+	it("should NOT fallback if MF is inactive and onlyMoodleFramework is true", () => {
+		jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
+			mock<ArrayList>({
+				contains: jest.fn().mockReturnValue(false)
+			})
+		);
+		const fallbackSpy = jest.spyOn(Moodle.prototype as any, "fallbackMoodle");
+		const moodle = new Moodle({
+			name: "TestMoodle",
+			player,
+			texture: "test_texture.png",
+			type: "Good",
+			tresholds: [0, 0.25, 0.5, 0.75]
+		});
+		moodle.moodle(0.5, true);
+		expect(fallbackSpy).not.toHaveBeenCalled();
+	});
+
+	it("should NOT fallback if MF is active but getMoodle returns undefined and onlyMoodleFramework is true", () => {
+		jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
+			mock<ArrayList>({
+				contains: jest.fn().mockReturnValue(true)
+			})
+		);
+		Object.defineProperty(SpyPipewrench, "getTexture", {
+			value: jest.fn().mockReturnValue({}),
+			writable: true
+		});
+		Object.defineProperty(SpyPipewrench, "require", {
+			value: jest.fn(),
+			writable: true
+		});
+		(globalThis as any).MF = {
+			createMoodle: jest.fn(),
+			ISMoodle: { new: jest.fn() },
+			getMoodle: jest.fn(() => undefined)
+		};
+		const fallbackSpy = jest.spyOn(Moodle.prototype as any, "fallbackMoodle");
+		const moodle = new Moodle({
+			name: "TestMoodle",
+			player,
+			texture: "test_texture.png",
+			type: "Good",
+			tresholds: [0, 0.25, 0.5, 0.75]
+		});
+		moodle.moodle(0.5, true);
+		expect(fallbackSpy).not.toHaveBeenCalled();
+		// Clean up global
+		// @ts-ignore
+		delete (globalThis as any).MF;
+	});
+
+	it("should fallback if MF is active, getMoodle returns undefined, and onlyMoodleFramework is false", () => {
+		jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
+			mock<ArrayList>({
+				contains: jest.fn().mockReturnValue(true)
+			})
+		);
+		Object.defineProperty(SpyPipewrench, "getTexture", {
+			value: jest.fn().mockReturnValue({}),
+			writable: true
+		});
+		Object.defineProperty(SpyPipewrench, "require", {
+			value: jest.fn(),
+			writable: true
+		});
+		(globalThis as any).MF = {
+			createMoodle: jest.fn(),
+			ISMoodle: { new: jest.fn() },
+			getMoodle: jest.fn(() => undefined)
+		};
+		const fallbackSpy = jest.spyOn(Moodle.prototype as any, "fallbackMoodle");
+		const moodle = new Moodle({
+			name: "TestMoodle",
+			player,
+			texture: "test_texture.png",
+			type: "Good",
+			tresholds: [0, 0.25, 0.5, 0.75]
+		});
+
+		moodle.moodle(0.5);
+		expect(fallbackSpy).toHaveBeenCalledWith(0.5);
+
+		// Clean up global
+		// @ts-ignore
+		delete (globalThis as any).MF;
+	});
+});
+describe("MoodleFramework active: moodle can be called more often", () => {
+	let player: any;
+	let mfMoodle: any;
+	beforeEach(() => {
+		player = { id: 1 };
+		jest.spyOn(SpyPipewrench, "getActivatedMods").mockImplementation(() =>
+			mock<ArrayList>({
+				contains: jest.fn().mockImplementation((mod: string) => mod === "MoodleFramework")
+			})
+		);
+		Object.defineProperty(SpyPipewrench, "getTexture", {
+			value: jest.fn().mockReturnValue({
+				addDependency: jest.fn(),
+				bind: jest.fn(),
+				copyMaskRegion: jest.fn(),
+				createMask: jest.fn(),
+			} as unknown as MFTexture),
+			writable: true
+		});
+		Object.defineProperty(SpyPipewrench, "require", {
+			value: jest.fn(),
+			writable: true
+		});
+		mfMoodle = {
+			setThresholds: jest.fn(),
+			setPicture: jest.fn(),
+			getGoodBadNeutral: jest.fn(() => 2),
+			getLevel: jest.fn(() => 1),
+			setValue: jest.fn()
+		};
+		(globalThis as any).MF = {
+			createMoodle: jest.fn(),
+			ISMoodle: { new: jest.fn() },
+			getMoodle: jest.fn(() => mfMoodle)
+		};
+	});
+	afterEach(() => {
+		jest.restoreAllMocks();
+		// @ts-ignore
+		delete (globalThis as any).MF;
+	});
+	it("should call MF moodle logic every time moodle() is called", () => {
+		const moodle = new Moodle({
+			name: "TestMoodle",
+			player,
+			texture: "test_texture.png",
+			type: "Good",
+			tresholds: [0, 0.25, 0.5, 0.75]
+		});
+		moodle.moodle(0.1);
+		moodle.moodle(0.2);
+		moodle.moodle(0.3);
+		expect(mfMoodle.setValue).toHaveBeenCalledTimes(3);
+		expect(mfMoodle.setThresholds).toHaveBeenCalled();
+	});
+	it("should not fallback to HaloText when MF is active", () => {
+		const fallbackSpy = jest.spyOn(Moodle.prototype as any, "fallbackMoodle");
+		const moodle = new Moodle({
+			name: "TestMoodle",
+			player,
+			texture: "test_texture.png",
+			type: "Good",
+			tresholds: [0, 0.25, 0.5, 0.75]
+		});
+		moodle.moodle(0.5);
+		expect(fallbackSpy).not.toHaveBeenCalled();
+	});
+});
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mock } from "jest-mock-extended";
 import { Moodle } from "@client/components/Moodles";
