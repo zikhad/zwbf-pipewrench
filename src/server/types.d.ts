@@ -2,19 +2,19 @@ import { ArrayList, InventoryItem, IsoGameCharacter } from "@asledgehammer/pipew
 
 export type Fluid = "HumanMilk" | "Semen" | string;
 
-interface FluidContainer {
+export type FluidContainer = {
 	removeFluid(): void;
 	addFluid(type: any, amount: number): void;
 	getCapacity(): number;
-}
+};
 
-interface FluidContainerItem {
+export type FluidContainerItem = {
 	getFluidContainer(): FluidContainer;
-}
+};
 
-interface CraftRecipeData {
+export type CraftRecipeData = {
 	getInputItems(index: number): ArrayList;
-}
+};
 
 export type Recipe = {
 	OnTest: Record<string, (item: InventoryItem, character: IsoGameCharacter) => boolean>;

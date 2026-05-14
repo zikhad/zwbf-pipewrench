@@ -1,7 +1,7 @@
 import * as Events from "@asledgehammer/pipewrench-events";
-import { Lactation } from "./Lactation";
-import { Pregnancy } from "./Pregnancy";
-import { Womb } from "./Womb";
+import { Lactation } from "@client/components/Lactation";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Womb } from "@client/components/Womb";
 import { getSpecificPlayer, getText, isDebugEnabled, KahluaTable, triggerEvent } from "@asledgehammer/pipewrench";
 import { ISToolTip } from "@asledgehammer/pipewrench/client";
 import { ZLBFEventsEnum } from "@constants";
