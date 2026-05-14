@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.3.1...v1.4.0) (2026-05-14)
+
+
+### Features
+
+* **moodles:** changing pregnancy moodle timing ([dd9680b](https://github.com/zikhad/zwbf-pipewrench/commit/dd9680ba2983d0eb4642f06bbe083a3483d34231))
+* **moodles:** updating moodle logic ([1c33440](https://github.com/zikhad/zwbf-pipewrench/commit/1c33440872e85f0df40932d81073f023262ebcdd))
+* **pregnancy:** revamping pregnancy state logic ([8ea58e0](https://github.com/zikhad/zwbf-pipewrench/commit/8ea58e033ca1d984309c59b63f56a4be58c8a2cd))
+* **ui:** creating of tabbed layout ([a414206](https://github.com/zikhad/zwbf-pipewrench/commit/a4142065bf94b36c8cc7c9fa6e50ea380cf6d4f1))
+* **ui:** improving pregnancy Tab ui ([9e0089f](https://github.com/zikhad/zwbf-pipewrench/commit/9e0089f3e888c1360bd07631060622f8298d0993))
+* **ui:** improving Tabbed UI ([1de5479](https://github.com/zikhad/zwbf-pipewrench/commit/1de5479e2c7c657722bad8c7af2294f169b15b55))
+* **ui:** make tabbed layout extensible ([2cf103d](https://github.com/zikhad/zwbf-pipewrench/commit/2cf103d3d5b5c14d5cd9499aa253d1b413925b4c))
+
+
+### Bug Fixes
+
+* **lactation:** fix lactation increase over time ([d230799](https://github.com/zikhad/zwbf-pipewrench/commit/d230799393f93bfab7ca61e042fe9b8108b815e5))
+
 ### [1.3.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.3.0...v1.3.1) (2026-04-29)
 
 ## [1.3.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.2.0...v1.3.0) (2026-04-28)
