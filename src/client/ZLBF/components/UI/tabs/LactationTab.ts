@@ -7,7 +7,7 @@ import { ZLBFUITabContext, ZLBFUITabDefinition } from "@client/components/UI/ZLB
  */
 export class LactationTab extends ZLBFUITabDefinition {
 	readonly id = "Lactation";
-	readonly titleKey = "IGUI_ZLBF_UI_Lactation_Title";
+	readonly TITLE_KEY = "IGUI_ZLBF_UI_Lactation_Title";
 
 	build(ui: ZLBFTabbedUI, context: ZLBFUITabContext) {
 		ui.addImage(

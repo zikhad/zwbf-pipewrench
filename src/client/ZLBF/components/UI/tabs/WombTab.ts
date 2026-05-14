@@ -11,7 +11,7 @@ import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
  */
 export class WombTab extends ZLBFUITabDefinition {
 	readonly id = "Womb";
-	readonly titleKey = "IGUI_ZLBF_UI_Womb_Title";
+	readonly TITLE_KEY = "IGUI_ZLBF_UI_Womb_Title";
 
 	build(ui: ZLBFTabbedUI, context: ZLBFUITabContext) {
 		ui.nextLine();
