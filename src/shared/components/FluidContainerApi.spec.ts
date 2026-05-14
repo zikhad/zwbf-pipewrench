@@ -1,7 +1,7 @@
 import { mock } from "jest-mock-extended";
 import { InventoryItem } from "@asledgehammer/pipewrench";
-import { FluidContainerApi } from "./FluidContainerApi";
-import { Fluid } from "../../server/types";
+import { FluidContainerApi } from "@shared/components/FluidContainerApi";
+import { Fluid } from "@server/types";
 import { Fluids } from "@constants";
 
 const getMockedItem = ({
@@ -45,6 +45,38 @@ const getMockedItem = ({
 };
 
 describe("FluidContainerApi", () => {
+	describe("amount", () => {
+		it("should return amount when container exists", () => {
+			const mockItem = getMockedItem({ amount: 0.42 });
+
+			const api = new FluidContainerApi(mockItem);
+			expect(api.amount).toBe(0.42);
+		});
+
+		it("should return 0 when container does not exist", () => {
+			const mockItem = getMockedItem({ isFluidContainer: false });
+
+			const api = new FluidContainerApi(mockItem);
+			expect(api.amount).toBe(0);
+		});
+	});
+
+	describe("primaryFluid", () => {
+		it("should return primary fluid string when container exists", () => {
+			const mockItem = getMockedItem({ primaryFluid: Fluids.HUMAN_MILK });
+
+			const api = new FluidContainerApi(mockItem);
+			expect(api.primaryFluid).toBe(Fluids.HUMAN_MILK);
+		});
+
+		it("should return null when container does not exist", () => {
+			const mockItem = getMockedItem({ isFluidContainer: false });
+
+			const api = new FluidContainerApi(mockItem);
+			expect(api.primaryFluid).toBeNull();
+		});
+	});
+
 	describe("hasContainer", () => {
 		it("should return true when item exposes a fluid container", () => {
 			const mockItem = getMockedItem();
@@ -115,6 +147,17 @@ describe("FluidContainerApi", () => {
 	});
 
 	describe("fill", () => {
+		it("should use container capacity when amount is not provided", () => {
+			const addFluid = jest.fn();
+			const mockItem = getMockedItem({ addFluid, freeCapacity: 1.0, capacity: 0.4 });
+
+			const api = new FluidContainerApi(mockItem);
+			const amount = api.fill("TestFluid");
+
+			expect(amount).toBe(0.4);
+			expect(addFluid).toHaveBeenCalledWith("TestFluid", 0.4);
+		});
+
 		it("should add fluid when container has free capacity", () => {
 			const addFluid = jest.fn();
 			const mockItem = getMockedItem({ addFluid, freeCapacity: 1.0, capacity: 0.5 });
@@ -183,6 +226,18 @@ describe("FluidContainerApi", () => {
 	});
 
 	describe("clear", () => {
+		it("should call removeFluid with amount and once without args when amount is provided", () => {
+			const removeFluid = jest.fn();
+			const mockItem = getMockedItem({ removeFluid });
+
+			const api = new FluidContainerApi(mockItem);
+			api.clear(0.25);
+
+			expect(removeFluid).toHaveBeenNthCalledWith(1, 0.25);
+			expect(removeFluid).toHaveBeenNthCalledWith(2);
+			expect(removeFluid).toHaveBeenCalledTimes(2);
+		});
+
 		it("should call removeFluid when container exists", () => {
 			const removeFluid = jest.fn();
 			const mockItem = getMockedItem({ removeFluid });

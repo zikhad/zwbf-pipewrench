@@ -5,6 +5,7 @@
 		"prebuild": "npm run clean",
 		"build": "tstl -p ./tsconfig.build.json",
 		"postbuild": "node scripts/postbuild.js",
+		"playtest": "npm run build && node scripts/playtest.js",
 		"clean": "rimraf dist",
 		"check": "prettier --check . && eslint .",
 		"lint": "prettier --write . && eslint .",

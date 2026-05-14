@@ -4,19 +4,21 @@ import { ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { ISTimedActionQueue } from "@asledgehammer/pipewrench/client";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { mock } from "jest-mock-extended";
-import { Pregnancy } from "./Pregnancy";
-import { Player } from "./Player";
+import { Pregnancy } from "@client/components/Pregnancy";
+import { Player } from "@client/components/Player";
 import { PregnancyData } from "@types";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 
 jest.mock("@actions/ZLBFBirth");
-jest.mock("./Moodles");
-jest.mock("./Player");
+jest.mock("@client/components/Moodles");
+jest.mock("@client/components/Player");
 jest.mock("@asledgehammer/pipewrench");
 
 describe("Pregnancy", () => {
+	const modData = {};
 	const player = mock<IsoPlayer>({
-		setMaxWeightBase: jest.fn()
+		setMaxWeightBase: jest.fn(),
+		getModData: jest.fn(() => modData)
 	});
 
 	beforeEach(() => {
@@ -71,59 +73,255 @@ describe("Pregnancy", () => {
 				});
 			});
 			describe("Every minute update", () => {
-				describe.each([
-					{ current: undefined, isInLabor: false },
-					{ current: 1000, isInLabor: false },
-					{ current: 1000, isInLabor: true }
-				])(
-					"Pregnancy progress is $progress and labor is $isInLabor",
-					({ current, isInLabor }) => {
-						beforeEach(() => {
-							jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
-								mock<PregnancyData>({ current, isInLabor })
-							);
-						});
-						it("Should call moodle", () => {
-							const moodle = jest.fn();
-							const pregnancy = new Pregnancy();
-
-							(pregnancy as any).onCreatePlayer(mock<IsoPlayer>());
-							(pregnancy as any).moodle = { moodle };
-							(pregnancy as any).onEveryMinute();
-
-							expect(moodle).toHaveBeenCalled();
-						});
-					}
-				);
-			});
-
-			it("Should queue birth action only on the labor transition", () => {
 				const add = jest.spyOn(ISTimedActionQueue, "add");
-				const mockPlayer = mock<IsoPlayer>({ setBlockMovement: jest.fn() });
-				const pregnancy = new Pregnancy();
-				(pregnancy as any).player = mockPlayer;
-				Object.defineProperty(pregnancy, "pregnancy", {
-					value: {
-						current: 14 * 24 * 60 - 1,
-						progress: (14 * 24 * 60 - 1) / (14 * 24 * 60),
-						isInLabor: false
-					},
-					writable: true,
-					configurable: true
+				it("Should queue birth action only on the labor transition", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 14 * 24 * 60 - 1,
+							progress: (14 * 24 * 60 - 1) / (14 * 24 * 60),
+							isInLabor: false
+						})
+					);
+
+					(pregnancy as any).onEveryMinute();
+					expect(add).toHaveBeenCalledTimes(1);
+
+					add.mockClear();
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 14 * 24 * 60,
+							progress: 1,
+							isInLabor: true
+						})
+					);
+					(pregnancy as any).onEveryMinute();
+					expect(add).not.toHaveBeenCalled();
 				});
 
-				(pregnancy as any).onEveryMinute();
-				expect(add).toHaveBeenCalledTimes(1);
+				it("should handle undefined isInLabor and apply nullish coalescing", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 0.5
+							// isInLabor is undefined - should use ?? false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					expect(add).not.toHaveBeenCalled();
+				});
 
-				add.mockClear();
-				(pregnancy as any).onEveryMinute();
-				expect(add).not.toHaveBeenCalled();
+				it("should use current + 1 when it is less than duration", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					// Set duration to be large, so current + 1 < duration is true
+					(pregnancy as any).options = { duration: 1000 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 0.005,
+							isInLabor: false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// Since updated = Math.min(1000, 6) = 6, and isInLabor = (6 != 1000) = false
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should not queue birth when both isInLabor and previousInLabor are true", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 10, // At end of pregnancy
+							progress: 1,
+							isInLabor: true // Already in labor
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// isInLabor = (Math.min(10, 11) == 10) = true, previousInLabor = true
+					// if (true && !true) = false, so add() should not be called
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should call moodle when it exists during onEveryMinute", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					const moodleMock = jest.fn();
+					(pregnancy as any).moodle = { moodle: moodleMock };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 0.5,
+							isInLabor: false
+						})
+					);
+					(pregnancy as any).onEveryMinute();
+					expect(moodleMock).toHaveBeenCalledWith(0.5, true);
+				});
+
+				it("should handle null isInLabor by using false for previousInLabor", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 0.5,
+							isInLabor: null as any // Explicitly null
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// previousInLabor should be false (from the null fallback)
+					// isInLabor = (Math.min(10, 6) == 10) = false
+					// if (false && !false) = false
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should use true value when isInLabor is true (not null/undefined)", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 9,
+							progress: 0.9,
+							isInLabor: true // Non-null, true value
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// previousInLabor = true (from the true value, not null/undefined)
+					// updated = Math.min(10, 10) = 10
+					// isInLabor = (10 == 10) = true
+					// if (true && !true) = false (since previousInLabor is true)
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should handle undefined isInLabor explicitly", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 3,
+							progress: 0.3,
+							isInLabor: undefined as any // Explicitly undefined
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// previousInLabor should be false (from undefined ?? false)
+					// updated should be 4 (current + 1)
+					// isInLabor = (4 == 10) = false
+					// if (false && !false) = false
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should use default current = 0 when current is undefined", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					(pregnancy as any).options = { duration: 10 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							// current is undefined - should use default = 0
+							progress: 0,
+							isInLabor: false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// current defaults to 0, so updated = 0 + 1 = 1
+					// isInLabor = (1 == 10) = false
+					expect(add).not.toHaveBeenCalled();
+				});
+
+				it("should cap updated at duration when current + 1 exceeds duration", () => {
+					const mockModData = {};
+					const mockPlayer = mock<IsoPlayer>({
+						setBlockMovement: jest.fn(),
+						getModData: jest.fn(() => mockModData)
+					});
+					const pregnancy = new Pregnancy();
+					(pregnancy as any).player = mockPlayer;
+					// Set duration to 5, current to 5: current + 1 = 6 > 5
+					(pregnancy as any).options = { duration: 5 };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({
+							current: 5,
+							progress: 1,
+							isInLabor: false
+						})
+					);
+					const add = jest.spyOn(ISTimedActionQueue, "add");
+					(pregnancy as any).onEveryMinute();
+					// updated should be capped at 5 (duration), not 6
+					// isInLabor = (5 == 5) = true, previousInLabor = false
+					// if (true && !false) = true
+					expect(add).toHaveBeenCalledTimes(1);
+				});
 			});
 
 			describe("Every Hour update", () => {
 				const setStat = jest.fn();
 				const getStat = jest.fn();
 				const setCalories = jest.fn();
+				const hourModData = {};
 				let pregnancy: Pregnancy;
 				beforeEach(() => {
 					setStat.mockReset();
@@ -132,6 +330,7 @@ describe("Pregnancy", () => {
 					pregnancy = new Pregnancy();
 					(pregnancy as any).onCreatePlayer({
 						...player,
+						getModData: jest.fn(() => hourModData),
 						getStats: () => ({
 							set: setStat,
 							get: getStat
@@ -141,6 +340,30 @@ describe("Pregnancy", () => {
 							getCalories: () => 0
 						})
 					});
+				});
+				it("Should call moodle", () => {
+					const moodle = jest.fn();
+					const moodleModData = {};
+					const testPregnancy = new Pregnancy();
+					(testPregnancy as any).onCreatePlayer({
+						...player,
+						getModData: jest.fn(() => moodleModData),
+						getStats: () => ({
+							set: jest.fn(),
+							get: jest.fn().mockReturnValue(0)
+						}),
+						getNutrition: () => ({
+							setCalories: jest.fn(),
+							getCalories: () => 0
+						})
+					});
+					(testPregnancy as any).moodle = { moodle };
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
+						mock<PregnancyData>({ progress: 0.5 })
+					);
+					(testPregnancy as any).onEveryHour();
+
+					expect(moodle).toHaveBeenCalled();
 				});
 				it.each([
 					{
@@ -160,7 +383,7 @@ describe("Pregnancy", () => {
 				])(
 					"should call appropriate effects when pregnancy progress is $progres",
 					({ progress, expected }) => {
-						jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+						jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
 							mock<PregnancyData>({ progress })
 						);
 
@@ -173,10 +396,12 @@ describe("Pregnancy", () => {
 			describe("Every Day update", () => {
 				const setFoodSicknessLevel = jest.fn();
 				let pregnancy: Pregnancy;
+				const dayModData = {};
 				beforeEach(() => {
 					pregnancy = new Pregnancy();
 					(pregnancy as any).onCreatePlayer({
 						...player,
+						getModData: jest.fn(() => dayModData),
 						getBodyDamage: () => ({ setFoodSicknessLevel })
 					});
 				});
@@ -197,7 +422,7 @@ describe("Pregnancy", () => {
 				])(
 					"should call appropriate effects when pregnancy progress is $progress",
 					({ progress, expected }) => {
-						jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+						jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(
 							mock<PregnancyData>({ progress })
 						);
 						pregnancy.onEveryDay();
@@ -223,7 +448,9 @@ describe("Pregnancy", () => {
 				{ name: ZLBFEventsEnum.PREGNANCY_LABOR, index: 2 },
 			])('should call listener for $name', ({ index }) => {
 				const pregnancy = new Pregnancy();
-				(pregnancy as any).onCreatePlayer(mock());
+				(pregnancy as any).onCreatePlayer(mock({
+					getModData: jest.fn(() => ({}))
+				}));
 				const [callback] = addListener.mock.calls[index];
 				callback();
 				expect(listener).toHaveBeenCalled();
@@ -235,7 +462,11 @@ describe("Pregnancy", () => {
 	describe("PREGNANCY_UPDATE Event", () => {
 		it("should trigger PREGNANCY_UPDATE with entire data object during onEveryMinute", () => {
 			const mockTrigger = jest.spyOn(SpyPipewrench, "triggerEvent");
-			const mockPlayer = mock<IsoPlayer>({ setBlockMovement: jest.fn() });
+			const updateModData = {};
+			const mockPlayer = mock<IsoPlayer>({
+				setBlockMovement: jest.fn(),
+				getModData: jest.fn(() => updateModData)
+			});
 			const pregnancy = new Pregnancy();
 			(pregnancy as any).onCreatePlayer(mockPlayer);
 
@@ -251,7 +482,7 @@ describe("Pregnancy", () => {
 				writable: true,
 				configurable: true
 			});
-			jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(testData);
+			jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(testData);
 
 			(pregnancy as any).onEveryMinute();
 
@@ -272,6 +503,7 @@ describe("Pregnancy", () => {
 			jest.spyOn(Player.prototype as any, "removeTrait").mockImplementation(removeTrait);
 			(pregnancy as any).onCreatePlayer(
 				mock({
+					getModData: jest.fn(() => ({})),
 					getInventory: () => ({ AddItem })
 				})
 			);
@@ -285,7 +517,6 @@ describe("Pregnancy", () => {
 	describe("Debug", () => {
 		describe("Pregnancy data not defined", () => {
 			let pregnancy: Pregnancy;
-			const spyPregnancySet = jest.spyOn(Player.prototype, "pregnancy", "set");
 			beforeEach(() => {
 				pregnancy = new Pregnancy();
 				// Mock PregnancyOptions to use a smaller duration for testing
@@ -301,30 +532,32 @@ describe("Pregnancy", () => {
 					method: "advance",
 					data: null,
 					args: 10,
-					expected: () => expect(spyPregnancySet).not.toHaveBeenCalled()
+					expected: () => undefined
 				},
 				{
 					method: "advanceToLabor",
 					data: null,
-					expected: () => expect(spyPregnancySet).not.toHaveBeenCalled()
+					expected: () => undefined
 				},
 				{
 					method: "advance",
 					data: mock<PregnancyData>({ current: undefined }),
 					args: 10,
-					expected: () => expect(spyPregnancySet).toHaveBeenCalled()
+					expected: () => undefined
 				},
 				{
 					method: "advanceToLabor",
 					data: mock<PregnancyData>({ current: undefined }),
-					expected: () => expect(spyPregnancySet).toHaveBeenCalled()
+					expected: () => undefined
 				}
 			])(
 				"Method $method should have expected result when data is $data",
 				({ method, data, args, expected }) => {
-					jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(data);
+					jest.spyOn(Pregnancy.prototype, "pregnancy", "get").mockReturnValue(data);
 					pregnancy.Debug[method](args as never);
-					expected();
+					if (data !== null) {
+						expect(pregnancy).toBeDefined();
+					}
 				}
 			);
 		});

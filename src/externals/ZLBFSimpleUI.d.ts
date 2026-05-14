@@ -50,3 +50,31 @@ type ZLBFSimpleUI = ZLBFUIObject & { [id: string]: ZLBFUIElement };
 
 /** Create and register a new ZLBF panel window. */
 declare const NewZLBFUI: () => ZLBFSimpleUI;
+
+type ZLBFTabbedUI = {
+	isUIVisible: boolean;
+	yAct?: number;
+	setWidthPixel: (width: number) => void;
+	setTitle: (title: string) => void;
+	toggle: () => void;
+	open: () => void;
+	close: () => void;
+	setVisible: (visible: boolean) => void;
+	registerTab: (id: string, name: string) => void;
+	setActiveTab: (name: string) => void;
+	addText: (
+		id: string,
+		text: string,
+		font?: string,
+		position?: "Center" | "Left" | "Right"
+	) => void;
+	nextLine: () => void;
+	addProgressBar: (id: string, value: number, min: number, max: number) => void;
+	addButton: (id: string, text: string, callback: () => void) => void;
+	addImage: (id: string, imagePath: string) => void;
+	setBorderToAllElements: (border: boolean) => void;
+	saveLayout: () => void;
+} & { [id: string]: ZLBFUIElement | undefined };
+
+/** Create and register the tabbed ZLBF PoC window. */
+declare const NewZLBFTabbedUI: () => ZLBFTabbedUI;

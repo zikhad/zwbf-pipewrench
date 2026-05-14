@@ -1,13 +1,13 @@
 import { mock } from "jest-mock-extended";
 import { IsoGameCharacter, InventoryItem } from "@asledgehammer/pipewrench";
-import * as SpyZLBF from "../client/ZLBF/ZLBF";
+import * as SpyZLBF from "@client/ZLBF";
 
-import { ZLBFRecipes } from "./ZLBFRecipes";
+import { ZLBFRecipes } from "@server/ZLBFRecipes";
 import { Fluids } from "@constants";
-import { CraftRecipeData, Fluid } from "./types";
+import type { CraftRecipeData, Fluid } from "@server/types";
 
 jest.mock("@asledgehammer/pipewrench");
-jest.mock("../client/ZLBF/ZLBF", () => ({
+jest.mock("@client/ZLBF", () => ({
 	lactation: {
 		milkAmount: 0,
 		bottleAmount: 0,

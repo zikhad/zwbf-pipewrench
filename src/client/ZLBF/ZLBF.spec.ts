@@ -1,4 +1,4 @@
-import { lactation, womb, pregnancy, UI } from "./ZLBF";
+import { lactation, womb, pregnancy, UI } from "@client/ZLBF";
 
 jest.mock("@client/components/Lactation");
 jest.mock("@client/components/Womb");

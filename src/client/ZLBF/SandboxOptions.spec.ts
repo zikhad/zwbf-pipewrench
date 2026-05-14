@@ -1,4 +1,4 @@
-import { LactationOptions, PregnancyOptions, WombOptions } from "./SandboxOptions";
+import { LactationOptions, PregnancyOptions, WombOptions } from "@client/SandboxOptions";
 
 describe("SandboxOptions", () => {
 	afterEach(() => {

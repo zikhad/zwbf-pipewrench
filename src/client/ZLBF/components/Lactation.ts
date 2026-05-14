@@ -1,11 +1,12 @@
-import { BodyPartType, IsoPlayer, triggerEvent, ZombRand } from "@asledgehammer/pipewrench";
+import { BodyPartType, IsoPlayer, triggerEvent, ZombRand, ZombRandFloat } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import { LactationData, LactationImage as LactationImages, PregnancyData } from "@types";
+import { LactationData, LactationImages, PregnancyData } from "@types";
 import { percentageToNumber } from "@utils";
 import { ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { LactationOptions } from "@client/SandboxOptions";
-import { Player, TimedEvents } from "./Player";
-import { Moodle } from "./Moodles";
+import { Player, TimedEvents } from "@client/components/Player";
+import { Moodle } from "@client/components/Moodles";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 /**
  * Lactation management system for a player character.
@@ -20,8 +21,8 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 	private readonly CONSTANTS = {
 		MAX_LEVEL: 5,
 		AMOUNTS: {
-			MIN: 0.02,
-			MAX: 0.1
+			MIN: 0.002,
+			MAX: 0.01
 		}
 	};
 
@@ -64,22 +65,39 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 		Events.everyOneMinute.addListener(() => this.onEveryMinute());
 		Events.everyTenMinutes.addListener(() => this.onEveryTenMinutes());
 		Events.everyHours.addListener(() => this.onEveryHour());
+
+		new Events.EventEmitter<(data: PregnancyData) => void>(
+			ZLBFEventsEnum.PREGNANCY_UPDATE
+		).addListener((data) => this.onPregnancyUpdate(data));
+
+		new Events.EventEmitter<(data: LactationData) => void>(
+			ZLBFEventsEnum.LACTATION_UPDATE
+		).addListener((data) => this.onLactationUpdate(data));
+	}
+
+	private get pregnancy(): PregnancyData | null {
+		return PregnancyState.get(this.player);
 	}
 
 	onPregnancyUpdate(data: PregnancyData) {
-		super.onPregnancyUpdate(data);
 		if (!this.pregnancy) return;
 
-		const { progress } = this.pregnancy;
+		const { progress } = data;
 		if (progress < 0.5) return;
 		this.toggle(true);
 		this.useMilk(0, progress);
 	}
 
+	onLactationUpdate(data: LactationData) {
+		if (!this.isLactating) return;
+		const multiplier = 1 + this.multiplier;
+		const amount = ZombRandFloat(this.CONSTANTS.AMOUNTS.MIN, this.CONSTANTS.AMOUNTS.MAX) * multiplier;
+		this.milkAmount = Math.min(this.capacity, this.milkAmount + amount);
+	}
+
 	onEveryMinute() {
+		this.moodle?.moodle(this.percentage, true);
 		triggerEvent(ZLBFEventsEnum.LACTATION_UPDATE, this.data);
-		// Apply moodle
-		this.moodle?.moodle(this.percentage);
 	}
 
 	onEveryTenMinutes() {
@@ -96,13 +114,11 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 
 	onEveryHour() {
 		if (!this.isLactating) return;
-
-		const amount = ZombRand(this.CONSTANTS.AMOUNTS.MIN, this.CONSTANTS.AMOUNTS.MAX);
-		const multiplier = 1 + this.multiplier;
-
-		this.milkAmount = Math.min(this.capacity, this.milkAmount + amount * multiplier);
 		this.multiplier = Math.max(0, this.multiplier - 0.1);
 		this.expiration = Math.max(0, this.expiration - 1);
+
+		// Apply moodle
+		this.moodle?.moodle(this.percentage);
 
 		if (this.expiration === 0) this.toggle(false);
 	}
@@ -120,6 +136,7 @@ export class Lactation extends Player<LactationData> implements TimedEvents {
 				milkAmount: 0,
 				multiplier: 0
 			};
+			this.moodle?.moodle(0);
 		}
 	}
 

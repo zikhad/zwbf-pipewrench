@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs-extra");
-const { copyFolder, getInfo } = require("./utils");
+const { copyFolder, getInfo, sanitizeFolderName } = require("./utils");
 const { generateTranslations } = require("./utils/translations");
 
 /**
@@ -68,20 +68,6 @@ const formatBuild42Require = requireValue => {
 	}
 
 	return `\\${dependencies.join(",\\")}`;
-};
-
-/**
- * Sanitizes the mod name to a filesystem-safe folder name.
- * @param {string} value
- * @returns {string}
- */
-const sanitizeFolderName = value => {
-	const sanitized = value
-		.replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
-		.replace(/[.\s]+$/g, "")
-		.trim();
-
-	return sanitized || "mod";
 };
 
 /**

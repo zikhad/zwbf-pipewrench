@@ -1,4 +1,4 @@
-import { ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions } from "./ZLBFDistributions";
+import { ZLBF_DISTRIBUTION_RULES, applyZLBFDistributions } from "@server/ZLBFDistributions";
 
 jest.mock("@asledgehammer/pipewrench");
 

@@ -19,6 +19,7 @@
 		"paths": {
 			"@shared/components/*": ["shared/components/*"],
 			"@server/components/*": ["server/components/*"],
+			"@server/*": ["server/*"],
 			"@client/components/*": ["client/ZLBF/components/*"],
 			"@client/*": ["client/ZLBF/*"],
 			"@actions/*": ["client/ZLBF/Actions/*"],

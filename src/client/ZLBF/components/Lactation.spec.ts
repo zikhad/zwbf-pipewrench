@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Lactation } from "./Lactation";
-import { BodyPart } from "@asledgehammer/pipewrench";
+import { Lactation } from "@client/components/Lactation";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
-import * as SpyModData from "./ModData";
+import * as SpyModData from "@client/components/ModData";
 import { LactationData } from "@types";
-import { Player } from "./Player";
+import { ZLBFEventsEnum } from "@constants";
+import { Player } from "@client/components/Player";
 import { mockedPlayer } from "@test/mock";
-import { mock } from "jest-mock-extended";
+import { PregnancyState } from "@client/components/PregnancyState";
 
 jest.mock("@asledgehammer/pipewrench-events");
-jest.mock("./Moodles");
-jest.mock("./Player");
+jest.mock("@client/components/Moodles");
+jest.mock("@client/components/Player");
+jest.mock("@client/components/PregnancyState");
 
 const SpyHasTrait = jest.fn().mockReturnValue(false);
 
@@ -20,6 +21,7 @@ describe("Lactation", () => {
 		jest.clearAllMocks();
 		jest.resetModules();
 		SpyHasTrait.mockReset().mockReturnValue(false);
+		(PregnancyState.get as jest.Mock).mockReturnValue(null);
 	});
 
 	describe("Without player or data", () => {
@@ -83,11 +85,18 @@ describe("Lactation", () => {
 			});
 
 			describe("everyOneMinute event", () => {
-				it("should keep lactation active", () => {
+				it("should trigger LACTATION_UPDATE with current data", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
 					lactation.onEveryMinute();
-					expect(SpyPipewrench.triggerEvent).toHaveBeenCalled();
+					expect(SpyPipewrench.triggerEvent).toHaveBeenCalledWith(
+						ZLBFEventsEnum.LACTATION_UPDATE,
+						expect.objectContaining({
+							isActive: true,
+							milkAmount: 0.4,
+							multiplier: 0
+						})
+					);
 				});
 			});
 			describe("everyTenMinutes", () => {
@@ -105,7 +114,14 @@ describe("Lactation", () => {
 						.mockReturnValueOnce(data)
 						.mockReturnValue({ ...data, expiration: 0 });
 				});
-
+			it("Should call moodle", () => {
+				const moodle = jest.fn();
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
+				(lactation as any).moodle = { moodle };
+				lactation.onEveryHour();
+				expect(moodle).toHaveBeenCalled();
+			});
 				it("Should de-activate lactation when it expires", () => {
 					const lactation = new Lactation();
 					lactation.onCreatePlayer(mockedPlayer());
@@ -113,6 +129,70 @@ describe("Lactation", () => {
 					lactation.onEveryHour();
 					expect(lactation.isLactating).toBe(false);
 				});
+			});
+		});
+
+		describe("Lactation update event", () => {
+			it("should register PREGNANCY_UPDATE listener and call onPregnancyUpdate", () => {
+				const addListener = jest.fn();
+				jest.spyOn(Events, "EventEmitter").mockImplementation(() => ({ addListener }) as any);
+
+				const lactation = new Lactation();
+				const onPregnancyUpdateSpy = jest.spyOn(lactation, "onPregnancyUpdate");
+				lactation.onCreatePlayer(mockedPlayer());
+
+				expect(Events.EventEmitter).toHaveBeenCalledWith(ZLBFEventsEnum.PREGNANCY_UPDATE);
+				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+
+				const payload = { progress: 0.8 };
+				const [callback] = addListener.mock.calls[0];
+				callback(payload);
+
+				expect(onPregnancyUpdateSpy).toHaveBeenCalledWith(payload);
+			});
+
+			it("should register LACTATION_UPDATE listener and call onLactationUpdate", () => {
+				const addListener = jest.fn();
+				jest.spyOn(Events, "EventEmitter").mockImplementation(() => ({ addListener }) as any);
+
+				const lactation = new Lactation();
+				const onLactationUpdateSpy = jest.spyOn(lactation, "onLactationUpdate");
+				lactation.onCreatePlayer(mockedPlayer());
+
+				expect(Events.EventEmitter).toHaveBeenCalledWith(ZLBFEventsEnum.LACTATION_UPDATE);
+				expect(addListener).toHaveBeenCalledWith(expect.any(Function));
+
+				const payload: LactationData = {
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				};
+				const [callback] = addListener.mock.calls[1];
+				callback(payload);
+
+				expect(onLactationUpdateSpy).toHaveBeenCalledWith(payload);
+			});
+
+			it("onLactationUpdate should increase milk amount while lactating", () => {
+				jest.spyOn(SpyPipewrench, "ZombRandFloat").mockReturnValue(0.005);
+				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				});
+
+				const lactation = new Lactation();
+				lactation.onCreatePlayer(mockedPlayer());
+				lactation.onLactationUpdate({
+					isActive: true,
+					milkAmount: 0.4,
+					expiration: 8,
+					multiplier: 0
+				});
+
+				expect(lactation.milkAmount).toBeGreaterThan(0.4);
 			});
 		});
 
@@ -126,14 +206,19 @@ describe("Lactation", () => {
 			lactation.onCreatePlayer(mockedPlayer());
 			lactation.Debug.set(0.4);
 			lactation.Debug[operation](0.1);
+			expect(lactation.milkAmount).toBeCloseTo(expected);
 			});
 
-			it("should be able to toggle lactation", () => {
-				const lactation = new Lactation();
-				lactation.onCreatePlayer(mockedPlayer());
-				expect(lactation.isLactating).toBe(true);
-				lactation.Debug.toggle(false);
-				expect(lactation.isLactating).toBe(false);
+		it("should be able to toggle lactation and call moodle with 0", () => {
+			const moodle = jest.fn();
+			const lactation = new Lactation();
+			lactation.onCreatePlayer(mockedPlayer());
+			(lactation as any).moodle = { moodle };
+			expect(lactation.isLactating).toBe(true);
+			moodle.mockClear();
+			lactation.Debug.toggle(false);
+			expect(lactation.isLactating).toBe(false);
+			expect(moodle).toHaveBeenCalledWith(0);
 			});
 		});
 	});
@@ -156,6 +241,17 @@ describe("Lactation", () => {
 				expect(lactation.milkAmount).toBe(0);
 			}
 		);
+
+		it("onLactationUpdate should do nothing when not lactating", () => {
+			const lactation = new Lactation();
+			lactation.onLactationUpdate({
+				isActive: false,
+				milkAmount: 0,
+				expiration: 1,
+				multiplier: 0
+			});
+			expect(lactation.milkAmount).toBe(0);
+		});
 	});
 
 	describe("Timer Events", () => {
@@ -173,7 +269,6 @@ describe("Lactation", () => {
 				};
 				const player = mockedPlayer();
 				lactation = new Lactation();
-				(lactation as any)[handler] = jest.fn();
 				lactation.onCreatePlayer(player);
 			});
 			it(`should register ${event} listener during player creation`, () => {
@@ -196,7 +291,7 @@ describe("Lactation", () => {
 		])(
 			"Lactation should be $expected when pregnancy progress is: $progress",
 			({ progress, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+				(PregnancyState.get as jest.Mock).mockReturnValue(
 					progress ? { progress } : null
 				);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
@@ -210,7 +305,7 @@ describe("Lactation", () => {
 				lactation.onCreatePlayer(
 					mockedPlayer({ HasTrait: SpyHasTrait.mockImplementation(() => true) })
 				);
-				lactation.onPregnancyUpdate({ progress: progress ?? 0 });
+				lactation.onPregnancyUpdate({ progress: progress ?? 0, current: 0 });
 				expect(lactation.isLactating).toBe(expected);
 			}
 		);
@@ -277,7 +372,7 @@ describe("Lactation", () => {
 		])(
 			"returns correct image when state is $state and fullness is $fullness",
 			({ progress, amount, expected }) => {
-				jest.spyOn(Player.prototype, "pregnancy", "get").mockReturnValue(
+				(PregnancyState.get as jest.Mock).mockReturnValue(
 					progress ? { progress } : null
 				);
 				jest.spyOn(Player.prototype, "data", "get").mockReturnValue({
