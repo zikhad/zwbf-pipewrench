@@ -10,21 +10,21 @@ describe("ZLBFUITabDefinition", () => {
 	it("can be subclassed with concrete implementations", () => {
 		class TestTab extends ZLBFUITabDefinition {
 			readonly id = "Test";
-			readonly titleKey = "IGUI_TEST";
+			readonly TITLE_KEY = "IGUI_TEST";
 			build = jest.fn();
 			update = jest.fn();
 		}
 
 		const tab = new TestTab();
 		expect(tab.id).toBe("Test");
-		expect(tab.titleKey).toBe("IGUI_TEST");
+		expect(tab.TITLE_KEY).toBe("IGUI_TEST");
 		expect(tab).toBeInstanceOf(ZLBFUITabDefinition);
 	});
 
 	it("exposes build and update as callable methods", () => {
 		class TestTab extends ZLBFUITabDefinition {
 			readonly id = "Test";
-			readonly titleKey = "IGUI_TEST";
+			readonly TITLE_KEY = "IGUI_TEST";
 			build = jest.fn();
 			update = jest.fn();
 		}

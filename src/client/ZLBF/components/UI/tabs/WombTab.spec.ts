@@ -48,7 +48,7 @@ describe("WombTab", () => {
 	});
 
 	it("has correct titleKey", () => {
-		expect(tab.titleKey).toBe("IGUI_ZLBF_UI_Womb_Title");
+		expect(tab.TITLE_KEY).toBe("IGUI_ZLBF_UI_Womb_Title");
 	});
 
 	describe("build", () => {
@@ -91,6 +91,10 @@ describe("WombTab", () => {
 				0,
 				1
 			);
+			expect(ui.addImage).toHaveBeenCalledWith("fertility_egg_img", "media/ui/fertility/egg/egg.png", {
+				width: 26,
+				height: 26
+			});
 		});
 
 		it("adds fertility bar when no player is provided", () => {

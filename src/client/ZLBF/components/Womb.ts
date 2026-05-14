@@ -12,14 +12,17 @@ import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "@client/components/Player";
 import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { PregnancyState } from "@client/components/PregnancyState";
+import { percentageToNumber } from "@client/Utils";
 
 /**
  * Manages reproductive functions, fertility, and pregnancy-related variables
- * for a player character in the game. Handles cycle tracking, fertility logic,
- * and dynamic image rendering for different states.
+ * for a player character in the game. Handles cycle tracking, fertility logic.
  */
 export class Womb extends Player<WombData> implements TimedEvents {
 
+	private readonly CONSTANTS = {
+		fertilityLevel: 5,
+	}
 	private readonly options = {
 		recovery: WombOptions.recovery,
 		capacity: WombOptions.capacity
@@ -132,6 +135,35 @@ export class Womb extends Player<WombData> implements TimedEvents {
 
 	get fertility() {
 		return this.data?.fertility ?? 0;
+	}
+
+	get fertilityLevelImage() {
+		switch (this.phase) {
+			case CyclePhaseEnum.RECOVERY:
+				return "fertility_level_recovery.png";
+			case CyclePhaseEnum.PREGNANT:
+				if ((this.pregnancy?.progress ?? 0) >= 0.05) {
+					return "fertility_level_pregnant.png";
+				}
+				return "fertility_level_fertilized.png";
+			default:
+				const level = percentageToNumber(this.fertility * 100, this.CONSTANTS.fertilityLevel);
+				return `fertility_level_${level}.png`;
+		}
+	}
+
+	get fertilityEggImage() {
+		switch (this.phase) {
+			case CyclePhaseEnum.RECOVERY:
+				return "egg_recovery.png";
+			case CyclePhaseEnum.PREGNANT:
+				if ((this.pregnancy?.progress ?? 0) >= 0.05) {
+					return "egg_pregnant.png";
+				}
+				return "egg_fertilized.png";
+			default:
+				return "egg_default.png";
+		}
 	}
 
 	get phase() {

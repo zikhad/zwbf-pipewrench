@@ -29,6 +29,9 @@ export abstract class ZLBFUITabDefinition {
 	abstract readonly id: string;
 	/** Translation key for the tab's title. */
 	abstract readonly TITLE_KEY: string;
+	
+	/** Mapping of UI element identifiers to their keys. */
+	abstract readonly ELEMENTS: Record<string, string | Record<string, string>>;
 	/**
 	 * Build the tab's static UI elements.
 	 * @param ui - The tabbed UI instance.

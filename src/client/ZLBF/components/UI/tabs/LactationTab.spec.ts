@@ -17,6 +17,18 @@ const makeUI = () => ({
 	[ZLBFUIElements.lactation.level]: { setPath: jest.fn() }
 });
 
+const addSizedImage = (ui: Pick<ZLBFTabbedUI, "addImage">) => {
+	ui.addImage("test-image", "media/ui/test.png", { width: 128, height: 64 });
+};
+
+const addWidthOnlyImage = (ui: Pick<ZLBFTabbedUI, "addImage">) => {
+	ui.addImage("test-image", "media/ui/test.png", { width: 128 });
+};
+
+const addHeightOnlyImage = (ui: Pick<ZLBFTabbedUI, "addImage">) => {
+	ui.addImage("test-image", "media/ui/test.png", { height: 64 });
+};
+
 describe("LactationTab", () => {
 	let tab: LactationTab;
 	let ui: ReturnType<typeof makeUI>;
@@ -31,7 +43,7 @@ describe("LactationTab", () => {
 	});
 
 	it("has correct titleKey", () => {
-		expect(tab.titleKey).toBe("IGUI_ZLBF_UI_Lactation_Title");
+		expect(tab.TITLE_KEY).toBe("IGUI_ZLBF_UI_Lactation_Title");
 	});
 
 	describe("build", () => {
@@ -53,6 +65,37 @@ describe("LactationTab", () => {
 				"Center"
 			);
 			expect(ui.nextLine).toHaveBeenCalled();
+		});
+
+		it("accepts addImage options with width and height", () => {
+			const addImage = jest.fn();
+
+			addSizedImage({ addImage } as Pick<ZLBFTabbedUI, "addImage">);
+
+			expect(addImage).toHaveBeenCalledWith("test-image", "media/ui/test.png", {
+				width: 128,
+				height: 64
+			});
+		});
+
+		it("accepts width-only addImage options", () => {
+			const addImage = jest.fn();
+
+			addWidthOnlyImage({ addImage } as Pick<ZLBFTabbedUI, "addImage">);
+
+			expect(addImage).toHaveBeenCalledWith("test-image", "media/ui/test.png", {
+				width: 128
+			});
+		});
+
+		it("accepts height-only addImage options", () => {
+			const addImage = jest.fn();
+
+			addHeightOnlyImage({ addImage } as Pick<ZLBFTabbedUI, "addImage">);
+
+			expect(addImage).toHaveBeenCalledWith("test-image", "media/ui/test.png", {
+				height: 64
+			});
 		});
 	});
 
