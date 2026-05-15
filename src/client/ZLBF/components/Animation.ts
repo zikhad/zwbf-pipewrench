@@ -118,6 +118,11 @@ export class Animation {
                 steps: createArray(32),
                 loop: 1,
                 fullnessSupport: false
+            },
+            {
+                steps: createArray(13),
+                loop: 1,
+                fullnessSupport: false
             }
         ],
     };
