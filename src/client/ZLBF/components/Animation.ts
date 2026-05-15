@@ -1,29 +1,24 @@
+import { ZombRandBetween } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Womb } from "@client/components/Womb";
 import { createArray, percentageToNumber, repeatArray } from "@client/Utils";
 import { ITEMS, ZLBFEventsEnum } from "@constants";
 
-/** Identifies the type of animation to play. */
+/** External Identifiers of the type of animation to play. */
 export enum ANIMATIONS {
     INTERCOURSE = "intercourse",
     BIRTH = "birth",
     CUSTOM = "custom",
-    FERTILIZATION_0 = "fertilization-0",
-    FERTILIZATION_1 = "fertilization-1",
-    FERTILIZATION_2 = "fertilization-2",
-    FERTILIZATION_3 = "fertilization-3",
+    FERTILIZATION = "fertilization"
 }
 
-/** Internal keys mapping animation states to their frame sequences. */
+/** Internal keys mapping animation states to their frame sequences. (this will be mapped to the folders inside ui/animation) */
 enum ANIMATION_KEY {
     NORMAL = "normal",
     PREGNANT = "pregnant",
     CONDOM = "condom",
     BIRTH = "birth",
-    FERTILIZATION_0 = "fertilization-0",
-    FERTILIZATION_1 = "fertilization-1",
-    FERTILIZATION_2 = "fertilization-2",
-    FERTILIZATION_3 = "fertilization-3",
+    FERTILIZATION = "fertilization",
 }
 /**
  * Defines the frame steps and optional loop count for a given animation.
@@ -33,8 +28,9 @@ enum ANIMATION_KEY {
  */
 type AnimationSetting = { steps: number[], loop?: number, fullnessSupport?: boolean };
 
-/** Maps each animation key to its ordered frame steps and optional loop count. */
-type AnimationSettings = Record<ANIMATION_KEY, AnimationSetting>;
+
+/** Maps each animation key to its variant settings. */
+type AnimationSettings = Record<ANIMATION_KEY, AnimationSetting[]>;
 
 /**
  * Payload sent when an animation event fires.
@@ -45,6 +41,7 @@ type AnimationSettings = Record<ANIMATION_KEY, AnimationSetting>;
  */
 export type AnimationConfig = {
     animation: ANIMATIONS;
+    variant?: number;
     duration: number;
     delta: number;
     custom?: AnimationSetting & { path: string };
@@ -66,53 +63,63 @@ export class Animation {
     public static wombImage: string = "media/ui/womb/normal/womb_normal_0.png";
     private static isAnimationActive = false;
 
-    private readonly defaultAnimations: AnimationSettings = {
-        [ANIMATION_KEY.NORMAL]: {
-            steps: [
-                ...repeatArray([0, 1, 2, 3, 4, 3, 2, 1], 20),
-                ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-            ],
-            loop: 1,
-            fullnessSupport: true
-        },
-        [ANIMATION_KEY.PREGNANT]: {
-            steps: [
-                ...repeatArray([0, 1, 2, 3, 2, 1], 20),
-                ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-            ],
-            loop: 1,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.CONDOM]: {
-            steps: [0, 1, 2, 3, 4, 5, 6],
-            loop: 4,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.BIRTH]: {
-            steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-            loop: 1,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.FERTILIZATION_0]: {
-            steps: createArray(29),
-            loop: 1,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.FERTILIZATION_1]: {
-            steps: createArray(31),
-            loop: 1,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.FERTILIZATION_2]: {
-            steps: createArray(26),
-            loop: 1,
-            fullnessSupport: false
-        },
-        [ANIMATION_KEY.FERTILIZATION_3]: {
-            steps: createArray(32),
-            loop: 1,
-            fullnessSupport: false
-        }
+    static readonly defaultAnimations: AnimationSettings = {
+        [ANIMATION_KEY.NORMAL]: [
+            {
+                steps: [
+                    ...repeatArray([0, 1, 2, 3, 4, 3, 2, 1], 20),
+                    ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+                ],
+                loop: 1,
+                fullnessSupport: true
+            }
+        ],
+        [ANIMATION_KEY.PREGNANT]: [
+            {
+                steps: [
+                    ...repeatArray([0, 1, 2, 3, 2, 1], 20),
+                    ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                ],
+                loop: 1,
+                fullnessSupport: false
+            }
+        ],
+        [ANIMATION_KEY.CONDOM]: [
+            {
+                steps: [0, 1, 2, 3, 4, 5, 6],
+                loop: 4,
+                fullnessSupport: false
+            }
+        ],
+        [ANIMATION_KEY.BIRTH]: [
+            {
+                steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                loop: 1,
+                fullnessSupport: false
+            }
+        ],
+        [ANIMATION_KEY.FERTILIZATION]: [
+            {
+                steps: createArray(29),
+                loop: 1,
+                fullnessSupport: false
+            },
+            {
+                steps: createArray(31),
+                loop: 1,
+                fullnessSupport: false
+            },
+            {
+                steps: createArray(26),
+                loop: 1,
+                fullnessSupport: false
+            },
+            {
+                steps: createArray(32),
+                loop: 1,
+                fullnessSupport: false
+            }
+        ],
     };
 
     /**
@@ -125,6 +132,14 @@ export class Animation {
         new Events.EventEmitter<(data: AnimationConfig) => void>(ZLBFEventsEnum.ANIMATION).addListener((data) => this.onAnimation(data));
         new Events.EventEmitter(ZLBFEventsEnum.ANIMATION_STOP).addListener(() => this.onAnimationStop());
         new Events.EventEmitter(ZLBFEventsEnum.IMAGE).addListener(() => this.onImage());
+    }
+
+    static getRandomVariantNumber(animation: ANIMATIONS) {
+        switch (animation) {
+            case ANIMATIONS.FERTILIZATION:
+                return ZombRandBetween(0, Animation.defaultAnimations[ANIMATION_KEY.FERTILIZATION].length);
+            default: return 0;
+        }
     }
 
     /**
@@ -144,25 +159,19 @@ export class Animation {
      * @param key The animation to extract key from
      * @returns A valid animation key
      */
-    private animationKey(key: ANIMATIONS ): ANIMATION_KEY {
-        switch(key) {
+    private animationKey(key: ANIMATIONS): ANIMATION_KEY {
+        switch (key) {
             case ANIMATIONS.BIRTH:
                 return ANIMATION_KEY.BIRTH;
-            case ANIMATIONS.FERTILIZATION_0:
-                return ANIMATION_KEY.FERTILIZATION_0;
-            case ANIMATIONS.FERTILIZATION_1:
-                return ANIMATION_KEY.FERTILIZATION_1;
-            case ANIMATIONS.FERTILIZATION_2:
-                return ANIMATION_KEY.FERTILIZATION_2;
-            case ANIMATIONS.FERTILIZATION_3:
-                return ANIMATION_KEY.FERTILIZATION_3;
+            case ANIMATIONS.FERTILIZATION:
+                return ANIMATION_KEY.FERTILIZATION;
+            default:
+                const { pregnancy } = this.womb;
+                if (this.womb.hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
+                if (pregnancy && pregnancy.progress > 0.5) return ANIMATION_KEY.PREGNANT;
+
+                return ANIMATION_KEY.NORMAL;
         }
-        
-        const { pregnancy } = this.womb;
-        if (this.womb.hasItem(ITEMS.CONDOM)) return ANIMATION_KEY.CONDOM;
-        if (pregnancy && pregnancy.progress > 0.5) return ANIMATION_KEY.PREGNANT;
-        
-        return ANIMATION_KEY.NORMAL;
     }
 
     /**
@@ -171,30 +180,30 @@ export class Animation {
      * @param props.delta Animation delta time
      * @param props.duration The duration of the animation  
     * */
-    onAnimation({ animation, delta, duration, custom }: AnimationConfig) {
+    onAnimation({ animation, variant = 0, delta, duration, custom }: AnimationConfig) {
         Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
-        const baseConfig = custom ?? this.defaultAnimations[key];
-        const steps = baseConfig.steps;
-        const loop = baseConfig.loop ?? 1;
-        const fullnessSupport = baseConfig.fullnessSupport ?? false;
+
+        print(`[ZLBF] Animation event received: ${animation} (key: ${key}, variant: ${variant}, delta: ${delta}, duration: ${duration})`);
+
+        const config = custom ?? Animation.defaultAnimations[key][variant];
+        const path = custom?.path ?? `media/ui/animation`;
+        
+        const steps = config.steps;
+        const loop = config.loop ?? 1;
+        const fullnessSupport = config.fullnessSupport ?? false;
         const fullness = this.fullness;
         const loopDuration = duration / loop;
-        if (!steps.length) {
-            // Defensive: fallback to frame 0 if no steps are defined
-            const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
-            const path = custom?.path ?? `media/ui/animation`;
-            Animation.wombImage = `${path}/${animation}${fullnessPath}/0.png`;
-            return;
-        }
         const currentLoopDelta = (delta * duration) % loopDuration;
         const stepDuration = loopDuration / steps.length;
         const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
-        const step = steps[stepIndex];
+        
+        const step = steps[stepIndex] ?? 0;
         const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
-        const path = custom?.path ?? `media/ui/animation`;
         const animationName = (animation === ANIMATIONS.CUSTOM) ? "" : animation;
-        Animation.wombImage = `${path}/${animationName}${fullnessPath}/${step}.png`;
+        const variantName = (variant > 0) ? `-v${variant}` : "";
+        
+        Animation.wombImage = `${path}/${animationName}${fullnessPath}${variantName}/${step}.png`;
     }
 
     /** Marks the active animation as finished and re-enables idle image updates. */
@@ -202,7 +211,7 @@ export class Animation {
         Animation.isAnimationActive = false;
     }
 
-    
+
     /**
      * Returns the player's current reproductive status for still-image selection.
      * - `"pregnant"` when pregnancy progress exceeds 5 %.
@@ -224,15 +233,15 @@ export class Animation {
      */
     private get imageIndex() {
         const { pregnancy, amount, capacity } = this.womb;
-        if(pregnancy && pregnancy.progress > 0.05) {
+        if (pregnancy && pregnancy.progress > 0.05) {
             const percentage = (pregnancy.progress > 0.9 ? 1 : pregnancy.progress) * 100;
             return percentageToNumber(percentage, 6);
         }
-        if (amount === 0) return 0; 
+        if (amount === 0) return 0;
         const percentage = Math.floor((amount / capacity) * 100);
         const index = percentageToNumber(percentage, 17);
         return Math.max(1, index);
-        
+
     }
 
     /**
