@@ -119,11 +119,23 @@ export class Animation {
             {
                 steps: [0, 1, 2, 3, 4, 5, 6],
                 loop: 4
+            },
+            {
+                steps: createArray(30),
+                loop: 20
             }
         ],
         [ANIMATION_KEY.BIRTH]: [
             {
                 steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                loop: 1,
+            },
+            {
+                steps: createArray(20),
+                loop: 1,
+            },
+            {
+                steps: createArray(29),
                 loop: 1,
             }
         ],
