@@ -65,6 +65,7 @@ export type AnimationConfig = {
 export class Animation {
     /** The current womb image path, shared across all consumers. */
     public static wombImage: string = "media/ui/womb/normal/womb_normal_0.png";
+    public static variant = 0;
     private static isAnimationActive = false;
 
     static readonly defaultAnimations: AnimationSettings = {
@@ -138,6 +139,7 @@ export class Animation {
         private readonly womb: Womb
     ) {
         new Events.EventEmitter<(data: AnimationConfig) => void>(ZLBFEventsEnum.ANIMATION).addListener((data) => this.onAnimation(data));
+        new Events.EventEmitter(ZLBFEventsEnum.ANIMATION_START).addListener((animation: ANIMATIONS) => this.onAnimationStart(animation));
         new Events.EventEmitter(ZLBFEventsEnum.ANIMATION_STOP).addListener(() => this.onAnimationStop());
         new Events.EventEmitter(ZLBFEventsEnum.IMAGE).addListener(() => this.onImage());
     }
@@ -182,18 +184,25 @@ export class Animation {
         }
     }
 
+    onAnimationStart(animation: ANIMATIONS) {
+        Animation.variant = Animation.getRandomVariantNumber(animation);
+    }
+
+    private guardAnimationSetting(animationSetting: AnimationSetting[], variant: number): AnimationSetting {
+        return animationSetting[variant] ?? animationSetting[0];
+    }
     /**
      * Event that updates the image of womb animated version
      * @param props.animation The ENUM for the animation to be used
      * @param props.delta Animation delta time
      * @param props.duration The duration of the animation  
     * */
-    onAnimation({ animation, variant = 0, delta, duration, custom }: AnimationConfig) {
+    onAnimation({ animation, variant = Animation.variant, delta, duration, custom }: AnimationConfig) {
         Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
         
-        
-        const config = custom ?? Animation.defaultAnimations[key][variant];
+        this.guardAnimationSetting(Animation.defaultAnimations[key], variant);
+        const config = custom ?? this.guardAnimationSetting(Animation.defaultAnimations[key], variant);
         const path = custom?.path ?? `media/ui/animation`;
         
         const steps = config.steps;

@@ -159,6 +159,21 @@ This will check for condoms and handle intercourse based on current conditions
 ```lua
   triggerEvent("ZLBFPregnancyStart");
 ```
+#### `ZLBFWombAnimationStart`: Fire when an animation starts to select a valid random variant
+Fire during the `start()` lifecycle of animation actions. Passes the animation type. Use this to initialize animation state before the first frame is rendered.
+```lua
+  -- Fired automatically during animation action start
+  triggerEvent("ZLBFWombAnimationStart", "birth");
+```
+**Note for mod developers**: You can listen this trigger with the following:
+```lua
+  Events.ZLBFWombAnimationStart.Add(function(animationType --[[ string ]]) {
+    -- Called when animation initializes
+    -- animationType will be one of: "intercourse", "birth", "custom", "fertilization"
+    -- Use this to compute random variants before animation update loop starts
+  });
+```
+
 #### `ZLBFWombAnimation`: Triggers a womb animation
 Usually triggered inside a Update of a **Animation**
 ```lua

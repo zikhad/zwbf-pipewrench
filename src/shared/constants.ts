@@ -29,6 +29,7 @@ export enum ZLBFEventsEnum {
 	PREGNANCY_STOP = "ZLBFPregnancyStop",
 	PREGNANCY_LABOR = "ZLBFPregnancyLabor",
 	ANIMATION = "ZLBFWombAnimation",
+	ANIMATION_START = "ZLBFWombAnimationStart",
 	ANIMATION_STOP = "ZLBFWombAnimationStop",
 	IMAGE = "ZLBFWombImage"
 }
@@ -42,7 +43,6 @@ export enum ITEMS {
 	VAGINAL_DOUCHE = "ZLBF.VaginalDouche",
 	BREAST_PUMP = "ZLBF.BreastPump",
 	BABY = "ZLBF.Baby"
-
 }
 
 export const Fluids: Record<string, Fluid> = {

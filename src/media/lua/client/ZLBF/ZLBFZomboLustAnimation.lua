@@ -61,6 +61,10 @@ local function emitAnimationUpdate(action)
     })
 end
 
+local function emitAnimationStart(_action)
+    triggerEvent("ZLBFWombAnimationStart", "intercourse")
+end
+
 local function emitAnimationStop()
     triggerEvent("ZLBFWombAnimationStop")
 end
@@ -74,9 +78,20 @@ local function patchAnimationAction()
         return true
     end
 
+    local originalStart = ISZomboDesireAnimationAction.start
     local originalUpdate = ISZomboDesireAnimationAction.update
     local originalPerform = ISZomboDesireAnimationAction.perform
     local originalStop = ISZomboDesireAnimationAction.stop
+
+    function ISZomboDesireAnimationAction:start(...)
+        if originalStart then
+            originalStart(self, ...)
+        end
+
+        if isAllowedAction(self) then
+            emitAnimationStart(self)
+        end
+    end
 
     function ISZomboDesireAnimationAction:update(...)
         if originalUpdate then

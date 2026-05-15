@@ -2,7 +2,7 @@ import { mock } from "jest-mock-extended";
 import { IsoPlayer, ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { ZLBFActionPregnancyStartAnimation } from "@client/Actions/ZLBFPregnancyStartAnimation";
-import { Animation, ANIMATIONS } from "@client/components/Animation";
+import { ANIMATIONS } from "@client/components/Animation";
 import { ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench");
@@ -23,43 +23,35 @@ describe("ZLBFPregnancyStartAnimation", () => {
 		expect(action.isValid()).toBe(true);
 	});
 
-	it("update should emit animation payload with variant", () => {
+	it("update should emit animation payload without variant", () => {
 		action.start();
 		jest.spyOn(action, "getJobDelta").mockReturnValue(0.5);
-
 		action.update();
 
 		expect(spyTriggerEvent).toHaveBeenCalledWith(
 			ZLBFEventsEnum.ANIMATION,
 			expect.objectContaining({
 				animation: ANIMATIONS.FERTILIZATION,
-				variant: expect.any(Number),
 				delta: 0.5,
 				duration: 800
 			})
 		);
+
+		// variant is intentionally omitted; Animation.onAnimationStart sets Animation.variant
+		// via the ANIMATION_START event and onAnimation uses it as default
+		const callArgs = (spyTriggerEvent as jest.Mock).mock.calls.find(
+			(call) => call[0] === ZLBFEventsEnum.ANIMATION
+		);
+		expect(callArgs?.[1]).not.toHaveProperty("variant");
 	});
 
-	it("start should select a random fertilization variant", () => {
-		const numVariants = Animation.defaultAnimations["fertilization"].length;
-		const selectedVariants = new Set<number>();
+	it("start should emit ANIMATION_START with FERTILIZATION animation", () => {
+		action.start();
 
-		// Start multiple times to verify variant selection
-		for (let i = 0; i < Math.min(10, numVariants); i++) {
-			action.start();
-			action.update();
-
-			const callArgs = (spyTriggerEvent as jest.Mock).mock.calls.find(
-				(call) => call[0] === ZLBFEventsEnum.ANIMATION
-			);
-			if (callArgs) {
-				const variant = callArgs[1].variant;
-				expect(variant).toBeGreaterThanOrEqual(0);
-				expect(variant).toBeLessThanOrEqual(numVariants);
-				selectedVariants.add(variant);
-			}
-			jest.clearAllMocks();
-		}
+		expect(spyTriggerEvent).toHaveBeenCalledWith(
+			ZLBFEventsEnum.ANIMATION_START,
+			ANIMATIONS.FERTILIZATION
+		);
 	});
 
 	it("stop should trigger ANIMATION_STOP event", () => {

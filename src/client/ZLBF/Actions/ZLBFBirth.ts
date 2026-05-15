@@ -22,6 +22,7 @@ export class ZLBFActionBirth extends ISBaseTimedAction {
 	start() {
 		super.start();
 		this.setActionAnim(ZLBFAnimations.BIRTH, null);
+		triggerEvent(ZLBFEventsEnum.ANIMATION_START, ANIMATIONS.BIRTH);
 	}
 
 	update() {

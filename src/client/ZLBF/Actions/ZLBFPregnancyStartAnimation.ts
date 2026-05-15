@@ -1,10 +1,10 @@
 import { ISBaseTimedAction, IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
-import { ANIMATIONS, AnimationConfig, Animation } from "@client/components/Animation";
+import { ANIMATIONS, AnimationConfig } from "@client/components/Animation";
 import { ZLBFEventsEnum } from "@constants";
 
 export class ZLBFActionPregnancyStartAnimation extends ISBaseTimedAction {
 	private readonly animation = ANIMATIONS.FERTILIZATION;
-	private variant = 0;
+	// private variant = 0;
 	constructor(player: IsoPlayer) {
 		super(player);
 		super.derive("ZLBFActionPregnancyStartAnimation");
@@ -16,7 +16,7 @@ export class ZLBFActionPregnancyStartAnimation extends ISBaseTimedAction {
 
 	start() {
 		super.start();
-		this.variant = Animation.getRandomVariantNumber(this.animation);
+		triggerEvent(ZLBFEventsEnum.ANIMATION_START, this.animation);
 	}
 
 	isValid() {
@@ -27,7 +27,6 @@ export class ZLBFActionPregnancyStartAnimation extends ISBaseTimedAction {
 		super.update();
 		triggerEvent(ZLBFEventsEnum.ANIMATION, {
 			animation: this.animation,
-			variant: this.variant,
 			delta: this.getJobDelta(),
 			duration: this.maxTime
 		} as AnimationConfig);

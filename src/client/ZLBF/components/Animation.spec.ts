@@ -61,7 +61,7 @@ describe("Animation", () => {
 	// ─── Constructor ───────────────────────────────────────────────────────
 
 	describe("Constructor", () => {
-		it("should register listeners for ANIMATION, ANIMATION_STOP, and IMAGE events", () => {
+		it("should register listeners for ANIMATION, ANIMATION_START, ANIMATION_STOP, and IMAGE events", () => {
 			const womb = makeWomb();
 			new Animation(womb);
 
@@ -69,9 +69,10 @@ describe("Animation", () => {
 				([event]: [string]) => event
 			);
 			expect(calledEvents).toContain(ZLBFEventsEnum.ANIMATION);
+			expect(calledEvents).toContain(ZLBFEventsEnum.ANIMATION_START);
 			expect(calledEvents).toContain(ZLBFEventsEnum.ANIMATION_STOP);
 			expect(calledEvents).toContain(ZLBFEventsEnum.IMAGE);
-			expect(mockAddListener).toHaveBeenCalledTimes(3);
+			expect(mockAddListener).toHaveBeenCalledTimes(4);
 		});
 	});
 
@@ -235,7 +236,7 @@ describe("Animation", () => {
 			it("should fallback to frame 0 if custom steps array is empty", () => {
 				const womb = makeWomb();
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: false, path: "dummy/path" } });
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: [], path: "dummy/path" } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("dummy/path/intercourse/0.png");
 			});
@@ -243,7 +244,7 @@ describe("Animation", () => {
 			it("should use custom config with non-empty steps and custom path", () => {
 				const womb = makeWomb({ amount: 0.1, capacity: 1 });
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [5, 6, 7], loop: 1, fullnessSupport: false, path: "custom/test" } });
+				const config = intercourseStart({ custom: { steps: [5, 6, 7], loop: 1, fullnessSupport: [], path: "custom/test" } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("custom/test/intercourse/5.png");
 			});
@@ -251,7 +252,7 @@ describe("Animation", () => {
 			it("should use custom path and fullnessSupport true branch", () => {
 				const womb = makeWomb({ amount: 0.6, capacity: 1 });
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [2, 3, 4], loop: 1, fullnessSupport: true, path: "media/custom" } });
+				const config = intercourseStart({ custom: { steps: [2, 3, 4], loop: 1, fullnessSupport: ["full", "empty"], path: "media/custom" } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("media/custom/intercourse/full/2.png");
 			});
@@ -259,7 +260,7 @@ describe("Animation", () => {
 			it("should handle empty steps with fullnessSupport=true and custom path", () => {
 				const womb = makeWomb({ amount: 0.6, capacity: 1 });
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: true, path: "test/path" } });
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: ["full", "empty"], path: "test/path" } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("test/path/intercourse/full/0.png");
 			});
@@ -267,7 +268,7 @@ describe("Animation", () => {
 			it("should use default path when custom.path is undefined", () => {
 				const womb = makeWomb();
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [1, 2], loop: 1, fullnessSupport: false, path: undefined as any } });
+				const config = intercourseStart({ custom: { steps: [1, 2], loop: 1, fullnessSupport: [], path: undefined as any } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("media/ui/animation/intercourse/1.png");
 			});
@@ -275,7 +276,7 @@ describe("Animation", () => {
 			it("should handle empty steps with fullnessSupport=true and default path", () => {
 				const womb = makeWomb({ amount: 0.7, capacity: 1 });
 				const animation = new Animation(womb);
-				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: true, path: undefined as any } });
+				const config = intercourseStart({ custom: { steps: [], loop: 1, fullnessSupport: ["full", "empty"], path: undefined as any } });
 				animation.onAnimation(config);
 				expect(Animation.wombImage).toBe("media/ui/animation/intercourse/full/0.png");
 		});
@@ -298,7 +299,7 @@ describe("Animation", () => {
 		it("should handle fullnessSupport=false explicitly in custom config", () => {
 			const womb = makeWomb({ amount: 0.2, capacity: 1 });
 			const animation = new Animation(womb);
-			const config = intercourseStart({ custom: { steps: [1, 2, 3], loop: 1, fullnessSupport: false, path: "test" } });
+			const config = intercourseStart({ custom: { steps: [1, 2, 3], loop: 1, fullnessSupport: [], path: "test" } });
 			animation.onAnimation(config);
 			expect(Animation.wombImage).toBe("test/intercourse/1.png");
 		});
