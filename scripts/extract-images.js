@@ -52,6 +52,11 @@ program
     "--output <dir>",
     "Output directory",
   )
+  .option(
+    "--position <position>",
+    "Position for fill mode: top, bottom, left, right, center, top-left, top-right, bottom-left, bottom-right",
+    "center",
+  )
   .parse();
 
 const input = program.args[0];
@@ -148,14 +153,6 @@ if (extension !== ".gif") {
   ffmpegArgs.push(
     "-ss",
     options.starttime,
-  );
-}
-
-// GIF loop handling
-if (extension === ".gif") {
-  ffmpegArgs.push(
-    "-ignore_loop",
-    "0",
   );
 }
 
@@ -290,7 +287,7 @@ for (
         b: 0,
         alpha: 0,
       },
-      position: "center",
+      position: options.position,
     });
   }
 
