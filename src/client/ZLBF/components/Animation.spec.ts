@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as Events from "@asledgehammer/pipewrench-events";
+import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { Animation, AnimationConfig, ANIMATIONS } from "@client/components/Animation";
 import { Womb } from "@client/components/Womb";
 import { ITEMS, ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench-events");
+jest.mock("@asledgehammer/pipewrench");
 jest.mock("@client/components/Womb");
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -141,6 +143,52 @@ describe("Animation", () => {
 
 				expect(() => animation.onAnimation(intercourseStart())).not.toThrow();
 				expect(Animation.wombImage).toMatch(/^media\/ui\/animation\/intercourse\/\d+\.png$/);
+			});
+		});
+
+		describe("fertilization animation with variants", () => {
+			it("fertilization animation variant 0 should not add suffix", () => {
+				const womb = makeWomb();
+				const animation = new Animation(womb);
+
+				animation.onAnimation({
+					animation: ANIMATIONS.FERTILIZATION,
+					variant: 0,
+					delta: 0,
+					duration: 1000
+				});
+
+				expect(Animation.wombImage).toMatch(/fertilization/);
+				expect(Animation.wombImage).not.toMatch(/-v/);
+			});
+
+			it("fertilization animation variant 2 should include suffix", () => {
+				const womb = makeWomb();
+				const animation = new Animation(womb);
+
+				animation.onAnimation({
+					animation: ANIMATIONS.FERTILIZATION,
+					variant: 2,
+					delta: 0,
+					duration: 1000
+				});
+
+				expect(Animation.wombImage).toMatch(/-v2/);
+			});
+
+			it("should use correct frame count for variant", () => {
+				const womb = makeWomb();
+				const animation = new Animation(womb);
+
+				// Variant 1 has 31 frames
+				animation.onAnimation({
+					animation: ANIMATIONS.FERTILIZATION,
+					variant: 1,
+					delta: 0.5,
+					duration: 1000
+				});
+
+				expect(Animation.wombImage).toMatch(/fertilization.*-v1/);
 			});
 		});
 

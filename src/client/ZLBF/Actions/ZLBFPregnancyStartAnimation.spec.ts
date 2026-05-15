@@ -1,9 +1,8 @@
 import { mock } from "jest-mock-extended";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
-import { ISBaseTimedAction } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { ZLBFActionPregnancyStartAnimation } from "@client/Actions/ZLBFPregnancyStartAnimation";
-import { ANIMATIONS } from "@client/components/Animation";
+import { Animation, ANIMATIONS } from "@client/components/Animation";
 import { ZLBFEventsEnum } from "@constants";
 
 jest.mock("@asledgehammer/pipewrench");
@@ -14,6 +13,9 @@ describe("ZLBFPregnancyStartAnimation", () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+		// Setup ZombRandBetween on the mocked module before creating the action
+		(SpyPipewrench as any).ZombRandBetween = (min: number, max: number) => 
+			Math.floor(Math.random() * (max - min + 1)) + min;
 		action = new ZLBFActionPregnancyStartAnimation(mock<IsoPlayer>());
 	});
 
@@ -21,7 +23,8 @@ describe("ZLBFPregnancyStartAnimation", () => {
 		expect(action.isValid()).toBe(true);
 	});
 
-	it("update should emit animation payload", () => {
+	it("update should emit animation payload with variant", () => {
+		action.start();
 		jest.spyOn(action, "getJobDelta").mockReturnValue(0.5);
 
 		action.update();
@@ -30,10 +33,33 @@ describe("ZLBFPregnancyStartAnimation", () => {
 			ZLBFEventsEnum.ANIMATION,
 			expect.objectContaining({
 				animation: ANIMATIONS.FERTILIZATION,
+				variant: expect.any(Number),
 				delta: 0.5,
 				duration: 800
 			})
 		);
+	});
+
+	it("start should select a random fertilization variant", () => {
+		const numVariants = Animation.defaultAnimations["fertilization"].length;
+		const selectedVariants = new Set<number>();
+
+		// Start multiple times to verify variant selection
+		for (let i = 0; i < Math.min(10, numVariants); i++) {
+			action.start();
+			action.update();
+
+			const callArgs = (spyTriggerEvent as jest.Mock).mock.calls.find(
+				(call) => call[0] === ZLBFEventsEnum.ANIMATION
+			);
+			if (callArgs) {
+				const variant = callArgs[1].variant;
+				expect(variant).toBeGreaterThanOrEqual(0);
+				expect(variant).toBeLessThanOrEqual(numVariants);
+				selectedVariants.add(variant);
+			}
+			jest.clearAllMocks();
+		}
 	});
 
 	it("stop should trigger ANIMATION_STOP event", () => {
