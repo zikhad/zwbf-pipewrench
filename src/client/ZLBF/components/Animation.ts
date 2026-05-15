@@ -26,7 +26,11 @@ enum ANIMATION_KEY {
  * @property loop - Optional number of times the animation should repeat within its duration (default is 1).
  * @property fullnessSupport - Optional flag indicating if the animation has separate frames for "full" vs "empty" states. (default is false)
  */
-type AnimationSetting = { steps: number[], loop?: number, fullnessSupport?: boolean };
+type AnimationSetting = {
+    steps: number[],
+    loop?: number,
+    fullnessSupport?: ("full" | "empty")[]
+};
 
 
 /** Maps each animation key to its variant settings. */
@@ -71,7 +75,14 @@ export class Animation {
                     ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
                 ],
                 loop: 1,
-                fullnessSupport: true
+                fullnessSupport: ["empty", "full"]
+            },
+            {
+                steps: [
+                    ...createArray(171)
+                ],
+                loop: 1,
+                fullnessSupport: ["empty"]
             }
         ],
         [ANIMATION_KEY.PREGNANT]: [
@@ -80,49 +91,41 @@ export class Animation {
                     ...repeatArray([0, 1, 2, 3, 2, 1], 20),
                     ...[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
                 ],
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             }
         ],
         [ANIMATION_KEY.CONDOM]: [
             {
                 steps: [0, 1, 2, 3, 4, 5, 6],
-                loop: 4,
-                fullnessSupport: false
+                loop: 4
             }
         ],
         [ANIMATION_KEY.BIRTH]: [
             {
                 steps: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
                 loop: 1,
-                fullnessSupport: false
             }
         ],
         [ANIMATION_KEY.FERTILIZATION]: [
             {
                 steps: createArray(29),
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             },
             {
                 steps: createArray(31),
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             },
             {
                 steps: createArray(26),
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             },
             {
                 steps: createArray(32),
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             },
             {
                 steps: createArray(13),
-                loop: 1,
-                fullnessSupport: false
+                loop: 1
             }
         ],
     };
@@ -188,23 +191,23 @@ export class Animation {
     onAnimation({ animation, variant = 0, delta, duration, custom }: AnimationConfig) {
         Animation.isAnimationActive = true;
         const key = this.animationKey(animation);
-
-        print(`[ZLBF] Animation event received: ${animation} (key: ${key}, variant: ${variant}, delta: ${delta}, duration: ${duration})`);
-
+        
+        
         const config = custom ?? Animation.defaultAnimations[key][variant];
         const path = custom?.path ?? `media/ui/animation`;
         
         const steps = config.steps;
         const loop = config.loop ?? 1;
-        const fullnessSupport = config.fullnessSupport ?? false;
-        const fullness = this.fullness;
         const loopDuration = duration / loop;
         const currentLoopDelta = (delta * duration) % loopDuration;
         const stepDuration = loopDuration / steps.length;
         const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
-        
         const step = steps[stepIndex] ?? 0;
+        
+        const fullness = this.fullness;
+        const fullnessSupport = config.fullnessSupport?.includes(fullness) ?? false;
         const fullnessPath = (fullnessSupport) ? `/${fullness}` : "";
+        
         const animationName = (animation === ANIMATIONS.CUSTOM) ? "" : animation;
         const variantName = (variant > 0) ? `-v${variant}` : "";
         
