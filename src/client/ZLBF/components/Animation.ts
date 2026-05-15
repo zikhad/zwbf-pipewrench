@@ -8,7 +8,10 @@ export enum ANIMATIONS {
     INTERCOURSE = "intercourse",
     BIRTH = "birth",
     CUSTOM = "custom",
-    FERTILIZATION = "fertilization"
+    FERTILIZATION_0 = "fertilization-0",
+    FERTILIZATION_1 = "fertilization-1",
+    FERTILIZATION_2 = "fertilization-2",
+    FERTILIZATION_3 = "fertilization-3",
 }
 
 /** Internal keys mapping animation states to their frame sequences. */
@@ -17,7 +20,10 @@ enum ANIMATION_KEY {
     PREGNANT = "pregnant",
     CONDOM = "condom",
     BIRTH = "birth",
-    FERTILIZATION = "fertilization"
+    FERTILIZATION_0 = "fertilization-0",
+    FERTILIZATION_1 = "fertilization-1",
+    FERTILIZATION_2 = "fertilization-2",
+    FERTILIZATION_3 = "fertilization-3",
 }
 /**
  * Defines the frame steps and optional loop count for a given animation.
@@ -87,8 +93,23 @@ export class Animation {
             loop: 1,
             fullnessSupport: false
         },
-        [ANIMATION_KEY.FERTILIZATION]: {
-            steps: createArray(45),
+        [ANIMATION_KEY.FERTILIZATION_0]: {
+            steps: createArray(29),
+            loop: 1,
+            fullnessSupport: false
+        },
+        [ANIMATION_KEY.FERTILIZATION_1]: {
+            steps: createArray(31),
+            loop: 1,
+            fullnessSupport: false
+        },
+        [ANIMATION_KEY.FERTILIZATION_2]: {
+            steps: createArray(26),
+            loop: 1,
+            fullnessSupport: false
+        },
+        [ANIMATION_KEY.FERTILIZATION_3]: {
+            steps: createArray(32),
             loop: 1,
             fullnessSupport: false
         }
@@ -127,8 +148,14 @@ export class Animation {
         switch(key) {
             case ANIMATIONS.BIRTH:
                 return ANIMATION_KEY.BIRTH;
-            case ANIMATIONS.FERTILIZATION:
-                return ANIMATION_KEY.FERTILIZATION;
+            case ANIMATIONS.FERTILIZATION_0:
+                return ANIMATION_KEY.FERTILIZATION_0;
+            case ANIMATIONS.FERTILIZATION_1:
+                return ANIMATION_KEY.FERTILIZATION_1;
+            case ANIMATIONS.FERTILIZATION_2:
+                return ANIMATION_KEY.FERTILIZATION_2;
+            case ANIMATIONS.FERTILIZATION_3:
+                return ANIMATION_KEY.FERTILIZATION_3;
         }
         
         const { pregnancy } = this.womb;
