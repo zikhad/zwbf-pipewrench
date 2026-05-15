@@ -79,10 +79,22 @@ export class Animation {
                 fullnessSupport: ["empty", "full"]
             },
             {
-                steps: [
-                    ...createArray(171)
-                ],
+                steps: createArray(171),
                 loop: 1,
+                fullnessSupport: ["empty"]
+            },
+            {
+                steps: createArray(13),
+                loop: 20,
+                fullnessSupport: ["full"]
+            },
+            {
+                steps: createArray(29),
+                loop: 20
+            },
+            {
+                steps: createArray(30),
+                loop: 20,
                 fullnessSupport: ["empty"]
             }
         ],
