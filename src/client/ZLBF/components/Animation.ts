@@ -144,14 +144,6 @@ export class Animation {
         new Events.EventEmitter(ZLBFEventsEnum.IMAGE).addListener(() => this.onImage());
     }
 
-    static getRandomVariantNumber(animation: ANIMATIONS) {
-        switch (animation) {
-            case ANIMATIONS.FERTILIZATION:
-                return ZombRandBetween(0, Animation.defaultAnimations[ANIMATION_KEY.FERTILIZATION].length);
-            default: return 0;
-        }
-    }
-
     /**
      * Returns `"full"` when the womb holds more than half its capacity,
      * otherwise `"empty"`. Used to select the correct normal-animation folder.
@@ -185,7 +177,7 @@ export class Animation {
     }
 
     onAnimationStart(animation: ANIMATIONS) {
-        Animation.variant = Animation.getRandomVariantNumber(animation);
+        Animation.variant = ZombRandBetween(0, Animation.defaultAnimations[this.animationKey(animation)].length - 1);
     }
 
     private guardAnimationSetting(animationSetting: AnimationSetting[], variant: number): AnimationSetting {
