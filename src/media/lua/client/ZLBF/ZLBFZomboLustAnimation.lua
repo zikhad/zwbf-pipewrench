@@ -54,8 +54,7 @@ local function emitAnimationUpdate(action)
         delta = action:getJobDelta() or 0
     end
 
-    triggerEvent("ZLBFWombAnimation", {
-        animation = "intercourse",
+    triggerEvent("ZLBFWombAnimationUpdate", {
         delta = delta,
         duration = action.duration or 1
     })

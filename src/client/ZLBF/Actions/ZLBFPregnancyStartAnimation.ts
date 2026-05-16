@@ -1,5 +1,5 @@
 import { ISBaseTimedAction, IsoPlayer, triggerEvent } from "@asledgehammer/pipewrench";
-import { ANIMATIONS, AnimationConfig } from "@client/components/Animation";
+import { ANIMATIONS, AnimationUpdateConfig } from "@client/components/Animation";
 import { ZLBFEventsEnum } from "@constants";
 
 export class ZLBFActionPregnancyStartAnimation extends ISBaseTimedAction {
@@ -25,11 +25,10 @@ export class ZLBFActionPregnancyStartAnimation extends ISBaseTimedAction {
 
 	update() {
 		super.update();
-		triggerEvent(ZLBFEventsEnum.ANIMATION, {
-			animation: this.animation,
+		triggerEvent(ZLBFEventsEnum.ANIMATION_UPDATE, {
 			delta: this.getJobDelta(),
 			duration: this.maxTime
-		} as AnimationConfig);
+		} as AnimationUpdateConfig);
 	}
 
 	stop() {

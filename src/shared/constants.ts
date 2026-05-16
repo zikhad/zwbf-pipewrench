@@ -28,8 +28,8 @@ export enum ZLBFEventsEnum {
 	PREGNANCY_START = "ZLBFPregnancyStart",
 	PREGNANCY_STOP = "ZLBFPregnancyStop",
 	PREGNANCY_LABOR = "ZLBFPregnancyLabor",
-	ANIMATION = "ZLBFWombAnimation",
 	ANIMATION_START = "ZLBFWombAnimationStart",
+	ANIMATION_UPDATE = "ZLBFWombAnimationUpdate",
 	ANIMATION_STOP = "ZLBFWombAnimationStop",
 	IMAGE = "ZLBFWombImage"
 }

@@ -29,9 +29,8 @@ describe("ZLBFPregnancyStartAnimation", () => {
 		action.update();
 
 		expect(spyTriggerEvent).toHaveBeenCalledWith(
-			ZLBFEventsEnum.ANIMATION,
+			ZLBFEventsEnum.ANIMATION_UPDATE,
 			expect.objectContaining({
-				animation: ANIMATIONS.FERTILIZATION,
 				delta: 0.5,
 				duration: 800
 			})
@@ -40,7 +39,7 @@ describe("ZLBFPregnancyStartAnimation", () => {
 		// variant is intentionally omitted; Animation.onAnimationStart sets Animation.variant
 		// via the ANIMATION_START event and onAnimation uses it as default
 		const callArgs = (spyTriggerEvent as jest.Mock).mock.calls.find(
-			(call) => call[0] === ZLBFEventsEnum.ANIMATION
+			(call) => call[0] === ZLBFEventsEnum.ANIMATION_UPDATE
 		);
 		expect(callArgs?.[1]).not.toHaveProperty("variant");
 	});

@@ -74,6 +74,12 @@ Built-in debugging utilities for testing and development:
 - Pregnancy management (start/stop/advance)
 - All accessible through the `Debug` property on component instances
 
+## Installation
+
+1. Download the mod from the [releases page](https://github.com/zikhad/zwbf-pipewrench/releases)
+2. Extract to your Project Zomboid mods directory
+3. Enable "ZomboLust Being Female" in the mod menu
+
 ## 🦸‍♀️ Support!
 <hr/>
 <br/>
@@ -159,42 +165,39 @@ This will check for condoms and handle intercourse based on current conditions
 ```lua
   triggerEvent("ZLBFPregnancyStart");
 ```
-#### `ZLBFWombAnimationStart`: Fire when an animation starts to select a valid random variant
-Fire during the `start()` lifecycle of animation actions. Passes the animation type. Use this to initialize animation state before the first frame is rendered.
+#### `ZLBFWombAnimationStart`: Configure a animation to play
+Fire during the `start()` lifecycle of animation actions.
+You can pass either a predefined key of `ANIMATIONS` or a custom `AnimationSetting`.
+
+Predefined animation name:
 ```lua
-  -- Fired automatically during animation action start
   triggerEvent("ZLBFWombAnimationStart", "birth");
 ```
-**Note for mod developers**: You can listen this trigger with the following:
+
+Custom `AnimationSetting`:
 ```lua
-  Events.ZLBFWombAnimationStart.Add(function(animationType --[[ string ]]) {
-    -- Called when animation initializes
-    -- animationType will be one of: "intercourse", "birth", "custom", "fertilization"
-    -- Use this to compute random variants before animation update loop starts
-  });
+triggerEvent("ZLBFWombAnimationStart", {
+  name = "custom-animation", --[[ [required] Folder name of the animation ]]
+  steps = [0, 1, 2, 3, 4], --[[ [required] steps of the animation ]]
+  loop = 4, --[[ [optional] number of loops the animatiol will go through ]]
+  fullnessSupport = ["full", "empty"], --[[ [optional] will the animation support full / empty states ? ]]
+  pregnancy = true, --[[ [optional] will this trigger when character is pregnant  ]]
+  condom = true, --[[ [optional] will this trigger when character has a condom in their main inventory  ]]
+  path = "media/ui/animation/" --[[ [optional] path of the animation ]]
+});
 ```
+Examples of animation paths:
+- `media/ui/animation/custom-animation/empty/0.png`
+- `media/ui/animation/custom-animation/full/0.png`
+- `media/ui/animation/custom-animation/0.png`
+
 
 #### `ZLBFWombAnimation`: Triggers a womb animation
 Usually triggered inside a Update of a **Animation**
 ```lua
-  triggerEvent("ZLBFWombAnimation", {
-    animation = "intercourse" --[[ A valid womb animation ]],
-    delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
-    duration: 1 --[[ number - usualy the action.duration ]]
-  });
-```
-It can offer a custom animation support through the custom `param`, as follows
-```lua
-  triggerEvent("ZLBFWombAnimation", {
-    animation = "custom" --[[ A valid womb animation or "custom" for new animations]],
-    delta = 0.5 --[[ number - usually the action.getJobDelta() ]],
-    duration: 1 --[[ number - usualy the action.duration ]],
-    custom: {
-      steps = [0,1,2,3,4], -- the image name inside the folder must be 0.png, 1.png, ...
-      loop = true, -- can the animation be looped ?
-      fullnessSupport = true -- if true, the system will expect a full / empty folder
-      path = "media/ui/animation/path-example" -- final path of the animation will be media/ui/animation/path-example/full/0.png
-    }
+  triggerEvent("ZLBFWombAnimationUpdate", {
+    delta = 0.5 --[[ [required] - usually the action.getJobDelta() ]],
+    duration = 1 --[[ [required] - usualy the action.duration ]]
   });
 ```
 
@@ -210,12 +213,6 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 ```
 
 ---
-
-## Installation
-
-1. Download the mod from the [releases page](https://github.com/zikhad/zwbf-pipewrench/releases)
-2. Extract to your Project Zomboid mods directory
-3. Enable "ZomboLust Being Female" in the mod menu
 
 ## Building And Running The Mod
 
