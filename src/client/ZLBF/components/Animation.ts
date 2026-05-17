@@ -151,6 +151,11 @@ export class Animation {
                 name: "birth-v2",
                 steps: createArray(29),
                 loop: 1,
+            },
+            {
+                name: "birth-v3",
+                steps: createArray(76),
+                loop: 1,
             }
         ],
         [ANIMATIONS.FERTILIZATION]: [
