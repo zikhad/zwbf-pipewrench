@@ -365,13 +365,22 @@ describe("onAnimation", () => {
 			expect(Animation.wombImage).toBe("media/ui/womb/conception/womb_conception_0.png");
 		});
 
-		it("should set pregnant idle image and clamp high progress to last frame", () => {
-			const womb = makeWomb({ pregnancy: { progress: 0.95 } as PregnancyData });
+		it.each([
+			{
+				progress: 0.1,
+				expectedIndex: 0
+			},
+			{
+				progress: 0.95,
+				expectedIndex: 6
+			}
+		])("should set pregnant image to $expectedIndex whe progress is $progress", ({progress, expectedIndex}) => {
+			const womb = makeWomb({ pregnancy: { progress } as PregnancyData });
 			const animationInstance = new Animation(womb);
 
 			animationInstance.onImage();
 
-			expect(Animation.wombImage).toBe("media/ui/womb/pregnant/womb_pregnant_6.png");
+			expect(Animation.wombImage).toBe(`media/ui/womb/pregnant/womb_pregnant_${expectedIndex}.png`);
 		});
 	});
 });

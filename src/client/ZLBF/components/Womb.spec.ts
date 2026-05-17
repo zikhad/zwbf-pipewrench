@@ -598,6 +598,12 @@ describe("Womb", () => {
 
 				expect(womb.fertilityLevelStatus).toBe("pregnant");
 			});
+			it("returns pregnant image with pregnancy undefined (edge case)", () => {
+				const womb = new Womb();
+				jest.spyOn(womb, "phase", "get").mockReturnValue(CyclePhaseEnum.PREGNANT);
+
+				expect(womb.fertilityLevelStatus).toBe("fertilized");
+			});
 
 			it("maps fertility percentage to fertility level image for non-special phases", () => {
 				const womb = new Womb();

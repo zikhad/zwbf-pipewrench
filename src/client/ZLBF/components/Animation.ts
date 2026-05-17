@@ -259,7 +259,7 @@ export class Animation {
         const currentLoopDelta = (delta * duration) % loopDuration;
         const stepDuration = loopDuration / steps.length;
         const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
-        const step = steps[stepIndex] ?? 0;
+        const step = steps[stepIndex];
         
         const fullness = (this.womb.amount > (this.womb.capacity / 2)) ? "full" : "empty";
         const fullnessPath = (fullnessSupport.includes(fullness)) ? fullness : null;
