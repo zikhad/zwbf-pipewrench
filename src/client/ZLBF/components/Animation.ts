@@ -134,6 +134,12 @@ export class Animation {
                 loop: 20,
                 condom: true,
                 fullnessSupport: ["empty"]
+            },
+            {
+                name: "condom-v3",
+                steps: createArray(4),
+                loop: 30,
+                condom: true,
             }
         ],
         [ANIMATIONS.BIRTH]: [
