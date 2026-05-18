@@ -151,9 +151,18 @@ Events.ZLBFLactationUpdate.Add(function ({
     -- delta is a number between 0-1 that represents how far along the labor is
   });
 ```
+#### `ZLBFPregnancyStop`: Fired when pregnancy is forcefully stoped
+Fired when pregnancy is stopped (via debug or programmatic request, not through natural labor)
+```lua
+  Events.ZLBFPregnancyStop.Add(function () {
+    -- Pregnancy has ended; trigger any cleanup logic
+  });
+```
+
 ### Triggers
 #### `ZLBFIntercourse`: Trigger for intercourse event
-This will check for condoms and handle intercourse based on current conditions
+This will check for condoms and handle intercourse based on current conditions.
+Inject a random amount of semen in womb and trigger pregnancy based on fertility.
 ```lua
   triggerEvent("ZLBFIntercourse");
 ```
@@ -161,16 +170,19 @@ This will check for condoms and handle intercourse based on current conditions
 ```lua
   triggerEvent("ZLBFMenstrualEffects");
 ```
-#### `ZLBFPregnancyStart`: Trigge to start pregnancy
+#### `ZLBFPregnancyStart`: Trigger to start pregnancy
 ```lua
   triggerEvent("ZLBFPregnancyStart");
 ```
+
 #### `ZLBFWombAnimationStart`: Configure a animation to play
 Fire during the `start()` lifecycle of animation actions.
 You can pass either a predefined key of `ANIMATIONS` or a custom `AnimationSetting`.
 
 Predefined animation name:
 ```lua
+  triggerEvent("ZLBFWombAnimationStart", "intercourse");
+  triggerEvent("ZLBFWombAnimationStart", "fertilization");
   triggerEvent("ZLBFWombAnimationStart", "birth");
 ```
 
@@ -179,21 +191,23 @@ Custom `AnimationSetting`:
 triggerEvent("ZLBFWombAnimationStart", {
   name = "custom-animation", --[[ [required] Folder name of the animation ]]
   steps = [0, 1, 2, 3, 4], --[[ [required] steps of the animation ]]
-  loop = 4, --[[ [optional] number of loops the animatiol will go through ]]
+  loop = 4, --[[ [optional] number of loops the animation will go through ]]
   fullnessSupport = ["full", "empty"], --[[ [optional] will the animation support full / empty states ? ]]
+  birth = false,--[[ [optional] is this a birthing animation? ]]
+  fertilization = false, --[[ [optional] is this a fertilization animation? ]]
   pregnancy = true, --[[ [optional] will this trigger when character is pregnant  ]]
-  condom = true, --[[ [optional] will this trigger when character has a condom in their main inventory  ]]
-  path = "media/ui/animation/" --[[ [optional] path of the animation ]]
+  condom = false, --[[ [optional] will this trigger when character has a condom in their main inventory  ]]
+  path = "media/ui/animation/", --[[ [optional] path of the animation ]]
 });
 ```
 Examples of animation paths:
 - `media/ui/animation/custom-animation/empty/0.png`
 - `media/ui/animation/custom-animation/full/0.png`
 - `media/ui/animation/custom-animation/0.png`
+**NOTE:** `birth` and `fertilization` animations will bypass conditions, meaning `pregnancy` and `condom` only apply for `pregnancy` or default animations. (when none of them are defined)
 
-
-#### `ZLBFWombAnimation`: Triggers a womb animation
-Usually triggered inside a Update of a **Animation**
+#### `ZLBFWombAnimationUpdate`: Triggers a womb animation update
+Usually triggered inside a Update of a **Animation** to apply the animation delta
 ```lua
   triggerEvent("ZLBFWombAnimationUpdate", {
     delta = 0.5 --[[ [required] - usually the action.getJobDelta() ]],
@@ -211,6 +225,18 @@ This will update the `Animation.wombImage` based on current womb / pregnancy sta
 ```lua
   triggerEvent("ZLBFWombImage");
 ```
+
+### For Mod Integration Developers
+
+For comprehensive guidance on integrating other mods with ZomboLust Being Female—including event patterns, trait extensions, fluid mechanics, Lua UI components, and compatibility considerations—see the **[Mod Integrator Agent Guide](.github/agents/mod-integrator.agent.md)**.
+
+This agent provides:
+- **Event Integration Patterns**: How to listen to pregnancy, lactation, menstrual cycle, and labor updates.
+- **Trait Extensions**: Using ZLBF traits for custom gameplay.
+- **Animation Triggers**: Programmatically starting custom animations and intercourse sequences.
+- **Fluid Mechanics**: Accessing milk and sperm quantities through the mod API.
+- **Optional Mod Hooks**: ZomboLust and MoodleFramework integration patterns.
+- **Common Gotchas**: Timing, dependency checks and testing strategies.
 
 ---
 
@@ -258,10 +284,14 @@ If you are not familiar with Node.js, the short version is:
 
 ## Requirements
 
-- **Project Zomboid**: Build 41.78 or later
+- **Project Zomboid**: Build 42 or later
+
+### Recommendedd mods
+- [ZomboLust](https://www.loverslab.com/files/file/44539-project-zomboid-zombolust-zombodesire-framework/) - Sex Framework - Although not required, this will enable impregnation and womb animations
+- [ZomboRut](https://www.loverslab.com/topic/265927-project-zomboid-zomborut-%E2%80%94-b42-nsfw-sex-mod) - Sex Framework - Although not required, this will enable impregnation and womb animations
+**Note:** Those mods might not be compatible with each other, choose one.
 
 ### Optional Mods
-- [ZomboLust](https://www.loverslab.com/files/file/44539-project-zomboid-zombolust-zombodesire-framework/) - Although not required, this will enable impregnation and womb animations
 - [MoodleFramework](https://steamcommunity.com/sharedfiles/filedetails/?id=3396446795&searchtext=moodle+framework) - This mod will create custom moodles for **Being Female**
 
 ## Configuration
