@@ -10,9 +10,9 @@ import {
 import { WombOptions } from "@client/SandboxOptions";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Player, TimedEvents } from "@client/components/Player";
-import { CyclePhaseEnum, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
+import { CyclePhaseEnum, ITEMS, ZLBFEventsEnum, ZLBFTraitsEnum } from "@constants";
 import { PregnancyState } from "@client/components/PregnancyState";
-import { percentageToNumber } from "@client/Utils";
+import { percentageToNumber, trimModuleName } from "@client/Utils";
 
 /**
  * Manages reproductive functions, fertility, and pregnancy-related variables
@@ -204,10 +204,10 @@ export class Womb extends Player<WombData> implements TimedEvents {
 			text: `${getText("IGUI_ZLBF_UI_Sperm")} ${amountInMilliliters} ml`,
 			style: "good",
 		});
-		if (this.hasItem("ZLBF.Condom")) {
+		if (this.hasItem(ITEMS.CONDOM)) {
 			const inventory = this.player.getInventory();
-			inventory.Remove("Condom");
-			inventory.AddItem("ZLBF.CondomUsed");
+			inventory.Remove(trimModuleName(ITEMS.CONDOM)); // for whichever reason the remove method doesn't work with the module.name of the item.
+			inventory.AddItem(ITEMS.CONDOM_USED);
 		} else {
 			this.amount += amount;
 			this.total += amount;

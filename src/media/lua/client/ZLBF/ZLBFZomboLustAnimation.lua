@@ -48,14 +48,17 @@ local function isAllowedAction(action)
     return hasIncludedTag(tags)
 end
 
+local function emitAnimationStart(_action)
+    triggerEvent("ZLBFWombAnimationStart", "intercourse")
+end
+
 local function emitAnimationUpdate(action)
     local delta = 0
     if action.getJobDelta then
         delta = action:getJobDelta() or 0
     end
 
-    triggerEvent("ZLBFWombAnimation", {
-        animation = "intercourse",
+    triggerEvent("ZLBFWombAnimationUpdate", {
         delta = delta,
         duration = action.duration or 1
     })
@@ -74,9 +77,20 @@ local function patchAnimationAction()
         return true
     end
 
+    local originalStart = ISZomboDesireAnimationAction.start
     local originalUpdate = ISZomboDesireAnimationAction.update
     local originalPerform = ISZomboDesireAnimationAction.perform
     local originalStop = ISZomboDesireAnimationAction.stop
+
+    function ISZomboDesireAnimationAction:start(...)
+        if originalStart then
+            originalStart(self, ...)
+        end
+
+        if isAllowedAction(self) then
+            emitAnimationStart(self)
+        end
+    end
 
     function ISZomboDesireAnimationAction:update(...)
         if originalUpdate then

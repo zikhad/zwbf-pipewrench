@@ -1,6 +1,5 @@
 import { mock } from "jest-mock-extended";
-import { IsoPlayer } from "@asledgehammer/pipewrench";
-import { ISBaseTimedAction } from "@asledgehammer/pipewrench";
+import { IsoPlayer, ISBaseTimedAction } from "@asledgehammer/pipewrench";
 import * as SpyPipewrench from "@asledgehammer/pipewrench";
 import { ZLBFActionPregnancyStartAnimation } from "@client/Actions/ZLBFPregnancyStartAnimation";
 import { ANIMATIONS } from "@client/components/Animation";
@@ -14,6 +13,9 @@ describe("ZLBFPregnancyStartAnimation", () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
+		// Setup ZombRandBetween on the mocked module before creating the action
+		(SpyPipewrench as any).ZombRandBetween = (min: number, max: number) => 
+			Math.floor(Math.random() * (max - min + 1)) + min;
 		action = new ZLBFActionPregnancyStartAnimation(mock<IsoPlayer>());
 	});
 
@@ -21,18 +23,33 @@ describe("ZLBFPregnancyStartAnimation", () => {
 		expect(action.isValid()).toBe(true);
 	});
 
-	it("update should emit animation payload", () => {
+	it("update should emit animation payload without variant", () => {
+		action.start();
 		jest.spyOn(action, "getJobDelta").mockReturnValue(0.5);
-
 		action.update();
 
 		expect(spyTriggerEvent).toHaveBeenCalledWith(
-			ZLBFEventsEnum.ANIMATION,
+			ZLBFEventsEnum.ANIMATION_UPDATE,
 			expect.objectContaining({
-				animation: ANIMATIONS.FERTILIZATION,
 				delta: 0.5,
 				duration: 800
 			})
+		);
+
+		// variant is intentionally omitted; Animation.onAnimationStart sets Animation.variant
+		// via the ANIMATION_START event and onAnimation uses it as default
+		const callArgs = (spyTriggerEvent as jest.Mock).mock.calls.find(
+			(call) => call[0] === ZLBFEventsEnum.ANIMATION_UPDATE
+		);
+		expect(callArgs?.[1]).not.toHaveProperty("variant");
+	});
+
+	it("start should emit ANIMATION_START with FERTILIZATION animation", () => {
+		action.start();
+
+		expect(spyTriggerEvent).toHaveBeenCalledWith(
+			ZLBFEventsEnum.ANIMATION_START,
+			ANIMATIONS.FERTILIZATION
 		);
 	});
 
