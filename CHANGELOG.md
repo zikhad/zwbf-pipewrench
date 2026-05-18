@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.5.1...v1.6.0) (2026-05-18)
+
+
+### Features
+
+* **animation:** added new birthing animation ([902adcb](https://github.com/zikhad/zwbf-pipewrench/commit/902adcb2ffac07e8b595f43bf37736efd5a88b00))
+* **animation:** added new condom animation ([e54acee](https://github.com/zikhad/zwbf-pipewrench/commit/e54aceed6f696577fade5044fd970887c9feae39))
+* **animation:** added new condom animation ([d9931bb](https://github.com/zikhad/zwbf-pipewrench/commit/d9931bbd09bc2d967dd3f5e1eda9f7f841dee7d8))
+* **animation:** adding animations for intercourse ([d1af97d](https://github.com/zikhad/zwbf-pipewrench/commit/d1af97d1ecdde00cb9bf0d9175d85c98e76249d5))
+* **animation:** adding animations for pregnant intercourse ([4ea784b](https://github.com/zikhad/zwbf-pipewrench/commit/4ea784be4322026537dafcfc0409ea972d3dcd83))
+* **animation:** adding more birthing animations ([7406122](https://github.com/zikhad/zwbf-pipewrench/commit/7406122ec36e8d32c88f765d74420e316a2d4ad3))
+* **animation:** adding the listener for getting random variations of animations ([809f64b](https://github.com/zikhad/zwbf-pipewrench/commit/809f64be54043407582addc71db38ce189bbcd5f))
+* **animation:** update animation logic and created a start trigger logic ([1ee5b7d](https://github.com/zikhad/zwbf-pipewrench/commit/1ee5b7d2b1188d55c07c376bb471a1fd3db170ba))
+* **scripts:** adding support for endtime ([61d9650](https://github.com/zikhad/zwbf-pipewrench/commit/61d9650506ab789ebc5595b4eefe124c43a9b847))
+* **ui:** adding animation variation support ([4de39c6](https://github.com/zikhad/zwbf-pipewrench/commit/4de39c6ac61310019497bce14b69a4807c042b1a))
+* **ui:** adding fertilization animation variations images ([94a28d0](https://github.com/zikhad/zwbf-pipewrench/commit/94a28d07cf2c7af910ba9a6f458526720fc72327))
+* **ui:** adding fertilization animations ([63da4bc](https://github.com/zikhad/zwbf-pipewrench/commit/63da4bcdeab9617871f4138c04c54d72af782b89))
+* **ui:** adding new fertilization animation ([9510350](https://github.com/zikhad/zwbf-pipewrench/commit/9510350359b39500813a4eac49a74f53588d5091))
+* **ui:** adding new intercourse images ([02df005](https://github.com/zikhad/zwbf-pipewrench/commit/02df0052c383ffe8f85626128b10ece24eb8093d))
+* **ui:** creating a way to external mods to trigger animation variations ([c6aa250](https://github.com/zikhad/zwbf-pipewrench/commit/c6aa25016ea7b95c64069cafbce60c49c1ec94fb))
+
+
+### Bug Fixes
+
+* **animation:** fix animation to make sure variations works ([1adfb69](https://github.com/zikhad/zwbf-pipewrench/commit/1adfb69f2df9610eee7b051e4b9343086f73592c))
+
 ### [1.5.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.5.0...v1.5.1) (2026-05-15)
 
 
