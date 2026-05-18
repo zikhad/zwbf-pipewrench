@@ -152,24 +152,8 @@ describe("onAnimation", () => {
 
 				animationPregnant.onAnimationStart(ANIMATIONS.FERTILIZATION);
 				animationPregnant.onAnimation(updateAnimation());
-
-				// FERTILIZATION has no pregnancy-tagged variants, so selection is empty and update is a no-op.
-				expect(Animation.animation).toBeUndefined();
 				expect(Animation.wombImage).toBe("media/ui/animation/fertilization/0.png");
 			});
-
-			/*it("should use correct frame count for variant", () => {
-				const womb = makeWomb();
-				const animationInstance = new Animation(womb);
-
-				// Variant 1 has 31 frames
-				animationInstance.onAnimation({
-					delta: 0.5,
-					duration: 1000
-				});
-
-				expect(Animation.wombImage).toMatch(/fertilization.*-v1/);
-			});*/
 		});
 	});
 

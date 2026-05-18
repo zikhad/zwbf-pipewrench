@@ -23,6 +23,8 @@ type AnimationSetting = {
     steps: number[],
     loop?: number,
     fullnessSupport?: ("full" | "empty")[]
+    birth?: boolean
+    fertilization?: boolean
     pregnancy?: boolean
     condom?: boolean
     path?: string
@@ -141,52 +143,57 @@ export class Animation {
                 name: "birth",
                 steps: createArray(12),
                 loop: 1,
-                pregnancy: true,
+                birth: true,
             },
             {
                 name: "birth-v1",
                 steps: createArray(20),
                 loop: 1,
-                pregnancy: true,
+                birth: true,
             },
             {
                 name: "birth-v2",
                 steps: createArray(29),
                 loop: 1,
-                pregnancy: true,
+                birth: true,
             },
             {
                 name: "birth-v3",
                 steps: createArray(76),
                 loop: 1,
-                pregnancy: true,
+                birth: true,
             }
         ],
         [ANIMATIONS.FERTILIZATION]: [
             {
                 name: "fertilization",
                 steps: createArray(29),
-                loop: 1
+                loop: 1,
+                fertilization: true,
             },
             {
                 name: "fertilization-v1",
                 steps: createArray(31),
-                loop: 1
+                loop: 1,
+                fertilization: true,
             },
             {
                 name: "fertilization-v2",
                 steps: createArray(26),
-                loop: 1
+                loop: 1,
+                fertilization: true,
             },
             {
                 name: "fertilization-v3",
                 steps: createArray(32),
-                loop: 1
+                loop: 1,
+                fertilization: true,
             },
             {
                 name: "fertilization-v4",
                 steps: createArray(13),
-                loop: 1
+                loop: 1,
+                fertilization: true,
             }
         ],
     };
@@ -217,12 +224,17 @@ export class Animation {
         const isPregnant = this.pregnancyStatus === "pregnant";
         const fullness = this.fullness;
 
-        return animations.filter(({ condom, pregnancy, fullnessSupport }) => {
-            if (hasCondom && condom !== true) return false; /** Requires condom but variant does not support it */
-            if (!hasCondom && condom === true) return false; /** Does not require condom but variant requires it */
+        return animations.filter(({ condom, pregnancy, fullnessSupport, birth, fertilization }) => {
+            if (birth) return true; /** Birth animations are always available when triggered */
+            if (fertilization) return true; /** Fertilization animations are always available when triggered */
+            
             if (isPregnant && pregnancy !== true) return false; /** Is pregnant but variant does not support it */
             if (!isPregnant && pregnancy === true) return false; /** Is not pregnant but variant requires it */
+            if (hasCondom && condom !== true) return false; /** Requires condom but variant does not support it */
+            if (!hasCondom && condom === true) return false; /** Does not require condom but variant requires it */
+            
             if (fullnessSupport && !fullnessSupport.includes(fullness)) return false; /** Fullness does not match */
+
             return true;
         });
     }
