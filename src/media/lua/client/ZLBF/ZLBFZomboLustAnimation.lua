@@ -48,6 +48,10 @@ local function isAllowedAction(action)
     return hasIncludedTag(tags)
 end
 
+local function emitAnimationStart(_action)
+    triggerEvent("ZLBFWombAnimationStart", "intercourse")
+end
+
 local function emitAnimationUpdate(action)
     local delta = 0
     if action.getJobDelta then
@@ -58,10 +62,6 @@ local function emitAnimationUpdate(action)
         delta = delta,
         duration = action.duration or 1
     })
-end
-
-local function emitAnimationStart(_action)
-    triggerEvent("ZLBFWombAnimationStart", "intercourse")
 end
 
 local function emitAnimationStop()

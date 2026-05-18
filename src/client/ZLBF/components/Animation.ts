@@ -141,21 +141,25 @@ export class Animation {
                 name: "birth",
                 steps: createArray(12),
                 loop: 1,
+                pregnancy: true,
             },
             {
                 name: "birth-v1",
                 steps: createArray(20),
                 loop: 1,
+                pregnancy: true,
             },
             {
                 name: "birth-v2",
                 steps: createArray(29),
                 loop: 1,
+                pregnancy: true,
             },
             {
                 name: "birth-v3",
                 steps: createArray(76),
                 loop: 1,
+                pregnancy: true,
             }
         ],
         [ANIMATIONS.FERTILIZATION]: [
@@ -209,14 +213,16 @@ export class Animation {
      * @returns The filtered array of animation settings that match the player's current reproductive state.
      */
     private filterVariants(animations: AnimationSetting[]) {
-        const hasCondom = this.hasCondom;
+        const hasCondom = this.womb.hasItem(ITEMS.CONDOM);
         const isPregnant = this.pregnancyStatus === "pregnant";
+        const fullness = this.fullness;
 
-        return animations.filter(({ condom, pregnancy }) => {
+        return animations.filter(({ condom, pregnancy, fullnessSupport }) => {
             if (hasCondom && condom !== true) return false; /** Requires condom but variant does not support it */
             if (!hasCondom && condom === true) return false; /** Does not require condom but variant requires it */
             if (isPregnant && pregnancy !== true) return false; /** Is pregnant but variant does not support it */
             if (!isPregnant && pregnancy === true) return false; /** Is not pregnant but variant requires it */
+            if (fullnessSupport && !fullnessSupport.includes(fullness)) return false; /** Fullness does not match */
             return true;
         });
     }
@@ -237,6 +243,10 @@ export class Animation {
         } else {
             Animation.animation = animation;
         }
+    }
+
+    private get fullness() {
+        return (this.womb.amount > (this.womb.capacity / 2)) ? "full" : "empty";
     }
 
     /**
@@ -261,10 +271,11 @@ export class Animation {
         const stepIndex = Math.floor(currentLoopDelta / stepDuration) % steps.length;
         const step = steps[stepIndex];
         
-        const fullness = (this.womb.amount > (this.womb.capacity / 2)) ? "full" : "empty";
+        const fullness = this.fullness;
         const fullnessPath = (fullnessSupport.includes(fullness)) ? fullness : null;
 
-		Animation.wombImage = `${[path, name, fullnessPath, step].filter((part => part !== null)).join("/")}.png`;
+		const finalPath = [path, name, fullnessPath].filter((part) => part !== null).join("/");
+        Animation.wombImage = `${finalPath}/${step}.png`;
     }
 
     /** Marks the active animation as finished and re-enables idle image updates. */
@@ -284,11 +295,6 @@ export class Animation {
         if (!pregnancy) return "normal";
         if (pregnancy.progress > 0.05) return "pregnant";
         return "conception";
-    }
-
-    private get hasCondom() {
-        const { hasItem } = this.womb;
-        return hasItem(ITEMS.CONDOM);
     }
 
     /**
