@@ -191,7 +191,7 @@ describe("WombTab", () => {
 			(womb as any).fertility = 0.5;
 			(womb as any).amount = 0;
 			(womb as any).total = 0;
-			(womb as any).fertilityLevelStatus = 3;
+			(womb as any).fertilityLevelStatus = "pregnant";
 			const player = mockedPlayer();
 			mockHasTrait.mockReturnValue(false);
 

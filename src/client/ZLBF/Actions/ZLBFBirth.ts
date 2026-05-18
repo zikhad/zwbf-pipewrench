@@ -1,5 +1,5 @@
 import { ISBaseTimedAction, triggerEvent } from "@asledgehammer/pipewrench";
-import { AnimationConfig, ANIMATIONS } from "@client/components/Animation";
+import { AnimationUpdateConfig, ANIMATIONS } from "@client/components/Animation";
 import { Pregnancy } from "@client/components/Pregnancy";
 import { ZLBFAnimations, ZLBFEventsEnum } from "@constants";
 
@@ -22,17 +22,17 @@ export class ZLBFActionBirth extends ISBaseTimedAction {
 	start() {
 		super.start();
 		this.setActionAnim(ZLBFAnimations.BIRTH, null);
+		triggerEvent(ZLBFEventsEnum.ANIMATION_START, ANIMATIONS.BIRTH);
 	}
 
 	update() {
 		super.update();
 		const delta = this.getJobDelta();
 		triggerEvent(ZLBFEventsEnum.PREGNANCY_LABOR, delta);
-		triggerEvent(ZLBFEventsEnum.ANIMATION, {
-			animation: ANIMATIONS.BIRTH,
+		triggerEvent(ZLBFEventsEnum.ANIMATION_UPDATE, {
 			delta,
 			duration: this.maxTime
-		} as AnimationConfig);
+		} as AnimationUpdateConfig);
 	}
 	stop() {
 		triggerEvent(ZLBFEventsEnum.ANIMATION_STOP);

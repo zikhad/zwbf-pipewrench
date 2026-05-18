@@ -70,3 +70,14 @@ export const createArray = (length: number) => {
 	}
 	return steps;
 };
+
+/**
+ * Trims the module prefix from an item name.
+ * For example, "ZLBF.Condom" becomes "Condom".
+ * @param name The full name with module prefix.
+ * @returns The trimmed item name without the module prefix.
+ */
+export const trimModuleName = (name: string): string => {
+	const parts = name.split(".");
+	return parts[parts.length - 1];
+}

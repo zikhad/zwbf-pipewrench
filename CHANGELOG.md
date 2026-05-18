@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.5.0...v1.5.1) (2026-05-15)
+
+
+### Bug Fixes
+
+* **ui:** removal of assets after artist request ([b6648ec](https://github.com/zikhad/zwbf-pipewrench/commit/b6648ec91e78b8eba4502e436404b6854e8a9b31))
+
+## [1.5.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.4.0...v1.5.0) (2026-05-14)
+
+
+### Features
+
+* **animation:** adding a new fertilization animation ([d428f6e](https://github.com/zikhad/zwbf-pipewrench/commit/d428f6e66cb0ff1c67d59bb1f8931d85157b1d88))
+* **system:** shell script to resize images in bulk ([5237f43](https://github.com/zikhad/zwbf-pipewrench/commit/5237f43af891cf1541e1d294c5899498ce4f5695))
+* **ui:** make ui addImage accept width and height ([c9537a5](https://github.com/zikhad/zwbf-pipewrench/commit/c9537a52c9f1e65876b413aa126405b3a4a6d888))
+* **ui:** revamping womb ui ([6e7082b](https://github.com/zikhad/zwbf-pipewrench/commit/6e7082b33ca5592e1651905f4ef6af6e8fa75a23))
+
 ## [1.4.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.3.1...v1.4.0) (2026-05-14)
 
 
