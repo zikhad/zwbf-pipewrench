@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.6.0...v1.6.1) (2026-05-18)
+
+
+### Bug Fixes
+
+* **animation:** adding params to correct query fertilization animations ([9d082d1](https://github.com/zikhad/zwbf-pipewrench/commit/9d082d15c78d6c7f85a310953b4f3586005469da))
+
 ## [1.6.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.5.1...v1.6.0) (2026-05-18)
 
 
