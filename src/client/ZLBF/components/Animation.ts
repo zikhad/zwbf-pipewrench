@@ -1,4 +1,4 @@
-import { ZombRandBetween } from "@asledgehammer/pipewrench";
+import { ZombRandBetween, getTexture } from "@asledgehammer/pipewrench";
 import * as Events from "@asledgehammer/pipewrench-events";
 import { Womb } from "@client/components/Womb";
 import { createArray, percentageToNumber, repeatArray } from "@client/Utils";
@@ -254,6 +254,24 @@ export class Animation {
             Animation.animation = selectableVariants[variantIndex] ?? selectableVariants[0];
         } else {
             Animation.animation = animation;
+        }
+
+        if (Animation.animation !== undefined) {
+            this.preloadFrames(Animation.animation);
+        }
+    }
+
+    /**
+     * Preloads all frame textures for the given animation to prevent flickering.
+     * Calls pcall(getTexture, path) for each step across all applicable fullness variants.
+     */
+    private preloadFrames({ name, path = "media/ui/animation", steps, fullnessSupport = [] }: AnimationSetting) {
+        const variantsToLoad: (string | null)[] = fullnessSupport.length > 0 ? fullnessSupport : [null];
+        for (const variant of variantsToLoad) {
+            const basePath = [path, name, variant].filter((part) => part !== null).join("/");
+            for (const step of steps) {
+                pcall(getTexture, `${basePath}/${step}.png`);
+            }
         }
     }
 

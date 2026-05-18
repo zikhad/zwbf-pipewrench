@@ -227,6 +227,72 @@ describe("onAnimation", () => {
 
 	// ─── onAnimationStop ───────────────────────────────────────────────────
 
+	describe("preloadFrames", () => {
+		let getTextureMock: jest.Mock;
+
+		beforeEach(() => {
+			getTextureMock = jest.fn();
+			(SpyPipewrench as any).getTexture = getTextureMock;
+		});
+
+		it("should call pcall+getTexture for every step when animation has no fullnessSupport", () => {
+			const womb = makeWomb();
+			const animationInstance = new Animation(womb);
+
+			animationInstance.onAnimationStart(ANIMATIONS.BIRTH);
+
+			// birth variant: steps = createArray(12) → [0..11], no fullnessSupport
+			const BIRTH_ANIMATION = Animation.defaultAnimations[ANIMATIONS.BIRTH][0];
+			expect(getTextureMock).toHaveBeenCalledTimes(BIRTH_ANIMATION.steps.length);
+			for (const step of BIRTH_ANIMATION.steps) {
+				expect(getTextureMock).toHaveBeenCalledWith(`media/ui/animation/birth/${step}.png`);
+			}
+		});
+
+		it("should call pcall+getTexture for every step across all fullness variants", () => {
+			const womb = makeWomb({ amount: 0, capacity: 1 });
+			const animationInstance = new Animation(womb);
+
+			// intercourse: fullnessSupport: ["empty", "full"], steps has 170 entries
+			animationInstance.onAnimationStart(ANIMATIONS.INTERCOURSE);
+
+			const intercourseSteps = Animation.animation!.steps;
+			const expectedCalls = intercourseSteps.length * 2; // empty + full
+			expect(getTextureMock).toHaveBeenCalledTimes(expectedCalls);
+
+			for (const step of intercourseSteps) {
+				expect(getTextureMock).toHaveBeenCalledWith(`media/ui/animation/intercourse/empty/${step}.png`);
+				expect(getTextureMock).toHaveBeenCalledWith(`media/ui/animation/intercourse/full/${step}.png`);
+			}
+		});
+
+		it("should not call getTexture when no animation variant is selected", () => {
+			const womb = makeWomb({ pregnancy: { progress: 0.6 } as PregnancyData }, { hasCondom: true });
+			const animationInstance = new Animation(womb);
+
+			animationInstance.onAnimationStart(ANIMATIONS.INTERCOURSE);
+
+			expect(Animation.animation).toBeUndefined();
+			expect(getTextureMock).not.toHaveBeenCalled();
+		});
+
+		it("should preload frames when a concrete AnimationSetting is passed directly", () => {
+			const womb = makeWomb();
+			const animationInstance = new Animation(womb);
+
+			animationInstance.onAnimationStart({
+				name: "custom",
+				steps: [0, 1, 2],
+				path: "media/custom-path"
+			});
+
+			expect(getTextureMock).toHaveBeenCalledTimes(3);
+			expect(getTextureMock).toHaveBeenCalledWith("media/custom-path/custom/0.png");
+			expect(getTextureMock).toHaveBeenCalledWith("media/custom-path/custom/1.png");
+			expect(getTextureMock).toHaveBeenCalledWith("media/custom-path/custom/2.png");
+		});
+	});
+
 	describe("onAnimationStop", () => {
 		it("should mark animation as inactive", () => {
 			const womb = makeWomb();
