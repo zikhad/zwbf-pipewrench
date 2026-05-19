@@ -22,6 +22,10 @@ Your job is to design and implement robust TypeScript mod code for PipeWrench pr
 - ALWAYS prefer existing types from @asledgehammer/pipewrench before introducing custom definitions.
 - When Build 42 APIs differ from Build 41 definitions, create precise type augmentations instead of using any.
 - Prefer placing Build 42 type augmentations in src/zomboid.d.ts; if this is not suitable, ask the user where to place them.
+- **Lua UI Methods**: When adding new methods to Lua UI classes (e.g., `ZLBFSimpleUI`, `ZLBFTabbedUI`), ALWAYS update the corresponding `.d.ts` type definitions in `src/externals/` to keep TypeScript in sync.
+- **Type Declaration Pattern**: For Lua globals and Lua-generated classes, use `@noResolution` comment in `.d.ts` files and export both interface/type definitions and the factory function (`NewZLBFUI()`, etc.).
+- **Lua Syntax Validation**: Validate Lua logical operations are properly parenthesized (e.g., `(condition and expression()) or default` not `condition and expression() or default`).
+- **Jest Mock Patterns**: Use `jest.mock()` with implementation callbacks to mock Lua globals (`getCore()`, `getTexture()`, `NewZLBFTabbedUI()`, `ZombRandBetween()`). Update mock implementations when adding new Lua methods to UI objects.
 - NEVER make a permanent fix by editing `node_modules`; if a dependency issue is found, use a local wrapper, source change, or explicitly call out a temporary diagnostic patch.
 - Prefer `npm test` for narrow validation and `npm run build` when checking Lua transpilation or packaging behavior.
 - Prefer feature branches (`feat/*`, `fix/*`, `refactor/*`, `docs/*`) instead of committing directly to `main`.
@@ -37,6 +41,22 @@ Your job is to design and implement robust TypeScript mod code for PipeWrench pr
 - Local mods folder: ~/Zomboid/mods
 - Steam Workshop mods folder: ~/Library/Application Support/Steam/steamapps/workshop/content/108600
 
+## Key File Organization
+- **`src/` (TypeScript source)**:
+  - `client/`, `server/`, `shared/` — Implementation folders organized by scope.
+  - `*.spec.ts` — Jest unit tests; run with `npm test`.
+- **`src/externals/` (TypeScript declarations for Lua)**:
+  - `*.d.ts` files that declare Lua globals and UI classes.
+  - **Critical**: These must match the actual Lua API. Update whenever Lua methods or classes change.
+  - Use `/** @noResolution */` comment to prevent TypeScript from resolving against actual Lua files.
+- **`src/media/lua/` (Lua source)**:
+  - Lua implementations of UI components, event handlers, and runtime systems.
+  - Changes here require corresponding `.d.ts` updates to keep TypeScript aware.
+- **`dist/` (Build output)**:
+  - Generated Lua (via TSTL transpilation) and copied media files.
+  - **Never edit directly**; regenerate with `npm run build`.
+  - Installed to `~/Zomboid/mods/` for playtesting.
+
 ## Working Style
 1. Clarify behavior and identify the minimal affected modules.
 2. Inspect existing PipeWrench and project definitions before creating new types.
@@ -45,6 +65,12 @@ Your job is to design and implement robust TypeScript mod code for PipeWrench pr
 5. Implement with composable classes/interfaces and explicit responsibilities.
 6. Add or update Jest tests first or alongside implementation.
 7. Run relevant tests and fix regressions before finishing.
+
+## Common Pitfalls & Lessons Learned
+- **Type Sync Gap**: When adding Lua methods, the TypeScript types (.d.ts) must be updated in parallel. Forgetting this causes "function is nil" runtime errors even if the Lua code is correct.
+- **Runtime Environment Mocking**: Lua globals like `getCore()`, `getTexture()`, and game UI classes are not available in Jest. Mock them in `src/test/mock.ts` and update mocks when the Lua API changes.
+- **Lua Logical Expressions**: Lua requires proper parentheses around logical operations in assignments: use `(a and b()) or c`, not `a and b() or c`. The parser will fail without parentheses.
+- **Test Isolation**: Ensure each test properly sets up or resets mocks for Lua globals. Use `beforeEach` to reset mock implementations to match the current Lua interface.
 
 ## Output Format
 - Brief plan.

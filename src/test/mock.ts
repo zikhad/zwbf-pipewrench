@@ -3,6 +3,14 @@ import { IsoPlayer } from "@asledgehammer/pipewrench";
 import { mock } from "jest-mock-extended";
 
 globalThis.print = jest.fn();
+(globalThis as any).pcall = (fn: (...args: unknown[]) => unknown, ...args: unknown[]) => {
+	try {
+		const result = fn(...args);
+		return [true, result];
+	} catch (e) {
+		return [false, String(e)];
+	}
+};
 
 (globalThis as any).NewZLBFUI = () => ({
 	setWidthPixel: jest.fn(),
