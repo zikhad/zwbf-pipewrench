@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/zikhad/zwbf-pipewrench/compare/v1.6.1...v1.7.0) (2026-05-19)
+
+
+### Features
+
+* **animations:** adding animations preloading ([2a5efd8](https://github.com/zikhad/zwbf-pipewrench/commit/2a5efd8dab0688746d8e54f62c4affef43bc42ed))
+
 ### [1.6.1](https://github.com/zikhad/zwbf-pipewrench/compare/v1.6.0...v1.6.1) (2026-05-18)
 
 
